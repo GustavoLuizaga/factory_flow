@@ -1,3 +1,29 @@
 # Godot 4+ specific ignores
 .godot/
+.import/
+*.import
 /android/
+/export/
+/export_presets.cfg
+
+# Mono-specific ignores (C# projects)
+.mono/
+data_*/
+mono_crash.*.json
+
+# System/Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Build artifacts
+*.apk
+*.zip
+*.pck
+*.exe
+*.x86_64
+*.dmg
