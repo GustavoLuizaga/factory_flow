@@ -1,0 +1,72 @@
+[gd_scene load_steps=5 format=3 uid="uid://cl4ypxvb3bddi"]
+
+[ext_resource type="Script" uid="uid://3pw82fsnpjux" path="res://ui/top_menu/top_menu.gd" id="1_topmenu"]
+[ext_resource type="Script" uid="uid://d2qvy781cecv3" path="res://ui/top_menu/draggable_button.gd" id="2_draggable"]
+[ext_resource type="PackedScene" uid="uid://c4mnvf0p7jtgk" path="res://entities/conveyors/conveyor_belt.tscn" id="3_conveyor"]
+[ext_resource type="PackedScene" uid="uid://bhptg6oky5hma" path="res://entities/machines/fusion_machine.tscn" id="4_machine"]
+
+[node name="TopMenu" type="CanvasLayer"]
+script = ExtResource("1_topmenu")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 70.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="ConveyorUpBtn" type="Button" parent="Panel/HBoxContainer"]
+custom_minimum_size = Vector2(60, 50)
+layout_mode = 2
+text = "↑
+CINTA"
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("3_conveyor")
+entity_name = "Cinta Arriba"
+conveyor_direction = 0
+
+[node name="ConveyorDownBtn" type="Button" parent="Panel/HBoxContainer"]
+custom_minimum_size = Vector2(60, 50)
+layout_mode = 2
+text = "↓
+CINTA"
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("3_conveyor")
+entity_name = "Cinta Abajo"
+conveyor_direction = 1
+
+[node name="ConveyorLeftBtn" type="Button" parent="Panel/HBoxContainer"]
+custom_minimum_size = Vector2(60, 50)
+layout_mode = 2
+text = "←
+CINTA"
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("3_conveyor")
+entity_name = "Cinta Izquierda"
+conveyor_direction = 2
+
+[node name="ConveyorRightBtn" type="Button" parent="Panel/HBoxContainer"]
+custom_minimum_size = Vector2(60, 50)
+layout_mode = 2
+text = "→
+CINTA"
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("3_conveyor")
+entity_name = "Cinta Derecha"
+
+[node name="MachineBtn" type="Button" parent="Panel/HBoxContainer"]
+custom_minimum_size = Vector2(60, 50)
+layout_mode = 2
+text = "⚙
+MÁQUINA"
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("4_machine")
+entity_name = "Máquina de Fusión"
