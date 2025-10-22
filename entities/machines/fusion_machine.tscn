@@ -1,6 +1,7 @@
 [gd_scene load_steps=2 format=3 uid="uid://bhptg6oky5hma"]
 
-[ext_resource type="Script" path="res://entities/machines/fusion_machine.gd" id="1_machine"]
+[ext_resource type="Script" uid="uid://baner5eo8qs6y" path="res://entities/machines/fusion_machine.gd" id="1_machine"]
+
 
 [node name="FusionMachine" type="Node2D"]
 script = ExtResource("1_machine")
