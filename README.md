@@ -1,6 +1,14 @@
 # Factory Flow
 
-Proyecto de gestión de flujo de fábrica desarrollado en Godot Engine.
+Juego móvil 2D de gestión de producción desarrollado en Godot Engine 4.x. Combina materiales usando cintas transportadoras y máquinas de fusión para crear nuevos productos.
+
+## 🎮 Concepto del Juego
+
+Factory Flow es un juego tipo puzzle/automation donde debes:
+1. **Materiales** aparecen automáticamente en la parte superior del tablero
+2. **Arrastra cintas transportadoras** del menú al tablero para guiar los materiales
+3. **Coloca máquinas de fusión** para combinar 2 materiales
+4. **Crea productos nuevos** siguiendo las recetas correctas
 
 ## 📋 Requisitos Previos
 
