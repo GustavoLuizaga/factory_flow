@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://bvabuucwirlvj"]
+
+[node name="goal_row" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="label_name" type="Label" parent="."]
+layout_mode = 2
+text = "Producto"
+
+[node name="label_count" type="Label" parent="."]
+layout_mode = 2
+text = "0/0"
