@@ -24,17 +24,31 @@ func _on_pressed() -> void:
 
 func _process(_delta: float) -> void:
 	if is_dragging and drag_preview:
-		drag_preview.global_position = get_global_mouse_position()
+		# Obtener posición del mouse/touch directamente
+		var mouse_pos = get_viewport().get_mouse_position()
+		
+		# Convertir a posición global del canvas usando la cámara
+		var camera = get_viewport().get_camera_2d()
+		if camera:
+			# Calcular offset desde el centro de la pantalla
+			var viewport_size = get_viewport().get_visible_rect().size
+			var offset = (mouse_pos - viewport_size / 2) / camera.zoom
+			drag_preview.global_position = camera.get_screen_center_position() + offset
+		else:
+			drag_preview.global_position = mouse_pos
 
 
 func _input(event: InputEvent) -> void:
-	if is_dragging:
-		if event is InputEventMouseButton:
-			if not event.pressed:
-				end_drag()
-		elif event is InputEventScreenTouch:
-			if not event.pressed:
-				end_drag()
+	if not is_dragging:
+		return
+	
+	# Detectar fin de arrastre con mouse o touch
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+			end_drag()
+	elif event is InputEventScreenTouch:
+		if not event.pressed:
+			end_drag()
 
 
 ## Inicia el arrastre
@@ -56,7 +70,10 @@ func create_drag_preview() -> void:
 	
 	# Instanciar la entidad como preview
 	drag_preview = entity_scene.instantiate()
-	get_tree().root.add_child(drag_preview)
+	
+	# Agregar al nivel principal, no al CanvasLayer
+	var level = get_tree().root.get_node("Level01")
+	level.add_child(drag_preview)
 	
 	# Configurar dirección si es una cinta
 	if drag_preview is ConveyorBelt:
@@ -66,7 +83,6 @@ func create_drag_preview() -> void:
 	
 	# Hacerlo semi-transparente
 	drag_preview.modulate = Color(1, 1, 1, 0.6)
-	drag_preview.global_position = get_global_mouse_position()
 
 
 ## Termina el arrastre y coloca la entidad si es válido
@@ -82,23 +98,21 @@ func end_drag() -> void:
 	
 	var grid = GameManager.current_grid
 	if not grid:
-		print("No hay grid disponible")
+		print("⚠️ No hay grid disponible")
 		drag_preview.queue_free()
 		drag_preview = null
 		return
 	
-	# Obtener la celda donde se soltó
-	var mouse_pos = get_global_mouse_position()
-	var cell = grid.world_to_grid(mouse_pos)
+	# Usar la posición global del preview para calcular la celda
+	var world_pos = drag_preview.global_position
+	var cell = grid.world_to_grid(world_pos)
 	
-	print("Intentando colocar en celda: ", cell)
+	print("🎯 Soltando en celda: ", cell, " (posición: ", world_pos, ")")
 	
 	# Verificar si se puede colocar
 	if grid.is_valid_cell(cell) and not grid.is_cell_occupied(cell):
-		# Remover el preview del root
+		# Remover del nivel y agregar al grid
 		drag_preview.get_parent().remove_child(drag_preview)
-		
-		# Agregar al grid
 		grid.add_child(drag_preview)
 		
 		# Restaurar opacidad
@@ -106,12 +120,12 @@ func end_drag() -> void:
 		
 		# Colocar en el grid
 		if grid.place_entity(drag_preview, cell):
-			print("¡Entidad colocada exitosamente!")
+			print("✅ Entidad colocada exitosamente en celda ", cell)
 		else:
-			print("Error al colocar entidad")
+			print("❌ Error al colocar entidad")
 			drag_preview.queue_free()
 	else:
-		print("Celda inválida u ocupada")
+		print("❌ Celda inválida u ocupada: ", cell)
 		drag_preview.queue_free()
 	
 	drag_preview = null

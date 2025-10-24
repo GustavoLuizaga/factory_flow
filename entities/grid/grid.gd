@@ -53,11 +53,16 @@ func _draw() -> void:
 
 ## Convierte una posición del mundo a coordenadas de celda
 func world_to_grid(world_pos: Vector2) -> Vector2i:
-	var local_pos = world_pos - global_position
-	return Vector2i(
-		int(local_pos.x / cell_size),
-		int(local_pos.y / cell_size)
+	# Convertir la posición global del mundo a posición local del grid
+	var local_pos = to_local(world_pos)
+	
+	# Calcular la celda
+	var cell = Vector2i(
+		int(floor(local_pos.x / cell_size)),
+		int(floor(local_pos.y / cell_size))
 	)
+	
+	return cell
 
 
 ## Convierte coordenadas de celda a posición del mundo (centro de la celda)
