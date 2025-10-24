@@ -1,17 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://bhptg6oky5hma"]
+[gd_scene load_steps=3 format=3 uid="uid://bhptg6oky5hma"]
 
 [ext_resource type="Script" uid="uid://baner5eo8qs6y" path="res://entities/machines/fusion_machine.gd" id="1_machine"]
+[ext_resource type="Texture2D" path="res://assets/images/fusion_machine_level_one.png" id="2_sprite"]
 
 
 [node name="FusionMachine" type="Node2D"]
 script = ExtResource("1_machine")
 
-[node name="Visual" type="ColorRect" parent="."]
-offset_left = -24.0
-offset_top = -24.0
-offset_right = 24.0
-offset_bottom = 24.0
-color = Color(0.1, 0.2, 0.5, 1)
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_sprite")
+scale = Vector2(0.5, 0.5)
 
 [node name="StatusLabel" type="Label" parent="."]
 offset_left = -24.0
@@ -19,6 +17,8 @@ offset_top = -8.0
 offset_right = 24.0
 offset_bottom = 8.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 12
 text = "0/2"
 horizontal_alignment = 1
@@ -29,11 +29,11 @@ offset_left = -24.0
 offset_top = -24.0
 offset_right = -19.0
 offset_bottom = -19.0
-color = Color(1, 0, 0, 1)
+color = Color(0, 1, 0, 0.5)
 
 [node name="InputBMarker" type="ColorRect" parent="."]
 offset_left = 19.0
 offset_top = -24.0
 offset_right = 24.0
 offset_bottom = -19.0
-color = Color(1, 0, 0, 1)
+color = Color(0, 1, 0, 0.5)

@@ -12,7 +12,7 @@ var is_processing: bool = false
 var process_timer: float = 0.0
 var current_cell: Vector2i = Vector2i.ZERO
 
-@onready var visual: ColorRect = $Visual
+@onready var sprite: Sprite2D = $Sprite
 @onready var status_label: Label = $StatusLabel
 @onready var input_a_marker: ColorRect = $InputAMarker
 @onready var input_b_marker: ColorRect = $InputBMarker
@@ -46,14 +46,13 @@ func on_placed_in_grid(cell: Vector2i) -> void:
 
 ## Actualiza el visual de la máquina
 func update_visual() -> void:
-	if visual:
-		visual.color = Color(0.1, 0.2, 0.5, 1.0)
-	
+	# El sprite ya no necesita cambios de color
+	# Solo actualizamos los marcadores de input
 	if input_a_marker:
-		input_a_marker.color = Color.RED if input_a == null else Color.GREEN
+		input_a_marker.color = Color(1, 0, 0, 0.5) if input_a == null else Color(0, 1, 0, 0.8)
 	
 	if input_b_marker:
-		input_b_marker.color = Color.RED if input_b == null else Color.GREEN
+		input_b_marker.color = Color(1, 0, 0, 0.5) if input_b == null else Color(0, 1, 0, 0.8)
 
 
 ## Actualiza el label de estado

@@ -11,7 +11,16 @@ var current_cell: Vector2i = Vector2i.ZERO
 var is_moving: bool = false
 var target_position: Vector2 = Vector2.ZERO
 
-@onready var visual: ColorRect = $Visual
+# Diccionario de sprites por tipo de material
+var sprite_paths: Dictionary = {
+	"Papel": "res://assets/images/item_paper.png",
+	"Metal": "res://assets/images/item_metal.png",
+	"Plastico": "res://assets/images/item_plastic.png",
+	"Madera": "res://assets/images/item_wood.png",
+	"Vidrio": "res://assets/images/item_glass.png"
+}
+
+@onready var sprite: Sprite2D = $Sprite
 @onready var label: Label = $Label
 
 
@@ -39,8 +48,17 @@ func setup(type: String, cell: Vector2i) -> void:
 
 ## Actualiza el visual según el tipo de material
 func update_visual() -> void:
-	if visual:
-		visual.color = GameManager.get_material_color(item_type)
+	if sprite and sprite_paths.has(item_type):
+		sprite.texture = load(sprite_paths[item_type])
+	elif sprite:
+		# Si no tiene sprite definido, usar color provisional
+		var color_rect = ColorRect.new()
+		color_rect.size = Vector2(30, 30)
+		color_rect.position = Vector2(-15, -15)
+		color_rect.color = GameManager.get_material_color(item_type)
+		add_child(color_rect)
+		sprite.visible = false
+	
 	if label:
 		label.text = item_type.substr(0, 3).to_upper()
 

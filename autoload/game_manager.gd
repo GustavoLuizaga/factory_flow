@@ -99,7 +99,7 @@ func _load_hardcoded_data() -> void:
 	base_materials = ["Papel", "Metal", "Plastico", "Madera", "Vidrio"]
 	recipes = {
 		"Papel+Metal": "Lata con etiqueta",
-		"Metal+Papel": "Lata con etiqueta",
+		"Metal+Papel": "Lata con etiqueta", 
 		"Metal+Plastico": "Cable recubierto",
 		"Plastico+Metal": "Cable recubierto",
 		"Plastico+Madera": "Juguete",
