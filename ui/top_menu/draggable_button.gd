@@ -12,14 +12,36 @@ signal drag_ended()
 
 var is_dragging: bool = false
 var drag_preview: Node2D = null
+var is_touch_inside: bool = false
 
 
 func _ready() -> void:
-	pressed.connect(_on_pressed)
+	# Configurar el botón para que sea touch-friendly
+	action_mode = Button.ACTION_MODE_BUTTON_PRESS  # Activar en press, no en release
+	
+	# Conectar gui_input para capturar eventos táctiles directamente
+	gui_input.connect(_on_gui_input)
+	
+	# Permitir que los eventos pasen a través después de procesarlos
+	mouse_filter = Control.MOUSE_FILTER_STOP
 
 
-func _on_pressed() -> void:
-	start_drag()
+func _on_gui_input(event: InputEvent) -> void:
+	# Detectar cuando se presiona sobre el botón (mouse o touch)
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			print("🖱️ Mouse detectado en botón: ", entity_name)
+			is_touch_inside = true
+			start_drag()
+			accept_event()  # Marcar el evento como manejado
+	elif event is InputEventScreenTouch:
+		if event.pressed:
+			print("👆 Touch detectado en botón: ", entity_name, " - Index: ", event.index)
+			is_touch_inside = true
+			start_drag()
+			accept_event()  # Marcar el evento como manejado
+	else:
+		print("❓ Evento desconocido en botón: ", event.get_class())
 
 
 func _process(_delta: float) -> void:
@@ -38,29 +60,43 @@ func _process(_delta: float) -> void:
 			drag_preview.global_position = mouse_pos
 
 
+# Capturar eventos globales de input para detectar cuando se suelta
 func _input(event: InputEvent) -> void:
 	if not is_dragging:
 		return
 	
-	# Detectar fin de arrastre con mouse o touch
+	# Detectar fin de arrastre con mouse
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+			print("🖱️ Mouse soltado - finalizando drag")
 			end_drag()
+			get_viewport().set_input_as_handled()
+	
+	# Detectar fin de arrastre con touch (CRÍTICO PARA MÓVILES)
 	elif event is InputEventScreenTouch:
 		if not event.pressed:
+			print("👆 Touch soltado - finalizando drag")
 			end_drag()
+			get_viewport().set_input_as_handled()
 
 
 ## Inicia el arrastre
 func start_drag() -> void:
 	if not entity_scene:
-		print("Error: No hay escena asignada a este botón")
+		print("❌ Error: No hay escena asignada a este botón")
+		return
+	
+	if is_dragging:
 		return
 	
 	is_dragging = true
 	create_drag_preview()
 	drag_started.emit(self)
-	print("Drag iniciado: ", entity_name)
+	
+	# Feedback visual: hacer el botón más oscuro mientras se arrastra
+	modulate = Color(0.7, 0.7, 0.7, 1.0)
+	
+	print("🟢 Drag iniciado: ", entity_name)
 
 
 ## Crea un preview visual del objeto siendo arrastrado
@@ -91,7 +127,11 @@ func end_drag() -> void:
 		return
 	
 	is_dragging = false
+	is_touch_inside = false
 	drag_ended.emit()
+	
+	# Restaurar color del botón
+	modulate = Color(1, 1, 1, 1)
 	
 	if not drag_preview:
 		return
