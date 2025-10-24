@@ -22,12 +22,23 @@ func setup_camera() -> void:
 
 ## Coloca los spawners de materiales en el grid
 func setup_material_spawners() -> void:
-	# Crear spawners en la fila superior del grid
-	spawn_material_at(Vector2i(1, 0), "Papel")
-	spawn_material_at(Vector2i(3, 0), "Metal")
-	spawn_material_at(Vector2i(5, 0), "Plastico")
-	spawn_material_at(Vector2i(7, 0), "Madera")
-	spawn_material_at(Vector2i(9, 0), "Vidrio")
+	# Crear spawners en posiciones aleatorias
+	var used_positions: Array[Vector2i] = []
+	var materials = ["Papel", "Metal", "Plastico", "Madera", "Vidrio"]
+	
+	for material in materials:
+		var random_x = randi() % grid.grid_width
+		var random_y = randi() % grid.grid_height
+		var position = Vector2i(random_x, random_y)
+		
+		# Evitar posiciones duplicadas
+		while position in used_positions:
+			random_x = randi() % grid.grid_width
+			random_y = randi() % grid.grid_height
+			position = Vector2i(random_x, random_y)
+		
+		used_positions.append(position)
+		spawn_material_at(position, material)
 	
 	print("Spawners de materiales colocados")
 
