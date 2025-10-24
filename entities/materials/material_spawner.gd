@@ -12,7 +12,16 @@ var current_cell: Vector2i = Vector2i.ZERO
 var spawn_timer: float = 0.0
 var current_item: Item = null
 
-@onready var visual: ColorRect = $Visual
+# Diccionario de sprites por tipo de material
+var sprite_paths: Dictionary = {
+	"Papel": "res://assets/images/spawn_paper.png",
+	"Metal": "res://assets/images/spawn_metal.png",
+	"Plastico": "res://assets/images/spawn_plastic.png",
+	"Madera": "res://assets/images/spawn_wood.png",
+	"Vidrio": "res://assets/images/spawn_glass.png"
+}
+
+@onready var sprite: Sprite2D = $Sprite
 @onready var label: Label = $Label
 
 
@@ -38,8 +47,8 @@ func on_placed_in_grid(cell: Vector2i) -> void:
 
 ## Actualiza el visual según el tipo de material
 func update_visual() -> void:
-	if visual:
-		visual.color = GameManager.get_material_color(material_type)
+	if sprite and sprite_paths.has(material_type):
+		sprite.texture = load(sprite_paths[material_type])
 	
 	if label:
 		label.text = material_type.substr(0, 3).to_upper()
