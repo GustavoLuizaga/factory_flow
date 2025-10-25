@@ -14,14 +14,15 @@ func _ready() -> void:
 	print("=== Level 1 iniciado ===")
 	setup_camera()
 	setup_material_spawners()
-	setup_objective_hub() # <<< NUEVO
+	setup_objective_hub_ui() # <<< NUEVO
 
 
 ## Configura la cámara para móvil
 func setup_camera() -> void:
 	if camera:
-		camera.position = Vector2(571, 324)  # Centro del viewport 1142x648
-		camera.zoom = Vector2(1.0, 1.0)
+		#camera.position = Vector2(571, 324)  # Centro del viewport 1142x648
+		camera.position = Vector2(571, 424)
+		camera.zoom = Vector2(0.8, 0.8)
 
 
 ## Coloca los spawners de materiales en el grid
@@ -48,25 +49,30 @@ func spawn_material_at(cell: Vector2i, material: String) -> void:
 
 
 ## --- NUEVO: crea e inserta la HUD de objetivos ---
-func setup_objective_hub() -> void:
+func setup_objective_hub_ui() -> void:
 	hub_objective = hub_objective_scene.instantiate()
 	add_child(hub_objective)
-	
-	# Posiciona el Hub justo debajo del grid
+
+	# Posición bajo el grid
 	var hub_y = grid.position.y + (grid.grid_height * grid.cell_size) + 16
-	
-	
-	# Calcular el centro horizontal del grid
 	var grid_width_px = grid.grid_width * grid.cell_size
-	var hub_width_px = hub_objective.get_rect().size.x if hub_objective.has_method("get_rect") else 200
-	var hub_x = grid.position.x + (grid_width_px / 2) - (hub_width_px / 2)
-
-
+	var hub_w = hub_objective.get_size().x
+	var hub_x = grid.position.x + (grid_width_px - hub_w) * 0.5
 	hub_objective.position = Vector2(hub_x, hub_y)
-	# Añade objetivos genéricos
-	hub_objective.add_objective("10 materiales")
-	hub_objective.add_objective("una fábrica")
-	hub_objective.add_objective("Genera energía")
-	hub_objective.add_objective("producción")
+	
+	# --- limpia antes de añadir nuevos ---
+	hub_objective.populate_slots()
+	hub_objective.objectives.clear() # vacía la lista
+
+	# Cargar iconos y crear objetivos
+	var tex_mat := load("res://ui/img/botella.png")        # reemplaza rutas
+	var tex_factory := load("res://ui/img/factory.png")
+	var tex_power := load("res://ui/img/lata.png")
+	var tex_prod := load("res://ui/img/caja.png")
+
+	hub_objective.add_objective_with_icon("Recolecta materiales", 10, tex_mat, 0)
+	hub_objective.add_objective_with_icon("Construye una fábrica", 1, tex_factory, 0)
+	hub_objective.add_objective_with_icon("Genera energía", 5, tex_power, 0)
+	hub_objective.add_objective_with_icon("Produce ítems", 20, tex_prod, 0)
 
 	print("Hub de objetivos inicializado")
