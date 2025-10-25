@@ -72,6 +72,11 @@ func update_status() -> void:
 
 ## Acepta un item en uno de los slots de entrada
 func accept_item(item: Item) -> bool:
+	# Solo aceptar materiales base, no productos
+	if not GameManager.is_base_material(item.item_type):
+		print("⚠️ Máquina rechaza producto: ", item.item_type, " (solo acepta materiales base)")
+		return false
+	
 	# Intentar colocar en input_a primero
 	if input_a == null:
 		input_a = item
@@ -160,8 +165,11 @@ func produce_output(product_type: String) -> void:
 		if next_entity and next_entity.has_method("accept_item"):
 			var item_scene = preload("res://entities/items/item.tscn")
 			var new_item = item_scene.instantiate()
-			new_item.setup(product_type, output_cell)
 			grid.add_child(new_item)
+			new_item.setup(product_type, output_cell)
+			
+			# Posicionar en la máquina antes de enviarlo
+			new_item.global_position = global_position
 			
 			if next_entity.accept_item(new_item):
 				print("Producto '", product_type, "' enviado a celda: ", output_cell)
@@ -169,14 +177,21 @@ func produce_output(product_type: String) -> void:
 			else:
 				new_item.queue_free()  # La entidad está ocupada, probar siguiente dirección
 		
-		# Caso 2: La celda está vacía, dejar el item ahí flotando
-		elif next_entity == null:
+		# Caso 2: La celda está vacía y no ocupada
+		elif next_entity == null and not grid.is_cell_occupied(output_cell):
 			var item_scene = preload("res://entities/items/item.tscn")
 			var new_item = item_scene.instantiate()
-			new_item.setup(product_type, output_cell)
 			grid.add_child(new_item)
-			new_item.global_position = grid.grid_to_world(output_cell)
-			print("Producto '", product_type, "' depositado en celda vacía: ", output_cell)
+			new_item.setup(product_type, output_cell)
+			
+			# Posicionar correctamente: como es hijo del grid, usar posición local
+			var local_pos = Vector2(
+				output_cell.x * grid.cell_size + grid.cell_size / 2,
+				output_cell.y * grid.cell_size + grid.cell_size / 2
+			)
+			new_item.position = local_pos
+			
+			print("Producto '", product_type, "' depositado en celda vacía: ", output_cell, " pos: ", local_pos)
 			return  # Éxito, salir
 	
 	# Si llegamos aquí, todas las celdas adyacentes están bloqueadas
