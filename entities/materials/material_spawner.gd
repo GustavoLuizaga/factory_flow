@@ -12,7 +12,16 @@ var current_cell: Vector2i = Vector2i.ZERO
 var spawn_timer: float = 0.0
 var current_item: Item = null
 
-@onready var visual: ColorRect = $Visual
+# Diccionario de sprites por tipo de material
+var sprite_paths: Dictionary = {
+	"Papel": "res://assets/images/spawn_paper.png",
+	"Metal": "res://assets/images/spawn_metal.png",
+	"Plastico": "res://assets/images/spawn_plastic.png",
+	"Madera": "res://assets/images/spawn_wood.png",
+	"Vidrio": "res://assets/images/spawn_glass.png"
+}
+
+@onready var sprite: Sprite2D = $Sprite
 @onready var label: Label = $Label
 
 
@@ -38,8 +47,8 @@ func on_placed_in_grid(cell: Vector2i) -> void:
 
 ## Actualiza el visual según el tipo de material
 func update_visual() -> void:
-	if visual:
-		visual.color = GameManager.get_material_color(material_type)
+	if sprite and sprite_paths.has(material_type):
+		sprite.texture = load(sprite_paths[material_type])
 	
 	if label:
 		label.text = material_type.substr(0, 3).to_upper()
@@ -55,30 +64,37 @@ func attempt_spawn() -> void:
 	if not grid:
 		return
 	
-	# Intentar spawnear en la celda de abajo
-	var output_cell = grid.get_adjacent_cell(current_cell, Vector2.DOWN)
+	# Intentar en todas las direcciones: abajo, derecha, izquierda, arriba
+	var directions = [Vector2.DOWN, Vector2.RIGHT, Vector2.LEFT, Vector2.UP]
+	var spawned_count = 0
 	
-	if not grid.is_valid_cell(output_cell):
-		print("Spawner: celda de salida inválida")
-		return
-	
-	var next_entity = grid.get_entity_at(output_cell)
-	
-	if next_entity and next_entity.has_method("accept_item"):
-		# Crear el item
-		var item_scene = preload("res://entities/items/item.tscn")
-		var new_item = item_scene.instantiate()
-		new_item.setup(material_type, current_cell)
-		grid.add_child(new_item)
+	for direction in directions:
+		var output_cell = grid.get_adjacent_cell(current_cell, direction)
 		
-		# Posicionar en el spawner inicialmente
-		new_item.global_position = global_position
+		if not grid.is_valid_cell(output_cell):
+			continue
 		
-		# Intentar pasarlo a la cinta/entidad de abajo
-		if next_entity.accept_item(new_item):
-			print("Spawner generó: ", material_type)
-		else:
-			# Si no puede aceptarlo, destruirlo
-			new_item.queue_free()
-	else:
-		print("Spawner: no hay receptor válido en la salida")
+		var next_entity = grid.get_entity_at(output_cell)
+		
+		if next_entity and next_entity.has_method("accept_item"):
+			# Crear un item para esta dirección
+			var item_scene = preload("res://entities/items/item.tscn")
+			var new_item = item_scene.instantiate()
+			new_item.setup(material_type, current_cell)
+			grid.add_child(new_item)
+			
+			# Posicionar en el spawner inicialmente
+			new_item.global_position = global_position
+			
+			# Intentar pasarlo a la cinta/entidad
+			if next_entity.accept_item(new_item):
+				spawned_count += 1
+				print("Spawner generó: ", material_type, " hacia ", direction)
+			else:
+				# Si no puede aceptarlo, destruirlo
+				new_item.queue_free()
+	
+	# Si no logró spawner en ninguna dirección
+	if spawned_count == 0:
+		#print("Spawner: no hay receptor válido en ninguna dirección")
+		pass

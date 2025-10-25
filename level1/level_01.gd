@@ -10,8 +10,11 @@ extends Node2D
 var hub_objective_scene: PackedScene = preload("res://ui/hub_objetive.tscn")
 var hub_objective: Node2D
 
+@export_enum("fixed","random") var spawners_mode := "fixed"  # elige sin tocar código ajeno
+
 func _ready() -> void:
 	print("=== Level 1 iniciado ===")
+	randomize()
 	setup_camera()
 	setup_material_spawners()
 	setup_objective_hub_ui() # <<< NUEVO
@@ -24,17 +27,39 @@ func setup_camera() -> void:
 		camera.position = Vector2(571, 424)
 		camera.zoom = Vector2(0.8, 0.8)
 
-
 ## Coloca los spawners de materiales en el grid
 func setup_material_spawners() -> void:
-	# Crear spawners en la fila superior del grid
+	if spawners_mode == "fixed":
+		_setup_spawners_fixed()
+	else:
+		_setup_spawners_random()
+	print("Spawners de materiales colocados")
+	
+# Tu versión: fila superior
+func _setup_spawners_fixed() -> void:
 	spawn_material_at(Vector2i(1, 0), "Papel")
 	spawn_material_at(Vector2i(3, 0), "Metal")
 	spawn_material_at(Vector2i(5, 0), "Plástico")
 	spawn_material_at(Vector2i(7, 0), "Madera")
 	spawn_material_at(Vector2i(9, 0), "Vidrio")
-	
-	print("Spawners de materiales colocados")
+
+# Versión de tu compañero: aleatoria
+func _setup_spawners_random() -> void:
+	var used_positions: Array[Vector2i] = []
+	var materials = ["Papel", "Metal", "Plastico", "Madera", "Vidrio"]
+
+	for material in materials:
+		var random_x = randi() % grid.grid_width
+		var random_y = randi() % grid.grid_height
+		var position = Vector2i(random_x, random_y)
+
+		while position in used_positions:
+			random_x = randi() % grid.grid_width
+			random_y = randi() % grid.grid_height
+			position = Vector2i(random_x, random_y)
+
+		used_positions.append(position)
+		spawn_material_at(position, material)
 
 
 ## Crea y coloca un spawner de material en una celda específica
