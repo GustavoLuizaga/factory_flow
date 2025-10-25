@@ -56,15 +56,15 @@ func load_data_from_database() -> void:
 	
 	print("✅ Base de datos abierta:", DB_PATH)
 	
-	# Cargar elementos
-	db.query("SELECT nombre FROM elementos")
+	# Cargar solo los elementos base (id <= 5: Papel, Metal, Plastico, Madera, Vidrio)
+	db.query("SELECT nombre FROM elementos WHERE id_elemento <= 5")
 	var elementos = db.query_result
 	
 	if elementos and len(elementos) > 0:
 		base_materials.clear()
 		for row in elementos:
 			base_materials.append(row["nombre"])
-		print("📦 Cargados", len(base_materials), "elementos:", base_materials)
+		print("📦 Cargados", len(base_materials), "materiales base:", base_materials)
 	
 	# Cargar combinaciones
 	db.query("""
@@ -119,6 +119,11 @@ func check_recipe(material_a: String, material_b: String) -> String:
 		return recipes[key2]
 	else:
 		return ""
+
+
+## Verifica si un item es un material base (no un producto)
+func is_base_material(item_type: String) -> bool:
+	return item_type in base_materials
 
 
 ## Obtiene el color de un material o producto
