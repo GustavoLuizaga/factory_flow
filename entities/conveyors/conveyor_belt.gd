@@ -13,14 +13,22 @@ var current_item: Item = null
 var current_cell: Vector2i = Vector2i.ZERO
 var direction_vector: Vector2 = Vector2.RIGHT
 var transfer_timer: float = 0.0
+var conveyor_textures = {
+	Direction.UP: preload("res://assets/images/conveyor_belt_up.png"),
+	Direction.DOWN: preload("res://assets/images/conveyor_belt_down.png"),
+	Direction.LEFT: preload("res://assets/images/conveyor_belt_left.png"),
+	Direction.RIGHT: preload("res://assets/images/conveyor_belt_right.png")
+}
 
 @onready var visual: ColorRect = $Visual
 @onready var arrow: Label = $Arrow
+@onready var sprite: Sprite2D = $Sprite
 
 
 func _ready() -> void:
 	update_direction()
 	update_visual()
+	adjust_sprite_size()
 
 
 func _process(delta: float) -> void:
@@ -52,19 +60,17 @@ func update_direction() -> void:
 
 ## Actualiza el visual según la dirección
 func update_visual() -> void:
+	# Actualizar el sprite con la textura correspondiente
+	if sprite:
+		sprite.texture = conveyor_textures[direction]
+		adjust_sprite_size()
+	
+	# Ya no necesitamos el visual y la flecha, pero los mantenemos por compatibilidad
 	if visual:
-		visual.color = Color(0.2, 0.6, 0.2, 1.0)
+		visual.visible = false
 	
 	if arrow:
-		match direction:
-			Direction.UP:
-				arrow.text = "↑"
-			Direction.DOWN:
-				arrow.text = "↓"
-			Direction.LEFT:
-				arrow.text = "←"
-			Direction.RIGHT:
-				arrow.text = "→"
+		arrow.visible = false
 
 
 ## Obtiene el nombre de la dirección
@@ -130,3 +136,17 @@ func transfer_item_to_next() -> void:
 ## Puede recibir items de spawners o cintas anteriores
 func can_receive_item() -> bool:
 	return current_item == null
+
+
+## Ajusta el tamaño del sprite para que encaje en una celda del grid
+func adjust_sprite_size() -> void:
+	if sprite and sprite.texture:
+		# Obtenemos el tamaño deseado (64x64 que es el tamaño de la celda del grid)
+		var target_size = Vector2(64, 64)
+		
+		# Calculamos la escala necesaria
+		var scale_x = target_size.x / sprite.texture.get_width()
+		var scale_y = target_size.y / sprite.texture.get_height()
+		
+		# Aplicamos la escala al sprite
+		sprite.scale = Vector2(scale_x, scale_y)
