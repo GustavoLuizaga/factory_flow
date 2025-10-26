@@ -12,10 +12,24 @@ class_name HubObjective
 @onready var background: ColorRect = $Background
 @onready var container: GridContainer = $Container
 
+static func _norm(s: String) -> String:
+	return s.to_lower().replacen("á","a").replacen("é","e").replacen("í","i").replacen("ó","o").replacen("ú","u")
+
+const ICON_PLACEHOLDER: Texture2D = null # crea uno si no existe
+
+const ICONS := {
+	"lata con etiqueta": preload("res://ui/img/lata.png"),
+	"botella con etiqueta": preload("res://ui/img/botella.png"),
+	"libro": preload("res://ui/img/libro.png"),
+	"caja de carton prensado": preload("res://ui/img/caja.png"),
+	"botella con tapa metalica": preload("res://ui/img/factory.png"),
+}
+
+
 # Objetivos visibles
 # [{ "title": String, "target": int, "current": int, "icon": Texture2D, "slot": Control }]
 var objectives: Array[Dictionary] = []
-
+var by_id: Dictionary = {}  # id:String -> Dictionary del objetivo
 
 func _ready() -> void:
 	setup_background()
@@ -23,9 +37,7 @@ func _ready() -> void:
 	populate_slots()
 
 
-# -------------------------
 # Fondo del HUB
-# -------------------------
 func setup_background() -> void:
 	background.color = Color(0.1, 0.1, 0.15, 0.9)
 	background.size = Vector2(
@@ -34,11 +46,9 @@ func setup_background() -> void:
 	)
 
 
-# -------------------------
 # Contenedor cuadriculado
-# -------------------------
 func setup_container() -> void:
-	container.columns = num_slots
+	container.columns = max(1, num_slots)
 	container.position = Vector2(spacing, spacing)
 	container.custom_minimum_size = Vector2(num_slots * slot_size, slot_size)
 	container.add_theme_constant_override("hseparation", spacing)
@@ -46,12 +56,14 @@ func setup_container() -> void:
 	container.clip_contents = true   # recorta desbordes
 
 
-# -------------------------
 # Placeholders vacíos
-# -------------------------
 func populate_slots() -> void:
+	# Borra todos los hijos del contenedor
 	for c in container.get_children():
 		c.queue_free()
+	
+	# No generes placeholders aquí.
+	# Solo se crean al agregar objetivos reales.
 		
 func _debug_dump():
 	print("children:", container.get_child_count())
@@ -60,9 +72,7 @@ func _debug_dump():
 		print(i, " filled=", s.get_meta("filled", false))
 
 
-# -------------------------------------------------------------------
 # Crea un slot: icono + (opcional) título + insignia "current/target"
-# -------------------------------------------------------------------
 func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Control:
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(slot_size, slot_size)
@@ -88,7 +98,7 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	panel.add_child(v)
 
 	var tr := TextureRect.new()
-	tr.texture = icon
+	tr.texture = icon if icon != null else ICON_PLACEHOLDER
 	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	tr.expand_mode = TextureRect.EXPAND_FIT_WIDTH
 	tr.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_FILL
@@ -161,9 +171,7 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	return panel
 
 
-# -------------------------------------------------------------------
 # Añadir objetivo con icono y meta
-# -------------------------------------------------------------------
 func add_objective_with_icon(title: String, target: int, icon_tex: Texture2D, current: int = 0) -> void:
 	var obj := {
 		"title": title,
@@ -210,10 +218,50 @@ func add_objective_with_icon(title: String, target: int, icon_tex: Texture2D, cu
 
 	objectives.append(obj)
 
+func refresh_from(obj_dict: Dictionary) -> void:
+	print("[HUB] objetivos recibidos:", obj_dict.size())
+	# limpiar UI y estado
+	for c in container.get_children():
+		c.queue_free()
+	objectives.clear()
+	by_id.clear()
 
-# -------------------------------------------------------------------
+	# crear todos los slots en una sola fila
+	for id in obj_dict.keys():
+		var o: Dictionary = obj_dict[id]
+		var title := String(o.title)
+		var target := int(o.target)
+		var current := int(o.current)
+
+		var key := _norm(title)
+		var tex: Texture2D = ICONS.get(key, ICON_PLACEHOLDER)
+
+		var slot := _make_slot(tex, title, current, target)
+		slot.set_meta("filled", true)
+		container.add_child(slot)
+
+		var rec := {
+			"id": String(id),
+			"title": title,
+			"target": target,
+			"current": current,
+			"icon": tex,
+			"slot": slot
+		}
+		objectives.append(rec)
+		by_id[String(id)] = rec
+
+	# ajustar columnas y tamaños para una sola fila
+	var n := objectives.size()
+	container.columns = max(1, n)
+
+	var content_w: float = float(n * slot_size + max(0, n - 1) * spacing)
+	container.custom_minimum_size = Vector2(content_w, slot_size)
+
+	background.size = Vector2(content_w + 2 * spacing, slot_size + 2 * spacing)
+
+
 # Actualizar progreso por índice
-# -------------------------------------------------------------------
 func set_progress(index: int, current: int) -> void:
 	if index < 0 or index >= objectives.size():
 		return
@@ -229,9 +277,7 @@ func add_progress(index: int, delta: int = 1) -> void:
 	_update_slot(o)
 
 
-# -------------------------
 # Refresco visual del slot
-# -------------------------
 func _update_slot(o: Dictionary) -> void:
 	if o.slot == null:
 		return
@@ -270,15 +316,37 @@ func _update_slot(o: Dictionary) -> void:
 	badge_panel.add_theme_stylebox_override("panel", badge_sb)
 
 
-# -------------------------
 # Tamaño útil para posicionar el HUB desde fuera
-# -------------------------
 func get_size() -> Vector2:
 	return background.size
 
-
-# -------------------------
 # Wrapper opcional sin icono
-# -------------------------
 func add_objective(texto: String, target: int = 1, current: int = 0) -> void:
 	add_objective_with_icon(texto, target, null, current)
+
+func _id_to_index(id: String) -> int:
+	# Ordenamiento simple: por consistencia usa el orden de carga
+	# Aquí mapeas manual si quieres:
+	return 0  # si necesitas, reimplementa con un diccionario
+
+func on_objective_progress(id: String, current: int, target: int) -> void:
+	print("Hub on_progress id=", id, " typeof=", typeof(id))
+	if not by_id.has(id):
+		return
+	var o: Dictionary = by_id[id]
+	o.current = clamp(current, 0, o.target)
+	_update_slot(o)
+	by_id[id] = o
+
+
+
+func on_objective_complete(id: String) -> void:
+	if by_id.has(id):
+		var o: Dictionary = by_id[id]
+		o.current = o.target
+		_update_slot(o)
+		by_id[id] = o
+
+
+func on_all_complete() -> void:
+	background.color = Color(0.1, 0.25, 0.12, 0.95)

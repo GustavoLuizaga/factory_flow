@@ -7,7 +7,7 @@ extends Node2D
 @onready var camera: Camera2D = $Camera2D
 
 
-var hub_objective_scene: PackedScene = preload("res://ui/hub_objetive.tscn")
+var hub_objective_scene: PackedScene = preload("res://ui//barra_objetivos/hub_objetive.tscn")
 var hub_objective: Node2D
 
 @export_enum("fixed","random") var spawners_mode := "fixed"  # elige sin tocar código ajeno
@@ -17,6 +17,7 @@ func _ready() -> void:
 	randomize()
 	setup_camera()
 	setup_material_spawners()
+	ObjectiveManager.reset_for_level(1)  # <<< NUEVO: limpia y carga objetivos desde BD
 	setup_objective_hub_ui() # <<< NUEVO
 
 
@@ -86,18 +87,33 @@ func setup_objective_hub_ui() -> void:
 	hub_objective.position = Vector2(hub_x, hub_y)
 	
 	# --- limpia antes de añadir nuevos ---
-	hub_objective.populate_slots()
+	#hub_objective.populate_slots()
 	hub_objective.objectives.clear() # vacía la lista
+	
+	# --- NUEVO: poblar objetivos desde la base de datos a través del autoload ---
+	for obj in ObjectiveManager.get_all_for_ui():
+		hub_objective.add_objective_with_icon(
+			obj.title,
+			obj.target,
+			obj.icon_tex,
+			obj.current
+		)
+		
+	# ⬇️ Ajuste dinámico del HUD según la cantidad real
+	hub_objective.num_slots = ObjectiveManager.objectives.size()
+	hub_objective.setup_background()
+	hub_objective.setup_container()
+		
+		# --- Conexión de señales ---
+	if not ObjectiveManager.objective_updated.is_connected(hub_objective.on_objective_progress):
+		ObjectiveManager.objective_updated.connect(hub_objective.on_objective_progress)
 
-	# Cargar iconos y crear objetivos
-	var tex_mat := load("res://ui/img/botella.png")        # reemplaza rutas
-	var tex_factory := load("res://ui/img/factory.png")
-	var tex_power := load("res://ui/img/lata.png")
-	var tex_prod := load("res://ui/img/caja.png")
+	if not ObjectiveManager.objective_completed.is_connected(hub_objective.on_objective_complete):
+		ObjectiveManager.objective_completed.connect(hub_objective.on_objective_complete)
 
-	hub_objective.add_objective_with_icon("Recolecta materiales", 10, tex_mat, 0)
-	hub_objective.add_objective_with_icon("Construye una fábrica", 1, tex_factory, 0)
-	hub_objective.add_objective_with_icon("Genera energía", 5, tex_power, 0)
-	hub_objective.add_objective_with_icon("Produce ítems", 20, tex_prod, 0)
+	if not ObjectiveManager.all_objectives_completed.is_connected(hub_objective.on_all_complete):
+		ObjectiveManager.all_objectives_completed.connect(hub_objective.on_all_complete)
 
-	print("Hub de objetivos inicializado")
+	hub_objective.refresh_from(ObjectiveManager.objectives)
+
+	print("Hub de objetivos inicializado desde base de datos")

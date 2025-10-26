@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+ObjectiveManager="*res://autoload/objective_manager.gd"
 GameManager="*res://autoload/game_manager.gd"
 
 [display]
@@ -25,6 +26,10 @@ window/size/viewport_width=1142
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=6
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot-sqlite/plugin.cfg")
 
 [input_devices]
 
