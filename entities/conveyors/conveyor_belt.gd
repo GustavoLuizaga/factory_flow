@@ -20,7 +20,6 @@ var conveyor_textures = {
 	Direction.RIGHT: preload("res://assets/images/conveyor_belt_right.png")
 }
 
-@onready var visual: ColorRect = $Visual
 @onready var arrow: Label = $Arrow
 @onready var sprite: Sprite2D = $Sprite
 
@@ -65,10 +64,7 @@ func update_visual() -> void:
 		sprite.texture = conveyor_textures[direction]
 		adjust_sprite_size()
 	
-	# Ya no necesitamos el visual y la flecha, pero los mantenemos por compatibilidad
-	if visual:
-		visual.visible = false
-	
+	# Ocultar la flecha, ahora usamos sprites
 	if arrow:
 		arrow.visible = false
 
