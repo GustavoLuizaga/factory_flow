@@ -139,13 +139,13 @@ func complete_fusion() -> void:
 	# Crear item de salida
 	produce_output(result)
 	
-	#NUEVO  fusion_machine.gd dentro de complete_fusion(), justo después de produce_output(result)
+	#NUEVO actualizar objetivos y métricas
 	ObjectiveManager.inc_by_element_name(result, 1)
 
 	
-	# -NUEVO-- PROGRESO OBJETIVOS (por nombre, evita choque de IDs duplicados) ---
+	# -NUEVO-- PROGRESO OBJETIVOS (por nombre, evita choque de IDs duplicados)
 	print("[OBJ] result=", result)
-	ObjectiveManager.inc_by_element_name(result, 1)
+	#ObjectiveManager.inc_by_element_name(result, 1)
 
 	# Registrar fusión
 	GameManager.register_fusion()

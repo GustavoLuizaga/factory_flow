@@ -2,28 +2,28 @@
 extends Node2D
 class_name HubObjective
 
-# --- Parámetros del HUB ---
+#Parámetros del HUB
 @export var num_slots: int = 4          # cantidad de cuadros visibles
 @export var slot_size: int = 64         # lado de cada cuadro
 @export var spacing: int = 8            # espacio entre cuadros y bordes
 @export var show_titles: bool = false   # mostrar u ocultar texto bajo el icono
 
-# --- Referencias de la escena (mantén tu jerarquía actual) ---
+#Referencias de la escena (mantén tu jerarquía actual)
 @onready var background: ColorRect = $Background
 @onready var container: GridContainer = $Container
 
-static func _norm(s: String) -> String:
-	return s.to_lower().replacen("á","a").replacen("é","e").replacen("í","i").replacen("ó","o").replacen("ú","u")
+#static func _norm(s: String) -> String:
+#	return s.to_lower().replacen("á","a").replacen("é","e").replacen("í","i").replacen("ó","o").replacen("ú","u")
 
 const ICON_PLACEHOLDER: Texture2D = null # crea uno si no existe
 
-const ICONS := {
-	"lata con etiqueta": preload("res://ui/img/lata.png"),
-	"botella con etiqueta": preload("res://ui/img/botella.png"),
-	"libro": preload("res://ui/img/libro.png"),
-	"caja de carton prensado": preload("res://ui/img/caja.png"),
-	"botella con tapa metalica": preload("res://ui/img/factory.png"),
-}
+#const ICONS := {
+#	"lata con etiqueta": preload("res://ui/img/lata.png"),
+#	"botella con etiqueta": preload("res://ui/img/botella.png"),
+#	"libro": preload("res://ui/img/libro.png"),
+##	"caja de carton prensado": preload("res://ui/img/caja.png"),
+#	"botella con tapa metalica": preload("res://ui/img/factory.png"),
+#}
 
 
 # Objetivos visibles
@@ -55,16 +55,14 @@ func setup_container() -> void:
 	container.add_theme_constant_override("vseparation", spacing)
 	container.clip_contents = true   # recorta desbordes
 
-
-# Placeholders vacíos
+#dejar el contenedor vacío antes de crear los slots reales
 func populate_slots() -> void:
 	# Borra todos los hijos del contenedor
 	for c in container.get_children():
 		c.queue_free()
-	
-	# No generes placeholders aquí.
-	# Solo se crean al agregar objetivos reales.
+	# Los plceholders solo se crean al agregar objetivos reales.
 		
+#inspección rápida del estado del contenedor
 func _debug_dump():
 	print("children:", container.get_child_count())
 	for i in range(container.get_child_count()):
@@ -77,7 +75,7 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(slot_size, slot_size)
 
-	var sb := StyleBoxFlat.new()
+	var sb := StyleBoxFlat.new() #define color de fondo, bordes y radios
 	sb.bg_color = Color(0.25, 0.25, 0.3, 1)
 	sb.border_width_left = 1
 	sb.border_width_top = 1
@@ -88,7 +86,7 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	sb.corner_radius_top_right = 8
 	sb.corner_radius_bottom_right = 8
 	sb.corner_radius_bottom_left = 8
-	panel.add_theme_stylebox_override("panel", sb)
+	panel.add_theme_stylebox_override("panel", sb) #aplica el estilo al panel
 
 	# Layout vertical: icono arriba, texto abajo
 	var v := VBoxContainer.new()
@@ -97,6 +95,7 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	v.add_theme_constant_override("separation", 4)
 	panel.add_child(v)
 
+	#icono
 	var tr := TextureRect.new()
 	tr.texture = icon if icon != null else ICON_PLACEHOLDER
 	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -104,7 +103,8 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	tr.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_FILL
 	tr.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	v.add_child(tr)
-
+	
+	#titulo
 	var lbl := Label.new()
 	lbl.text = title
 	lbl.visible = show_titles
@@ -120,6 +120,7 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	overlay.anchor_bottom = 1
 	panel.add_child(overlay)
 
+	#barra superior dentro del overlay
 	var topbar := HBoxContainer.new()
 	topbar.anchor_right = 1
 	topbar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -145,6 +146,7 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	badge_panel.add_theme_stylebox_override("panel", badge_sb)
 	topbar.add_child(badge_panel)
 
+	#Márgenes internos de la insignia
 	var badge_margin := MarginContainer.new()
 	badge_margin.add_theme_constant_override("margin_left", 6)
 	badge_margin.add_theme_constant_override("margin_right", 6)
@@ -152,6 +154,7 @@ func _make_slot(icon: Texture2D, title: String, current: int, target: int) -> Co
 	badge_margin.add_theme_constant_override("margin_bottom", 2)
 	badge_panel.add_child(badge_margin)
 
+	#Texto de la insignia
 	var badge_label := Label.new()
 	if target > 0:
 		badge_label.text = str(current) + "/" + str(target)
@@ -188,6 +191,7 @@ func add_objective_with_icon(title: String, target: int, icon_tex: Texture2D, cu
 			var new_slot := _make_slot(icon_tex, title, obj.current, target)
 			new_slot.set_meta("filled", true)
 
+			#Reemplaza al placeholder
 			container.remove_child(s)
 			s.queue_free()
 			container.add_child(new_slot)
@@ -218,6 +222,7 @@ func add_objective_with_icon(title: String, target: int, icon_tex: Texture2D, cu
 
 	objectives.append(obj)
 
+#Reconstruye toda la HUD acorde al estado actual
 func refresh_from(obj_dict: Dictionary) -> void:
 	print("[HUB] objetivos recibidos:", obj_dict.size())
 	# limpiar UI y estado
@@ -232,9 +237,15 @@ func refresh_from(obj_dict: Dictionary) -> void:
 		var title := String(o.title)
 		var target := int(o.target)
 		var current := int(o.current)
+		var element_id := int(o.element_id)        # <- clave: viene del ObjectiveManager
 
-		var key := _norm(title)
-		var tex: Texture2D = ICONS.get(key, ICON_PLACEHOLDER)
+		# pedir icono al manager por ID
+		var tex: Texture2D = ObjectiveManager._icon_for(element_id)
+		if tex == null:
+			tex = ICON_PLACEHOLDER
+			
+		#var key := _norm(title)
+		#var tex: Texture2D = ICONS.get(key, ICON_PLACEHOLDER)
 
 		var slot := _make_slot(tex, title, current, target)
 		slot.set_meta("filled", true)
@@ -277,7 +288,7 @@ func add_progress(index: int, delta: int = 1) -> void:
 	_update_slot(o)
 
 
-# Refresco visual del slot
+#Actualiza la vista de un objetivo ya creado
 func _update_slot(o: Dictionary) -> void:
 	if o.slot == null:
 		return
