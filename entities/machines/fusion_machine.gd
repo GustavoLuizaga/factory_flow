@@ -12,6 +12,9 @@ var is_processing: bool = false
 var process_timer: float = 0.0
 var current_cell: Vector2i = Vector2i.ZERO
 
+# Productos ya generados en esta máquina específica
+var completed_products: Array[String] = []
+
 @onready var sprite: Sprite2D = $Sprite
 @onready var status_label: Label = $StatusLabel
 @onready var input_a_marker: ColorRect = $InputAMarker
@@ -104,6 +107,17 @@ func try_fuse() -> void:
 	
 	var result = GameManager.check_recipe(input_a.item_type, input_b.item_type)
 	
+	# Verificar si este producto ya fue creado en ESTA máquina
+	if result != "" and result in completed_products:
+		print("⚠️ Esta máquina ya produjo: ", result, " - Rechazando combinación")
+		# Destruir items porque ya se produjo este producto aquí
+		input_a.destroy()
+		input_b.destroy()
+		input_a = null
+		input_b = null
+		update_status()
+		return
+	
 	if result != "":
 		print("¡Receta válida! ", input_a.item_type, " + ", input_b.item_type, " = ", result)
 		is_processing = true
@@ -129,6 +143,11 @@ func complete_fusion() -> void:
 		return
 	
 	print("¡Fusión completada! Producto: ", result)
+	
+	# Marcar este producto como completado en ESTA máquina
+	if result not in completed_products:
+		completed_products.append(result)
+		print("✅ Máquina en ", current_cell, " completó: ", result)
 	
 	# Destruir inputs
 	input_a.destroy()
@@ -157,31 +176,16 @@ func produce_output(product_type: String) -> void:
 		var output_cell = grid.get_adjacent_cell(current_cell, direction)
 		
 		if not grid.is_valid_cell(output_cell):
-			continue  # Probar siguiente dirección
+			continue  # Celda fuera del grid, probar siguiente dirección
+		
+		# Verificar si la celda está ocupada (por entidades o items)
+		if grid.is_cell_occupied(output_cell):
+			continue  # Celda ocupada, probar siguiente dirección
 		
 		var next_entity = grid.get_entity_at(output_cell)
 		
-		# Caso 1: Hay una entidad que puede recibir items (cinta transportadora)
-		if next_entity and next_entity.has_method("accept_item"):
-			var item_scene = preload("res://entities/items/item.tscn")
-			var new_item = item_scene.instantiate()
-			new_item.setup(product_type, output_cell)
-			grid.add_child(new_item)
-			
-			# Posicionar en la máquina antes de enviarlo
-			new_item.position = Vector2(
-				current_cell.x * grid.cell_size + grid.cell_size / 2,
-				current_cell.y * grid.cell_size + grid.cell_size / 2
-			)
-			
-			if next_entity.accept_item(new_item):
-				print("Producto '", product_type, "' enviado a celda: ", output_cell)
-				return  # Éxito, salir
-			else:
-				new_item.queue_free()  # La entidad está ocupada, probar siguiente dirección
-		
-		# Caso 2: La celda está vacía y no ocupada
-		elif next_entity == null and not grid.is_cell_occupied(output_cell):
+		# Solo colocar si la celda está completamente vacía (sin entidades)
+		if next_entity == null:
 			var item_scene = preload("res://entities/items/item.tscn")
 			var new_item = item_scene.instantiate()
 			grid.add_child(new_item)
@@ -194,8 +198,8 @@ func produce_output(product_type: String) -> void:
 			)
 			new_item.position = local_pos
 			
-			print("Producto '", product_type, "' depositado en celda vacía: ", output_cell, " pos: ", local_pos)
+			print("✅ Producto '", product_type, "' depositado en celda vacía: ", output_cell)
 			return  # Éxito, salir
 	
 	# Si llegamos aquí, todas las celdas adyacentes están bloqueadas
-	print("⚠️ Máquina bloqueada: no hay espacio para el output")
+	print("❌ MÁQUINA BLOQUEADA: No hay espacio libre adyacente para generar el producto '", product_type, "'")
