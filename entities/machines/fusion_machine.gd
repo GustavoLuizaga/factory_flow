@@ -165,11 +165,14 @@ func produce_output(product_type: String) -> void:
 		if next_entity and next_entity.has_method("accept_item"):
 			var item_scene = preload("res://entities/items/item.tscn")
 			var new_item = item_scene.instantiate()
-			grid.add_child(new_item)
 			new_item.setup(product_type, output_cell)
+			grid.add_child(new_item)
 			
 			# Posicionar en la máquina antes de enviarlo
-			new_item.global_position = global_position
+			new_item.position = Vector2(
+				current_cell.x * grid.cell_size + grid.cell_size / 2,
+				current_cell.y * grid.cell_size + grid.cell_size / 2
+			)
 			
 			if next_entity.accept_item(new_item):
 				print("Producto '", product_type, "' enviado a celda: ", output_cell)
