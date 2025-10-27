@@ -31,6 +31,9 @@ var current_grid: Node = null
 var items_produced: int = 0
 var successful_fusions: int = 0
 
+# Array para registrar todas las fusiones completadas (para verificar objetivos)
+var completed_fusions: Array[String] = []
+
 var db = null
 
 
@@ -144,7 +147,30 @@ func register_fusion() -> void:
 	print("Fusiones exitosas: ", successful_fusions)
 
 
+## Registra una fusión completada en el array de objetivos
+func register_completed_fusion(product: String) -> void:
+	completed_fusions.append(product)
+	print("🎯 Fusión registrada: ", product)
+	print("📊 Fusiones completadas hasta ahora: ", completed_fusions)
+	print("   Total de productos creados: ", completed_fusions.size())
+
+
+## Muestra el contenido completo del array de fusiones
+func show_completed_fusions() -> void:
+	print("\n=== ARRAY DE FUSIONES COMPLETADAS ===")
+	print("Total de fusiones: ", completed_fusions.size())
+	if completed_fusions.is_empty():
+		print("   (vacío)")
+	else:
+		for i in range(completed_fusions.size()):
+			print("   [", i, "] ", completed_fusions[i])
+	print("=====================================\n")
+
+
 ## Reinicia las estadísticas del nivel
 func reset_stats() -> void:
 	items_produced = 0
 	successful_fusions = 0
+	completed_fusions.clear()
+	print("📊 Estadísticas reiniciadas")
+	print("   Array de fusiones limpiado")

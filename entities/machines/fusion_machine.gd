@@ -149,6 +149,9 @@ func complete_fusion() -> void:
 		completed_products.append(result)
 		print("✅ Máquina en ", current_cell, " completó: ", result)
 	
+	# Registrar la fusión en el GameManager para objetivos
+	GameManager.register_completed_fusion(result)
+	
 	# Destruir inputs
 	input_a.destroy()
 	input_b.destroy()
