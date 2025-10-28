@@ -6,18 +6,22 @@ extends Node2D
 @onready var top_menu: CanvasLayer = $TopMenu
 @onready var camera: Camera2D = $Camera2D
 
+var hub_objective_scene: PackedScene = preload("res://ui//barra_objetivos/hub_objetive.tscn")
+var hub_objective: Node2D
 
 func _ready() -> void:
 	print("=== Level 1 iniciado ===")
 	setup_camera()
 	setup_material_spawners()
+	ObjectiveManager.reset_for_level(1)  # <<< NUEVO: limpia y carga objetivos desde BD
+	setup_objective_hub_ui() # <<< NUEVO
 
 
 ## Configura la cámara para móvil
 func setup_camera() -> void:
 	if camera:
-		camera.position = Vector2(571, 324)  # Centro del viewport 1142x648
-		camera.zoom = Vector2(1.0, 1.0)
+		camera.position = Vector2(571, 384)  # Centro del viewport 1142x648
+		camera.zoom = Vector2(1, 0.9)
 
 
 ## Coloca los spawners de materiales en el grid
@@ -52,3 +56,48 @@ func spawn_material_at(cell: Vector2i, material: String) -> void:
 	
 	grid.add_child(spawner)
 	grid.place_entity(spawner, cell)
+
+
+## --- NUEVO: crea e inserta la HUD de objetivos ---
+func setup_objective_hub_ui() -> void:
+	hub_objective = hub_objective_scene.instantiate()
+	add_child(hub_objective)
+
+	# Posición bajo el grid
+	var hub_y = grid.position.y + (grid.grid_height * grid.cell_size) + 16
+	var grid_width_px = grid.grid_width * grid.cell_size
+	var hub_w = hub_objective.get_size().x
+	var hub_x = grid.position.x + (grid_width_px - hub_w) * 0.5
+	hub_objective.position = Vector2(hub_x, hub_y)
+	
+	# --- limpia antes de añadir nuevos ---
+	#hub_objective.populate_slots()
+	hub_objective.objectives.clear() # vacía la lista
+	
+	# --- NUEVO: poblar objetivos desde la base de datos a través del autoload ---
+	for obj in ObjectiveManager.get_all_for_ui():
+		hub_objective.add_objective_with_icon(
+			obj.title,
+			obj.target,
+			obj.icon_tex,
+			obj.current
+		)
+		
+	# ⬇️ Ajuste dinámico del HUD según la cantidad real
+	hub_objective.num_slots = ObjectiveManager.objectives.size()
+	hub_objective.setup_background()
+	hub_objective.setup_container()
+		
+		# --- Conexión de señales ---
+	if not ObjectiveManager.objective_updated.is_connected(hub_objective.on_objective_progress):
+		ObjectiveManager.objective_updated.connect(hub_objective.on_objective_progress)
+
+	if not ObjectiveManager.objective_completed.is_connected(hub_objective.on_objective_complete):
+		ObjectiveManager.objective_completed.connect(hub_objective.on_objective_complete)
+
+	if not ObjectiveManager.all_objectives_completed.is_connected(hub_objective.on_all_complete):
+		ObjectiveManager.all_objectives_completed.connect(hub_objective.on_all_complete)
+
+	hub_objective.refresh_from(ObjectiveManager.objectives)
+
+	print("Hub de objetivos inicializado desde base de datos")
