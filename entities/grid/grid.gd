@@ -11,7 +11,7 @@ class_name Grid
 var occupied_cells: Dictionary = {}  # Vector2i -> Entity
 var entities: Array = []
 
-@onready var background: ColorRect = $Background
+@onready var background: TextureRect = $Background
 
 
 func _ready() -> void:
@@ -23,8 +23,17 @@ func _ready() -> void:
 ## Configura el fondo del grid
 func setup_background() -> void:
 	if background:
-		background.size = Vector2(grid_width * cell_size, grid_height * cell_size)
-		background.color = Color(0.2, 0.2, 0.25, 1.0)
+		var horizontal_margin := 50  # Mantener el margen horizontal
+		var top_margin := 40  # Margen superior
+		var bottom_margin := 15  # Margen inferior reducido
+		var vertical_offset := 16  # Desplazamiento hacia abajo
+		
+		background.position = Vector2(-horizontal_margin, -top_margin + vertical_offset)
+		background.size = Vector2(
+			grid_width * cell_size + horizontal_margin * 2,
+			grid_height * cell_size + top_margin + bottom_margin
+		)
+		background.custom_minimum_size = background.size
 
 
 ## Dibuja las líneas del grid para visualización
