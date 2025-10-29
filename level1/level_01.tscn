@@ -14,6 +14,6 @@ position = Vector2(571, 324)
 position = Vector2(51, 110)
 cell_size = 50
 grid_width = 20
-grid_height = 10
+grid_height = 9
 
 [node name="TopMenu" parent="." instance=ExtResource("3_topmenu")]
