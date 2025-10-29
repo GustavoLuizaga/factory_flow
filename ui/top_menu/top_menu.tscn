@@ -1,9 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://cl4ypxvb3bddi"]
+[gd_scene load_steps=10 format=3 uid="uid://cl4ypxvb3bddi"]
 
 [ext_resource type="Script" uid="uid://3pw82fsnpjux" path="res://ui/top_menu/top_menu.gd" id="1_topmenu"]
 [ext_resource type="Script" uid="uid://d2qvy781cecv3" path="res://ui/top_menu/draggable_button.gd" id="2_draggable"]
 [ext_resource type="PackedScene" uid="uid://c4mnvf0p7jtgk" path="res://entities/conveyors/conveyor_belt.tscn" id="3_conveyor"]
 [ext_resource type="PackedScene" uid="uid://bhptg6oky5hma" path="res://entities/machines/fusion_machine.tscn" id="4_machine"]
+[ext_resource type="Texture2D" path="res://assets/images/conveyor_belt_up.png" id="5_conv_up"]
+[ext_resource type="Texture2D" path="res://assets/images/conveyor_belt_down.png" id="6_conv_down"]
+[ext_resource type="Texture2D" path="res://assets/images/conveyor_belt_left.png" id="7_conv_left"]
+[ext_resource type="Texture2D" path="res://assets/images/conveyor_belt_right.png" id="8_conv_right"]
+[ext_resource type="Texture2D" path="res://assets/images/fusion_machine_level_one.png" id="9_machine"]
 
 [node name="TopMenu" type="CanvasLayer"]
 script = ExtResource("1_topmenu")
@@ -11,7 +16,8 @@ script = ExtResource("1_topmenu")
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 70.0
+offset_top = 10.0
+offset_bottom = 80.0
 grow_horizontal = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
@@ -21,52 +27,83 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 10
 alignment = 1
 
-[node name="ConveyorUpBtn" type="Button" parent="Panel/HBoxContainer"]
-custom_minimum_size = Vector2(60, 50)
+[node name="ConveyorUpContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
-text = "↑
-CINTA"
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ConveyorUpBtn" type="TextureButton" parent="Panel/HBoxContainer/ConveyorUpContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("5_conv_up")
+ignore_texture_size = true
+stretch_mode = 5
 script = ExtResource("2_draggable")
 entity_scene = ExtResource("3_conveyor")
 entity_name = "Cinta Arriba"
 conveyor_direction = 0
 
-[node name="ConveyorDownBtn" type="Button" parent="Panel/HBoxContainer"]
-custom_minimum_size = Vector2(60, 50)
+[node name="ConveyorDownContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
-text = "↓
-CINTA"
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ConveyorDownBtn" type="TextureButton" parent="Panel/HBoxContainer/ConveyorDownContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("6_conv_down")
+ignore_texture_size = true
+stretch_mode = 5
 script = ExtResource("2_draggable")
 entity_scene = ExtResource("3_conveyor")
 entity_name = "Cinta Abajo"
 conveyor_direction = 1
 
-[node name="ConveyorLeftBtn" type="Button" parent="Panel/HBoxContainer"]
-custom_minimum_size = Vector2(60, 50)
+[node name="ConveyorLeftContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
-text = "←
-CINTA"
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ConveyorLeftBtn" type="TextureButton" parent="Panel/HBoxContainer/ConveyorLeftContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("7_conv_left")
+ignore_texture_size = true
+stretch_mode = 5
 script = ExtResource("2_draggable")
 entity_scene = ExtResource("3_conveyor")
 entity_name = "Cinta Izquierda"
 conveyor_direction = 2
 
-[node name="ConveyorRightBtn" type="Button" parent="Panel/HBoxContainer"]
-custom_minimum_size = Vector2(60, 50)
+[node name="ConveyorRightContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
-text = "→
-CINTA"
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ConveyorRightBtn" type="TextureButton" parent="Panel/HBoxContainer/ConveyorRightContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("8_conv_right")
+ignore_texture_size = true
+stretch_mode = 5
 script = ExtResource("2_draggable")
 entity_scene = ExtResource("3_conveyor")
 entity_name = "Cinta Derecha"
 
-[node name="MachineBtn" type="Button" parent="Panel/HBoxContainer"]
-custom_minimum_size = Vector2(60, 50)
+[node name="MachineContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
-text = "⚙
-MÁQUINA"
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="MachineBtn" type="TextureButton" parent="Panel/HBoxContainer/MachineContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("9_machine")
+ignore_texture_size = true
+stretch_mode = 5
 script = ExtResource("2_draggable")
 entity_scene = ExtResource("4_machine")
 entity_name = "Máquina de Fusión"

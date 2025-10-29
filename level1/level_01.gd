@@ -12,6 +12,7 @@ var hub_objective: Node2D
 func _ready() -> void:
 	print("=== Level 1 iniciado ===")
 	setup_camera()
+	center_grid()  # <<< NUEVO: Centrar el grid
 	setup_material_spawners()
 	ObjectiveManager.reset_for_level(1)  # <<< NUEVO: limpia y carga objetivos desde BD
 	setup_objective_hub_ui() # <<< NUEVO
@@ -22,6 +23,35 @@ func setup_camera() -> void:
 	if camera:
 		camera.position = Vector2(571, 384)  # Centro del viewport 1142x648
 		camera.zoom = Vector2(1, 0.9)
+
+
+## Centra el grid en la pantalla
+func center_grid() -> void:
+	if grid:
+		# Obtener tamaño del viewport
+		var viewport_size = get_viewport_rect().size
+		
+		# Calcular el tamaño total del grid en píxeles
+		var grid_width_px = grid.grid_width * grid.cell_size
+		var grid_height_px = grid.grid_height * grid.cell_size
+		
+		# Calcular posición central considerando el menú superior (80px = 70px altura + 10px margen)
+		var top_menu_height = 80
+		var available_height = viewport_size.y - top_menu_height
+		
+		# Centrar horizontalmente y verticalmente (considerando el menú superior)
+		var center_x = (viewport_size.x - grid_width_px) / 2.0
+		var center_y = top_menu_height + (available_height - grid_height_px) / 2.0
+		
+		grid.position = Vector2(center_x, center_y)
+		
+		# Actualizar posición de la cámara al centro del grid
+		if camera:
+			var grid_center_x = center_x + (grid_width_px / 2.0)
+			var grid_center_y = center_y + (grid_height_px / 2.0)
+			camera.position = Vector2(grid_center_x, grid_center_y)
+		
+		print("Grid y cámara centrados. Grid en: ", grid.position, " Cámara en: ", camera.position)
 
 
 ## Coloca los spawners de materiales en el grid
@@ -63,7 +93,7 @@ func setup_objective_hub_ui() -> void:
 	hub_objective = hub_objective_scene.instantiate()
 	add_child(hub_objective)
 
-	# Posición bajo el grid
+	# Posición centrada bajo el grid
 	var hub_y = grid.position.y + (grid.grid_height * grid.cell_size) + 16
 	var grid_width_px = grid.grid_width * grid.cell_size
 	var hub_w = hub_objective.get_size().x
@@ -100,4 +130,4 @@ func setup_objective_hub_ui() -> void:
 
 	hub_objective.refresh_from(ObjectiveManager.objectives)
 
-	print("Hub de objetivos inicializado desde base de datos")
+	print("Hub de objetivos centrado bajo el grid")

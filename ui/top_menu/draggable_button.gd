@@ -1,7 +1,7 @@
-extends Button
+extends TextureButton
 class_name DraggableButton
 
-## Botón que se puede arrastrar para colocar entidades en el grid
+## Botón con imagen que se puede arrastrar para colocar entidades en el grid
 
 signal drag_started(button: DraggableButton)
 signal drag_ended()
@@ -17,7 +17,7 @@ var is_touch_inside: bool = false
 
 func _ready() -> void:
 	# Configurar el botón para que sea touch-friendly
-	action_mode = Button.ACTION_MODE_BUTTON_PRESS  # Activar en press, no en release
+	action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS  # Activar en press, no en release
 	
 	# Conectar gui_input para capturar eventos táctiles directamente
 	gui_input.connect(_on_gui_input)
