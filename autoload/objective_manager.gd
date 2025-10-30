@@ -133,15 +133,25 @@ func _icon_for(element_id: int) -> Texture2D:
 	var name: String = String(elem_id_to_name.get(element_id, ""))
 	match name:
 		"Lata con etiqueta":
-			return load("res://ui/img/lata.png") as Texture2D
+			return load("res://assets/images/Lata_con_etiqueta.png") as Texture2D
 		"Botella con etiqueta":
-			return load("res://ui/img/botella.png") as Texture2D
+			return load("res://assets/images/Botella_con_etiqueta.png") as Texture2D
 		"Libro":
-			return load("res://ui/img/factory.png") as Texture2D
+			return load("res://assets/images/Libro.png") as Texture2D
 		"Caja de cartón prensado":
-			return load("res://ui/img/caja.png") as Texture2D
+			return load("res://assets/images/Caja_de_cartón_prensado.png") as Texture2D
 		"Botella con tapa metálica":
-			return load("res://ui/img/botella.png") as Texture2D
+			return load("res://assets/images/Botella_con_tapa_metálica.png") as Texture2D
+		"Botella con tapa plástica":
+			return load("res://assets/images/Botella_con_tapa_plástica.png") as Texture2D
+		"Cable recubierto":
+			return load("res://assets/images/Cable_recubierto.png") as Texture2D
+		"Herramienta con mango de madera":
+			return load("res://assets/images/Herramienta_con_mango_de_madera.png") as Texture2D
+		"Juguete":
+			return load("res://assets/images/Juguete.png") as Texture2D
+		"Ventana con marco de madera":
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
 		_:
 			return null
 

@@ -11,13 +11,25 @@ var current_cell: Vector2i = Vector2i.ZERO
 var is_moving: bool = false
 var target_position: Vector2 = Vector2.ZERO
 
-# Diccionario de sprites por tipo de material
+# Diccionario de sprites por tipo de material y producto
 var sprite_paths: Dictionary = {
+	# Materiales base
 	"Papel": "res://assets/images/item_paper.png",
 	"Metal": "res://assets/images/item_metal.png",
 	"Plastico": "res://assets/images/item_plastic.png",
 	"Madera": "res://assets/images/item_wood.png",
-	"Vidrio": "res://assets/images/item_glass.png"
+	"Vidrio": "res://assets/images/item_glass.png",
+	# Productos fusionados
+	"Lata con etiqueta": "res://assets/images/Lata_con_etiqueta.png",
+	"Botella con etiqueta": "res://assets/images/Botella_con_etiqueta.png",
+	"Libro": "res://assets/images/Libro.png",
+	"Caja de cartón prensado": "res://assets/images/Caja_de_cartón_prensado.png",
+	"Botella con tapa metálica": "res://assets/images/Botella_con_tapa_metálica.png",
+	"Botella con tapa plástica": "res://assets/images/Botella_con_tapa_plástica.png",
+	"Cable recubierto": "res://assets/images/Cable_recubierto.png",
+	"Herramienta con mango de madera": "res://assets/images/Herramienta_con_mango_de_madera.png",
+	"Juguete": "res://assets/images/Juguete.png",
+	"Ventana con marco de madera": "res://assets/images/Ventana_con_marco_de_madera.png"
 }
 
 @onready var sprite: Sprite2D = $Sprite
@@ -49,18 +61,36 @@ func setup(type: String, cell: Vector2i) -> void:
 ## Actualiza el visual según el tipo de material
 func update_visual() -> void:
 	if sprite and sprite_paths.has(item_type):
-		sprite.texture = load(sprite_paths[item_type])
+		# Cargar la textura
+		var texture = load(sprite_paths[item_type]) as Texture2D
+		sprite.texture = texture
+		
+		# Auto-ajustar el tamaño a 50px (tamaño de celda)
+		if texture:
+			var texture_size = texture.get_size()
+			var target_size = 50.0  # Tamaño de la celda
+			
+			# Calcular la escala necesaria para ajustar al tamaño de celda
+			# Usar el lado más grande para calcular la escala
+			var max_dimension = max(texture_size.x, texture_size.y)
+			var scale_factor = target_size / max_dimension
+			
+			sprite.scale = Vector2(scale_factor, scale_factor)
+		else:
+			sprite.scale = Vector2(1, 1)  # Escala por defecto si no hay textura
 	elif sprite:
 		# Si no tiene sprite definido, usar color provisional
+		sprite.texture = null
 		var color_rect = ColorRect.new()
-		color_rect.size = Vector2(30, 30)
-		color_rect.position = Vector2(-15, -15)
+		color_rect.size = Vector2(40, 40)
+		color_rect.position = Vector2(-20, -20)
 		color_rect.color = GameManager.get_material_color(item_type)
 		add_child(color_rect)
 		sprite.visible = false
 	
 	if label:
 		label.text = item_type.substr(0, 3).to_upper()
+		label.visible = false  # Ocultar etiqueta si hay sprite
 
 
 ## Mueve el item a una nueva posición
