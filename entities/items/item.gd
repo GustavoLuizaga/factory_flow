@@ -19,13 +19,13 @@ var sprite_paths: Dictionary = {
 	"Plastico": "res://assets/images/item_plastic.png",
 	"Madera": "res://assets/images/item_wood.png",
 	"Vidrio": "res://assets/images/item_glass.png",
-	# Productos fusionados
+	# Productos fusionados (sin acentos para compatibilidad móvil)
 	"Lata con etiqueta": "res://assets/images/Lata_con_etiqueta.png",
 	"Botella con etiqueta": "res://assets/images/Botella_con_etiqueta.png",
 	"Libro": "res://assets/images/Libro.png",
-	"Caja de cartón prensado": "res://assets/images/Caja_de_cartón_prensado.png",
-	"Botella con tapa metálica": "res://assets/images/Botella_con_tapa_metálica.png",
-	"Botella con tapa plástica": "res://assets/images/Botella_con_tapa_plástica.png",
+	"Caja de carton prensado": "res://assets/images/Caja_de_carton_prensado.png",
+	"Botella con tapa metalica": "res://assets/images/Botella_con_tapa_metalica.png",
+	"Botella con tapa plastica": "res://assets/images/Botella_con_tapa_plastica.png",
 	"Cable recubierto": "res://assets/images/Cable_recubierto.png",
 	"Herramienta con mango de madera": "res://assets/images/Herramienta_con_mango_de_madera.png",
 	"Juguete": "res://assets/images/Juguete.png",

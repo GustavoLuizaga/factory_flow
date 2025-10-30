@@ -138,12 +138,12 @@ func _icon_for(element_id: int) -> Texture2D:
 			return load("res://assets/images/Botella_con_etiqueta.png") as Texture2D
 		"Libro":
 			return load("res://assets/images/Libro.png") as Texture2D
-		"Caja de cartón prensado":
-			return load("res://assets/images/Caja_de_cartón_prensado.png") as Texture2D
-		"Botella con tapa metálica":
-			return load("res://assets/images/Botella_con_tapa_metálica.png") as Texture2D
-		"Botella con tapa plástica":
-			return load("res://assets/images/Botella_con_tapa_plástica.png") as Texture2D
+		"Caja de carton prensado":
+			return load("res://assets/images/Caja_de_carton_prensado.png") as Texture2D
+		"Botella con tapa metalica":
+			return load("res://assets/images/Botella_con_tapa_metalica.png") as Texture2D
+		"Botella con tapa plastica":
+			return load("res://assets/images/Botella_con_tapa_plastica.png") as Texture2D
 		"Cable recubierto":
 			return load("res://assets/images/Cable_recubierto.png") as Texture2D
 		"Herramienta con mango de madera":
