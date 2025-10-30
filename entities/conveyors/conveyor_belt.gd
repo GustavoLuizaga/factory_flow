@@ -106,27 +106,34 @@ func transfer_item_to_next() -> void:
 	
 	var next_cell = grid.get_adjacent_cell(current_cell, direction_vector)
 	
-	# Verificar si la celda existe y está disponible
+	# Verificar si la celda existe
 	if not grid.is_valid_cell(next_cell):
-		print("Siguiente celda fuera de límites")
+		print("⚠️ Siguiente celda fuera de límites - destruyendo item")
+		current_item.destroy()
+		current_item = null
 		return
 	
 	var next_entity = grid.get_entity_at(next_cell)
 	
-	if next_entity == null:
-		# No hay nada, el item se pierde (o podríamos dejarlo aquí)
-		print("No hay receptor en la siguiente celda")
-		return
-	
-	# Intentar pasar el item a la siguiente entidad
-	if next_entity.has_method("accept_item"):
-		if next_entity.accept_item(current_item):
-			current_item = null
-			transfer_timer = 0.0
+	# Si hay una entidad, intentar pasarle el item
+	if next_entity != null:
+		# Intentar pasar el item a la siguiente entidad
+		if next_entity.has_method("accept_item"):
+			if next_entity.accept_item(current_item):
+				current_item = null
+				transfer_timer = 0.0
+				print("✅ Item transferido a la siguiente entidad")
+			else:
+				print("⏸️ La siguiente entidad no puede aceptar el item (ocupada) - esperando...")
 		else:
-			print("La siguiente entidad no puede aceptar el item (ocupada)")
+			print("❌ La siguiente entidad no puede recibir items - destruyendo")
+			current_item.destroy()
+			current_item = null
 	else:
-		print("La siguiente entidad no puede recibir items")
+		# No hay entidad en la siguiente celda - el item cae/desaparece
+		print("💨 No hay receptor en celda ", next_cell, " - item destruido")
+		current_item.destroy()
+		current_item = null
 
 
 ## Puede recibir items de spawners o cintas anteriores
