@@ -131,29 +131,33 @@ func get_all_for_ui() -> Array[Dictionary]:
 #Traducción del elemento id a un icono (Texture2D)
 func _icon_for(element_id: int) -> Texture2D:
 	var name: String = String(elem_id_to_name.get(element_id, ""))
-	match name:
-		"Lata con etiqueta":
-			return load("res://assets/images/Lata_con_etiqueta.png") as Texture2D
-		"Botella con etiqueta":
-			return load("res://assets/images/Botella_con_etiqueta.png") as Texture2D
-		"Libro":
-			return load("res://assets/images/Libro.png") as Texture2D
-		"Caja de carton prensado":
-			return load("res://assets/images/Caja_de_carton_prensado.png") as Texture2D
-		"Botella con tapa metalica":
-			return load("res://assets/images/Botella_con_tapa_metalica.png") as Texture2D
-		"Botella con tapa plastica":
-			return load("res://assets/images/Botella_con_tapa_plastica.png") as Texture2D
-		"Cable recubierto":
-			return load("res://assets/images/Cable_recubierto.png") as Texture2D
-		"Herramienta con mango de madera":
-			return load("res://assets/images/Herramienta_con_mango_de_madera.png") as Texture2D
-		"Juguete":
-			return load("res://assets/images/Juguete.png") as Texture2D
-		"Ventana con marco de madera":
-			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
-		_:
-			return null
+	# Normalizar el nombre quitando acentos para match
+	var normalized_name = _norm(name)
+	
+	# Buscar por nombre normalizado (sin acentos)
+	if normalized_name == _norm("Lata con etiqueta"):
+		return load("res://assets/images/Lata_con_etiqueta.png") as Texture2D
+	elif normalized_name == _norm("Botella con etiqueta"):
+		return load("res://assets/images/Botella_con_etiqueta.png") as Texture2D
+	elif normalized_name == _norm("Libro"):
+		return load("res://assets/images/Libro.png") as Texture2D
+	elif normalized_name == _norm("Caja de cartón prensado"):
+		return load("res://assets/images/Caja_de_carton_prensado.png") as Texture2D
+	elif normalized_name == _norm("Botella con tapa metálica"):
+		return load("res://assets/images/Botella_con_tapa_metalica.png") as Texture2D
+	elif normalized_name == _norm("Botella con tapa plástica"):
+		return load("res://assets/images/Botella_con_tapa_plastica.png") as Texture2D
+	elif normalized_name == _norm("Cable recubierto"):
+		return load("res://assets/images/Cable_recubierto.png") as Texture2D
+	elif normalized_name == _norm("Herramienta con mango de madera"):
+		return load("res://assets/images/Herramienta_con_mango_de_madera.png") as Texture2D
+	elif normalized_name == _norm("Juguete"):
+		return load("res://assets/images/Juguete.png") as Texture2D
+	elif normalized_name == _norm("Ventana con marco de madera"):
+		return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+	else:
+		print("⚠️ No se encontró imagen para: '", name, "' (normalizado: '", normalized_name, "')")
+		return null
 
 
 #      PROGRESO / ESTADO
