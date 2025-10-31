@@ -1,0 +1,38 @@
+{
+	"elementos": [
+		{ "id": 1, "nombre": "Papel", "es_base": true },
+		{ "id": 2, "nombre": "Metal", "es_base": true },
+		{ "id": 3, "nombre": "Plastico", "es_base": true },
+		{ "id": 4, "nombre": "Madera", "es_base": true },
+		{ "id": 5, "nombre": "Vidrio", "es_base": true },
+		{ "id": 6, "nombre": "Lata con etiqueta", "es_base": false },
+		{ "id": 7, "nombre": "Botella con etiqueta", "es_base": false },
+		{ "id": 8, "nombre": "Libro", "es_base": false },
+		{ "id": 9, "nombre": "Caja de carton prensado", "es_base": false },
+		{ "id": 10, "nombre": "Botella con tapa metalica", "es_base": false },
+		{ "id": 11, "nombre": "Cable recubierto", "es_base": false },
+		{ "id": 12, "nombre": "Herramienta con mango de madera", "es_base": false },
+		{ "id": 13, "nombre": "Botella con tapa plastica", "es_base": false },
+		{ "id": 14, "nombre": "Juguete", "es_base": false },
+		{ "id": 15, "nombre": "Ventana con marco de madera", "es_base": false }
+	],
+	"combinaciones": [
+		{ "elemento1": 1, "elemento2": 2, "resultado": 6 },
+		{ "elemento1": 1, "elemento2": 5, "resultado": 7 },
+		{ "elemento1": 1, "elemento2": 3, "resultado": 8 },
+		{ "elemento1": 1, "elemento2": 4, "resultado": 9 },
+		{ "elemento1": 2, "elemento2": 5, "resultado": 10 },
+		{ "elemento1": 2, "elemento2": 3, "resultado": 11 },
+		{ "elemento1": 2, "elemento2": 4, "resultado": 12 },
+		{ "elemento1": 3, "elemento2": 5, "resultado": 13 },
+		{ "elemento1": 3, "elemento2": 4, "resultado": 14 },
+		{ "elemento1": 4, "elemento2": 5, "resultado": 15 }
+	],
+	"niveles": [
+		{
+			"numero": 1,
+			"nombre": "Nivel 1 - Introducción",
+			"objetivos": [6, 7, 8, 9, 10]
+		}
+	]
+}

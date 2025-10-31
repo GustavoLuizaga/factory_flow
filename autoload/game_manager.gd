@@ -39,76 +39,96 @@ var db = null
 
 func _ready() -> void:
 	print("GameManager inicializado")
-	load_data_from_database()
+	print("🖥️ OS:", OS.get_name())
+	# Usar JSON en lugar de SQLite - funciona en todos los sistemas
+	_load_from_json()
 
 
-## Carga elementos y combinaciones desde SQLite
-func load_data_from_database() -> void:
-	if not ClassDB.class_exists("SQLite"):
-		push_error("❌ SQLite no disponible, usando datos hardcodeados")
+## Carga elementos y combinaciones desde JSON
+func _load_from_json() -> void:
+	var json_path = "res://database/game_data.json"
+	
+	if not FileAccess.file_exists(json_path):
+		print("❌ JSON no encontrado, usando datos hardcodeados")
 		_load_hardcoded_data()
 		return
 	
-	db = SQLite.new()
-	db.path = DB_PATH
-	
-	if not db.open_db():
-		push_error("❌ No se pudo abrir la base de datos, usando datos hardcodeados")
+	var file = FileAccess.open(json_path, FileAccess.READ)
+	if not file:
+		print("❌ Error al abrir JSON, usando datos hardcodeados")
 		_load_hardcoded_data()
 		return
 	
-	print("✅ Base de datos abierta:", DB_PATH)
+	var json_text = file.get_as_text()
+	file.close()
 	
-	# Cargar solo los elementos base (id <= 5: Papel, Metal, Plastico, Madera, Vidrio)
-	db.query("SELECT nombre FROM elementos WHERE id_elemento <= 5")
-	var elementos = db.query_result
+	var json = JSON.new()
+	var error = json.parse(json_text)
 	
-	if elementos and len(elementos) > 0:
-		base_materials.clear()
-		for row in elementos:
-			base_materials.append(row["nombre"])
-		print("📦 Cargados", len(base_materials), "materiales base:", base_materials)
-	else:
-		push_error("❌ No se pudieron cargar elementos, usando hardcoded")
+	if error != OK:
+		print("❌ Error al parsear JSON: ", json.get_error_message())
 		_load_hardcoded_data()
-		db.close_db()
 		return
+	
+	var data = json.data
+	print("✅ JSON cargado exitosamente")
+	
+	# Limpiar diccionarios
+	recipes.clear()
+	base_materials.clear()
+	
+	# Cargar elementos base
+	if data.has("elementos"):
+		for elem in data["elementos"]:
+			if elem.get("es_base", false):
+				base_materials.append(elem["nombre"])
 	
 	# Cargar combinaciones
-	db.query("""
-		SELECT 
-			e1.nombre as elemento1, 
-			e2.nombre as elemento2, 
-			e3.nombre as resultado
-		FROM combinaciones c
-		JOIN elementos e1 ON c.elemento1 = e1.id_elemento
-		JOIN elementos e2 ON c.elemento2 = e2.id_elemento
-		JOIN elementos e3 ON c.resultado = e3.id_elemento
-	""")
-	var combinaciones = db.query_result
-	
-	if combinaciones and len(combinaciones) > 0:
-		recipes.clear()
-		for row in combinaciones:
-			var elem1 = row["elemento1"]
-			var elem2 = row["elemento2"]
-			var resultado = row["resultado"]
-			
-			recipes[elem1 + "+" + elem2] = resultado
-			recipes[elem2 + "+" + elem1] = resultado
+	if data.has("combinaciones"):
+		# Primero crear un mapa de ID a nombre para búsqueda rápida
+		var id_to_name: Dictionary = {}
+		for elem in data["elementos"]:
+			id_to_name[elem["id"]] = elem["nombre"]
 		
-		print("🔬 Cargadas", len(combinaciones), "combinaciones:")
-		for key in recipes.keys():
-			print("   ", key, " -> ", recipes[key])
-	else:
-		push_error("❌ No se pudieron cargar recetas, usando hardcoded")
-		_load_hardcoded_data()
+		print("📋 Mapa de elementos ID->Nombre:")
+		for id in id_to_name.keys():
+			print("   ", id, " -> ", id_to_name[id])
+		
+		# Ahora procesar las combinaciones
+		for combo in data["combinaciones"]:
+			var mat1_id = combo["elemento1"]
+			var mat2_id = combo["elemento2"]
+			var resultado_id = combo["resultado"]
+			
+			# Obtener nombres usando el mapa
+			var mat1_nombre = id_to_name.get(mat1_id, "")
+			var mat2_nombre = id_to_name.get(mat2_id, "")
+			var resultado_nombre = id_to_name.get(resultado_id, "")
+			
+			if mat1_nombre == "" or mat2_nombre == "" or resultado_nombre == "":
+				print("⚠️ Receta incompleta: ", mat1_id, "+", mat2_id, "->", resultado_id)
+				continue
+			
+			# Crear claves bidireccionales
+			var key1 = mat1_nombre + "+" + mat2_nombre
+			var key2 = mat2_nombre + "+" + mat1_nombre
+			
+			recipes[key1] = resultado_nombre
+			if key1 != key2:  # Evitar duplicados cuando mat1 == mat2
+				recipes[key2] = resultado_nombre
+			
+			print("✅ Receta: ", mat1_nombre, " + ", mat2_nombre, " = ", resultado_nombre)
 	
-	db.close_db()
+	print("📦 Materiales base: ", base_materials.size())
+	print("🔧 Recetas cargadas: ", recipes.size(), " combinaciones")
+	print("\n📚 TODAS LAS RECETAS CARGADAS:")
+	for key in recipes.keys():
+		print("   ", key, " -> ", recipes[key])
 
 
-## Datos hardcodeados de respaldo (TODAS las combinaciones posibles)
+## FALLBACK: Datos hardcodeados por si falla JSON
 func _load_hardcoded_data() -> void:
+	print("⚠️ Usando datos hardcodeados de respaldo")
 	base_materials = ["Papel", "Metal", "Plastico", "Madera", "Vidrio"]
 	recipes = {
 		# Lata con etiqueta (Papel + Metal)
@@ -119,8 +139,9 @@ func _load_hardcoded_data() -> void:
 		"Papel+Vidrio": "Botella con etiqueta",
 		"Vidrio+Papel": "Botella con etiqueta",
 		
-		# Libro (Papel + Papel)
-		"Papel+Papel": "Libro",
+		# Libro (Papel + Plastico)
+		"Papel+Plastico": "Libro",
+		"Plastico+Papel": "Libro",
 		
 		# Caja de cartón prensado (Papel + Madera)
 		"Papel+Madera": "Caja de carton prensado",
@@ -159,18 +180,29 @@ func check_recipe(material_a: String, material_b: String) -> String:
 	var key1 = material_a + "+" + material_b
 	var key2 = material_b + "+" + material_a
 	
-	print("🔍 Buscando receta: ", key1)
-	print("   Recetas disponibles: ", recipes.size(), " combinaciones")
+	print("\n🔍 VERIFICANDO RECETA:")
+	print("   Material A: '", material_a, "'")
+	print("   Material B: '", material_b, "'")
+	print("   Clave 1: '", key1, "'")
+	print("   Clave 2: '", key2, "'")
+	print("   Total recetas disponibles: ", recipes.size())
 	
 	if recipes.has(key1):
-		print("   ✅ Receta encontrada: ", recipes[key1])
-		return recipes[key1]
+		var resultado = recipes[key1]
+		print("   ✅ RECETA ENCONTRADA (key1): ", resultado)
+		return resultado
 	elif recipes.has(key2):
-		print("   ✅ Receta encontrada: ", recipes[key2])
-		return recipes[key2]
+		var resultado = recipes[key2]
+		print("   ✅ RECETA ENCONTRADA (key2): ", resultado)
+		return resultado
 	else:
-		print("   ❌ Receta NO encontrada")
-		print("   Recetas cargadas:", recipes.keys())
+		print("   ❌ RECETA NO ENCONTRADA")
+		print("   Primeras 5 recetas disponibles:")
+		var count = 0
+		for k in recipes.keys():
+			if count < 5:
+				print("      '", k, "' -> '", recipes[k], "'")
+				count += 1
 		return ""
 
 

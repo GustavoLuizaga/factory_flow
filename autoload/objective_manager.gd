@@ -7,13 +7,6 @@ signal objective_updated(id_obj: String, current: int, target: int) #cambio incr
 signal objective_completed(id_obj: String) #objetivo alcanzado por primera vez
 signal all_objectives_completed() #todos los objetivos del nivel listos
 
-var db: SQLite #db es una instancia de la clase SQLite
-
-#Config DB
-const DB_PATH: String = "res://database/factory_db.db"
-# Instancia de godot-sqlite (addon). Tipado ancho para evitar "Variant".
-var sqlite: Object = null
-
 #Diccionarios creados vacíos inicialmente
 var elem_id_to_name: Dictionary = {}     # (id de los elementos)int -> String
 var elem_name_to_id: Dictionary = {}     # String -> int
@@ -25,92 +18,169 @@ var objectives: Dictionary = {}          # id:String -> {id,title,target,current
 
 
 func _ready() -> void:
-	_open_db()
-	if db == null:
-		return
-	_load_elements()   #llena catalogos id-nombre
-	_load_recipes()
-	_load_level_objectives(current_level_number) #crea objetivos con target=1 por defecto desde objetivo_elemento
-	_check_all_done() #si ya están todos en done=true, dispara all_objectives_completed()
+	print("[ObjectiveManager] Inicializando...")
+	print("[ObjectiveManager] OS:", OS.get_name())
+	
+	# Usar JSON en todas las plataformas
+	_load_from_json()
+	_load_level_objectives_from_json(current_level_number)
+	_check_all_done()
 	
 
-#Acceso a la DB
-# =========================
-func _open_db() -> void:
-	# Si el plugin está activo, esta clase ya existe
-	if not ClassDB.class_exists("SQLite"):
-		push_error("El plugin Godot SQLite no está activo o no fue cargado correctamente.")
+## Cargar datos desde JSON
+func _load_from_json() -> void:
+	var json_path = "res://database/game_data.json"
+	
+	if not FileAccess.file_exists(json_path):
+		print("[ObjectiveManager] ❌ JSON no encontrado, usando hardcoded")
+		_load_hardcoded_data()
 		return
-
-	db = SQLite.new()
-	db.path = DB_PATH
-	if not db.open_db():
-		push_error("No se pudo abrir DB: " + DB_PATH)
-		db = null
-
-# Helper de consulta.
-func _q(sql: String) -> Array:
-	if db == null:
-		push_error("DB no inicializada")
-		return []
-	var ok := db.query(sql)
-	if not ok or db.query_result == null:
-		return []
-	return db.query_result
-
-
-#      CARGAS INICIALES
-# =========================
-#Construye los mapas de los elementos: id -> nombre y nombre -> id
-func _load_elements() -> void:
+	
+	var file = FileAccess.open(json_path, FileAccess.READ)
+	if not file:
+		print("[ObjectiveManager] ❌ Error al abrir JSON")
+		_load_hardcoded_data()
+		return
+	
+	var json_text = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	
+	if error != OK:
+		print("[ObjectiveManager] ❌ Error al parsear JSON")
+		_load_hardcoded_data()
+		return
+	
+	var data = json.data
+	print("[ObjectiveManager] ✅ JSON cargado")
+	
+	# Limpiar
 	elem_id_to_name.clear()
 	elem_name_to_id.clear()
-	var rows: Array[Dictionary] = _q("SELECT id_elemento, nombre FROM elementos")
-	for r in rows:
-		var id_elem: int = int(r.id_elemento)
-		var nom: String = String(r.nombre)
-		elem_id_to_name[id_elem] = nom
-		elem_name_to_id[nom] = id_elem
-	print("[BD] elementos:", elem_id_to_name)
-
-#recetas como triples ids
-func _load_recipes() -> void:
 	recipes.clear()
-	var rows: Array[Dictionary] = _q("SELECT elemento1, elemento2, resultado FROM combinaciones")
-	for r in rows:
-		recipes.append({
-			"e1": int(r.elemento1),
-			"e2": int(r.elemento2),
-			"res": int(r.resultado)
-		})
-#construye objetivos para un nivel dado de la tabla objetivo_elemento
+	
+	# Cargar elementos
+	if data.has("elementos"):
+		for elem in data["elementos"]:
+			var id = elem["id"]
+			var nombre = elem["nombre"]
+			elem_id_to_name[id] = nombre
+			elem_name_to_id[nombre] = id
+	
+	# Cargar combinaciones
+	if data.has("combinaciones"):
+		for combo in data["combinaciones"]:
+			recipes.append({
+				"e1": combo["elemento1"],
+				"e2": combo["elemento2"],
+				"res": combo["resultado"]
+			})
+	
+	print("[ObjectiveManager] 📦 Elementos:", elem_id_to_name.size())
+	print("[ObjectiveManager] 🔧 Recetas:", recipes.size())
 
-func _load_level_objectives(nivel_num: int) -> void:
-	# 1) Buscar id_nivel por número de nivel
-	var niv: Array[Dictionary] = _q("SELECT id_nivel FROM nivel WHERE numero_nivel = %d" % nivel_num)
-	if niv.is_empty():
+
+## Cargar objetivos de nivel desde JSON
+func _load_level_objectives_from_json(nivel_num: int) -> void:
+	var json_path = "res://database/game_data.json"
+	
+	if not FileAccess.file_exists(json_path):
+		_load_level_objectives_hardcoded(nivel_num)
 		return
-	var id_nivel: int = int(niv[0].id_nivel)
-
-	# 2) Cargar objetivos(objectives): tabla objetivo_elemento (target implícito = 1)
+	
+	var file = FileAccess.open(json_path, FileAccess.READ)
+	if not file:
+		_load_level_objectives_hardcoded(nivel_num)
+		return
+	
+	var json_text = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	
+	if error != OK:
+		_load_level_objectives_hardcoded(nivel_num)
+		return
+	
+	var data = json.data
 	objectives.clear()
-	var rows: Array[Dictionary] = _q("SELECT id_elemento FROM objetivo_elemento WHERE id_nivel = %d" % id_nivel)
-	for r in rows:
-		var eid: int = int(r.id_elemento)
-		var name: String = String(elem_id_to_name.get(eid, "???")) #.get(clave, valor_por_defecto)
-		var id_str: String = "make_%d" % eid
-		objectives[id_str] = {
-			"id": id_str,
-			"title": name,       # Texto opcional para HUD
-			"target": 1,         # La tabla no define cantidades → 1 por defecto
-			"current": 0,
-			"element_id": eid,   # Referencia al producto objetivo
-			"done": false
-		}
-	# DEBUG: listar lo cargado
-	for k in objectives.keys():
-		var obj: Dictionary = objectives[k]
-		print("[OBJ] loaded:", obj.title)
+	
+	if data.has("niveles"):
+		for nivel in data["niveles"]:
+			if nivel["numero"] == nivel_num:
+				for elem_id in nivel["objetivos"]:
+					var elem_name = elem_id_to_name.get(elem_id, "Desconocido")
+					var obj_id = "obj_" + str(elem_id)
+					
+					objectives[obj_id] = {
+						"id": obj_id,
+						"title": elem_name,
+						"target": 1,
+						"current": 0,
+						"element_id": elem_id,
+						"done": false
+					}
+				
+				print("[ObjectiveManager] 🎯 Objetivos nivel ", nivel_num, ": ", objectives.size())
+				return
+	
+	print("[ObjectiveManager] ⚠️ Nivel no encontrado, usando hardcoded")
+	_load_level_objectives_hardcoded(nivel_num)
+
+
+## FALLBACK: Datos hardcodeados por si falla JSON
+func _load_hardcoded_data() -> void:
+	print("[ObjectiveManager] ⚠️ Usando datos hardcodeados de respaldo")
+	
+	elem_id_to_name = {
+		1: "Papel",
+		2: "Metal",
+		3: "Plastico",
+		4: "Madera",
+		5: "Vidrio",
+		6: "Lata con etiqueta",
+		7: "Botella con etiqueta",
+		8: "Libro",
+		9: "Caja de carton prensado",
+		10: "Botella con tapa metalica",
+		11: "Cable recubierto",
+		12: "Herramienta con mango de madera",
+		13: "Botella con tapa plastica",
+		14: "Juguete",
+		15: "Ventana con marco de madera"
+	}
+	
+	elem_name_to_id.clear()
+	for id in elem_id_to_name.keys():
+		elem_name_to_id[elem_id_to_name[id]] = id
+	
+	print("[ObjectiveManager] ✅ Cargados", elem_id_to_name.size(), "elementos")
+
+
+func _load_level_objectives_hardcoded(nivel_num: int) -> void:
+	objectives.clear()
+	
+	if nivel_num == 1:
+		# Nivel 1: Lata con etiqueta, Botella con etiqueta, Libro, Caja de carton prensado, Botella con tapa metalica
+		var level_objectives = [6, 7, 8, 9, 10]
+		
+		for eid in level_objectives:
+			var name = elem_id_to_name.get(eid, "???")
+			var id_str = "make_%d" % eid
+			objectives[id_str] = {
+				"id": id_str,
+				"title": name,
+				"target": 1,
+				"current": 0,
+				"element_id": eid,
+				"done": false
+			}
+			print("[OBJ] hardcoded loaded:", name)
+	
+	print("[ObjectiveManager] ✅ Nivel", nivel_num, "con", objectives.size(), "objetivos")
 
 
 #     API PARA LA UI
@@ -130,34 +200,32 @@ func get_all_for_ui() -> Array[Dictionary]:
 
 #Traducción del elemento id a un icono (Texture2D)
 func _icon_for(element_id: int) -> Texture2D:
-	var name: String = String(elem_id_to_name.get(element_id, ""))
-	# Normalizar el nombre quitando acentos para match
-	var normalized_name = _norm(name)
-	
-	# Buscar por nombre normalizado (sin acentos)
-	if normalized_name == _norm("Lata con etiqueta"):
-		return load("res://assets/images/Lata_con_etiqueta.png") as Texture2D
-	elif normalized_name == _norm("Botella con etiqueta"):
-		return load("res://assets/images/Botella_con_etiqueta.png") as Texture2D
-	elif normalized_name == _norm("Libro"):
-		return load("res://assets/images/Libro.png") as Texture2D
-	elif normalized_name == _norm("Caja de cartón prensado"):
-		return load("res://assets/images/Caja_de_carton_prensado.png") as Texture2D
-	elif normalized_name == _norm("Botella con tapa metálica"):
-		return load("res://assets/images/Botella_con_tapa_metalica.png") as Texture2D
-	elif normalized_name == _norm("Botella con tapa plástica"):
-		return load("res://assets/images/Botella_con_tapa_plastica.png") as Texture2D
-	elif normalized_name == _norm("Cable recubierto"):
-		return load("res://assets/images/Cable_recubierto.png") as Texture2D
-	elif normalized_name == _norm("Herramienta con mango de madera"):
-		return load("res://assets/images/Herramienta_con_mango_de_madera.png") as Texture2D
-	elif normalized_name == _norm("Juguete"):
-		return load("res://assets/images/Juguete.png") as Texture2D
-	elif normalized_name == _norm("Ventana con marco de madera"):
-		return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
-	else:
-		print("⚠️ No se encontró imagen para: '", name, "' (normalizado: '", normalized_name, "')")
-		return null
+	# Mapeo directo por ID de elemento
+	match element_id:
+		6:  # Lata con etiqueta
+			return load("res://assets/images/Lata_con_etiqueta.png") as Texture2D
+		7:  # Botella con etiqueta
+			return load("res://assets/images/Botella_con_etiqueta.png") as Texture2D
+		8:  # Libro
+			return load("res://assets/images/Libro.png") as Texture2D
+		9:  # Caja de carton prensado
+			return load("res://assets/images/Caja_de_carton_prensado.png") as Texture2D
+		10: # Botella con tapa metalica
+			return load("res://assets/images/Botella_con_tapa_metalica.png") as Texture2D
+		11: # Cable recubierto
+			return load("res://assets/images/Cable_recubierto.png") as Texture2D
+		12: # Herramienta con mango de madera
+			return load("res://assets/images/Herramienta_con_mango_de_madera.png") as Texture2D
+		13: # Botella con tapa plastica
+			return load("res://assets/images/Botella_con_tapa_plastica.png") as Texture2D
+		14: # Juguete
+			return load("res://assets/images/Juguete.png") as Texture2D
+		15: # Ventana con marco de madera
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		_:
+			var name = elem_id_to_name.get(element_id, "Desconocido")
+			print("⚠️ No se encontró imagen para elemento ID: ", element_id, " (", name, ")")
+			return null
 
 
 #      PROGRESO / ESTADO
@@ -234,11 +302,15 @@ func _check_all_done() -> void:
 
 #Reinicia y carga objetivos del nivel dado
 func reset_for_level(nivel_num: int) -> void:
-	# Asegura catálogos cargados
+	print("[ObjectiveManager] 🔄 Reset nivel:", nivel_num)
+	
+	# Recargar desde JSON
 	if elem_id_to_name.is_empty():
-		_load_elements()
-
+		_load_from_json()
+	
 	objectives.clear()
-	_load_level_objectives(nivel_num)
+	_load_level_objectives_from_json(nivel_num)
+	_check_all_done()
+	
+	print("[ObjectiveManager] ✅ Reset completado")
 
-	print("[OBJ] objetivos reiniciados para nivel:", nivel_num)
