@@ -19,13 +19,13 @@ var sprite_paths: Dictionary = {
 	"Plastico": "res://assets/images/item_plastic.png",
 	"Madera": "res://assets/images/item_wood.png",
 	"Vidrio": "res://assets/images/item_glass.png",
-	# Productos fusionados
+	# Productos fusionados (sin acentos para compatibilidad móvil)
 	"Lata con etiqueta": "res://assets/images/Lata_con_etiqueta.png",
 	"Botella con etiqueta": "res://assets/images/Botella_con_etiqueta.png",
 	"Libro": "res://assets/images/Libro.png",
-	"Caja de cartón prensado": "res://assets/images/Caja_de_cartón_prensado.png",
-	"Botella con tapa metálica": "res://assets/images/Botella_con_tapa_metálica.png",
-	"Botella con tapa plástica": "res://assets/images/Botella_con_tapa_plástica.png",
+	"Caja de carton prensado": "res://assets/images/Caja_de_carton_prensado.png",
+	"Botella con tapa metalica": "res://assets/images/Botella_con_tapa_metalica.png",
+	"Botella con tapa plastica": "res://assets/images/Botella_con_tapa_plastica.png",
 	"Cable recubierto": "res://assets/images/Cable_recubierto.png",
 	"Herramienta con mango de madera": "res://assets/images/Herramienta_con_mango_de_madera.png",
 	"Juguete": "res://assets/images/Juguete.png",
@@ -60,9 +60,22 @@ func setup(type: String, cell: Vector2i) -> void:
 
 ## Actualiza el visual según el tipo de material
 func update_visual() -> void:
-	if sprite and sprite_paths.has(item_type):
+	# Intentar buscar primero por nombre exacto, luego por nombre normalizado
+	var texture_path: String = ""
+	
+	if sprite_paths.has(item_type):
+		texture_path = sprite_paths[item_type]
+	else:
+		# Si no se encuentra, buscar normalizando (sin acentos)
+		var normalized_type = _normalize_text(item_type)
+		for key in sprite_paths.keys():
+			if _normalize_text(key) == normalized_type:
+				texture_path = sprite_paths[key]
+				break
+	
+	if sprite and texture_path != "":
 		# Cargar la textura
-		var texture = load(sprite_paths[item_type]) as Texture2D
+		var texture = load(texture_path) as Texture2D
 		sprite.texture = texture
 		
 		# Auto-ajustar el tamaño a 50px (tamaño de celda)
@@ -91,6 +104,11 @@ func update_visual() -> void:
 	if label:
 		label.text = item_type.substr(0, 3).to_upper()
 		label.visible = false  # Ocultar etiqueta si hay sprite
+
+
+## Normaliza texto quitando acentos
+static func _normalize_text(text: String) -> String:
+	return text.to_lower().replace("á","a").replace("é","e").replace("í","i").replace("ó","o").replace("ú","u")
 
 
 ## Mueve el item a una nueva posición

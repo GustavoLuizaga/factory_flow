@@ -106,6 +106,8 @@ func transfer_item_to_next() -> void:
 	
 	var next_cell = grid.get_adjacent_cell(current_cell, direction_vector)
 	
+	print("🔄 Transfiriendo desde ", current_cell, " hacia ", get_direction_name(), " → celda: ", next_cell)
+	
 	# Verificar si la celda existe
 	if not grid.is_valid_cell(next_cell):
 		print("⚠️ Siguiente celda fuera de límites - destruyendo item")
@@ -115,6 +117,11 @@ func transfer_item_to_next() -> void:
 	
 	var next_entity = grid.get_entity_at(next_cell)
 	
+	if next_entity != null:
+		print("   ✓ Hay entidad en ", next_cell, ": ", next_entity.name)
+	else:
+		print("   ✗ NO hay entidad en ", next_cell)
+	
 	# Si hay una entidad, intentar pasarle el item
 	if next_entity != null:
 		# Intentar pasar el item a la siguiente entidad
@@ -122,16 +129,16 @@ func transfer_item_to_next() -> void:
 			if next_entity.accept_item(current_item):
 				current_item = null
 				transfer_timer = 0.0
-				print("✅ Item transferido a la siguiente entidad")
+				print("   ✅ Item transferido exitosamente")
 			else:
-				print("⏸️ La siguiente entidad no puede aceptar el item (ocupada) - esperando...")
+				print("   ⏸️ Entidad ocupada - esperando...")
 		else:
-			print("❌ La siguiente entidad no puede recibir items - destruyendo")
+			print("   ❌ Entidad no puede recibir items - destruyendo")
 			current_item.destroy()
 			current_item = null
 	else:
 		# No hay entidad en la siguiente celda - el item cae/desaparece
-		print("💨 No hay receptor en celda ", next_cell, " - item destruido")
+		print("   💨 Item destruido (no hay receptor)")
 		current_item.destroy()
 		current_item = null
 
