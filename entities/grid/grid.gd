@@ -97,14 +97,32 @@ func get_entity_at(cell: Vector2i) -> Node:
 	return occupied_cells.get(cell, null)
 
 
+## DEBUG: Imprime todas las entidades en el grid
+func debug_print_all_entities() -> void:
+	print("\n=== MAPA DEL GRID ===")
+	for cell in occupied_cells.keys():
+		var entity = occupied_cells[cell]
+		var entity_info = ""
+		
+		if entity is ConveyorBelt:
+			entity_info = "Conveyor(" + entity.get_direction_name() + ")"
+		elif entity is MaterialSpawner:
+			entity_info = "Spawner(" + entity.material_type + ")"
+		else:
+			entity_info = entity.get_class()
+		
+		print("  [", cell, "] = ", entity_info)
+	print("===================\n")
+
+
 ## Coloca una entidad en el grid
 func place_entity(entity: Node2D, cell: Vector2i) -> bool:
 	if not is_valid_cell(cell):
-		print("Celda fuera de límites: ", cell)
+		print("❌ Celda fuera de límites: ", cell)
 		return false
 	
 	if is_cell_occupied(cell):
-		print("Celda ocupada: ", cell)
+		print("❌ Celda ocupada: ", cell, " por: ", occupied_cells[cell].name)
 		return false
 	
 	# Colocar entidad
@@ -118,7 +136,15 @@ func place_entity(entity: Node2D, cell: Vector2i) -> bool:
 	if entity.has_method("on_placed_in_grid"):
 		entity.on_placed_in_grid(cell)
 	
-	print("Entidad colocada en: ", cell)
+	var entity_type = "?"
+	if entity is ConveyorBelt:
+		entity_type = "Conveyor(" + entity.get_direction_name() + ")"
+	elif entity is MaterialSpawner:
+		entity_type = "Spawner(" + entity.material_type + ")"
+	else:
+		entity_type = entity.get_class()
+	
+	print("✅ Entidad colocada: ", entity_type, " en celda [", cell, "]")
 	return true
 
 

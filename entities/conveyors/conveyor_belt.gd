@@ -44,6 +44,23 @@ func on_placed_in_grid(cell: Vector2i) -> void:
 	print("Conveyor colocado en: ", cell, " dirección: ", get_direction_name())
 
 
+## Rota la dirección de la cinta 90 grados (sentido horario)
+func rotate_direction() -> void:
+	match direction:
+		Direction.UP:
+			direction = Direction.RIGHT
+		Direction.RIGHT:
+			direction = Direction.DOWN
+		Direction.DOWN:
+			direction = Direction.LEFT
+		Direction.LEFT:
+			direction = Direction.UP
+	
+	update_direction()
+	update_visual()
+	print("🔄 Cinta en [", current_cell, "] rotada a: ", get_direction_name())
+
+
 ## Actualiza el vector de dirección según el enum
 func update_direction() -> void:
 	match direction:
@@ -82,6 +99,7 @@ func get_direction_name() -> String:
 ## Acepta un item desde otra entidad
 func accept_item(item: Item) -> bool:
 	if current_item != null:
+		print("   ⏸️ Conveyor [", current_cell, "] ocupada, rechazando item")
 		return false  # Ya hay un item aquí
 	
 	current_item = item
@@ -91,7 +109,7 @@ func accept_item(item: Item) -> bool:
 	if GameManager.current_grid:
 		item.move_to_position(global_position)
 	
-	print("Conveyor en ", current_cell, " aceptó item: ", item.item_type)
+	print("   ✅ Conveyor [", current_cell, "] dir:", get_direction_name(), " aceptó item:", item.item_type)
 	return true
 
 
@@ -104,13 +122,14 @@ func transfer_item_to_next() -> void:
 	if not grid:
 		return
 	
+	# Calcular la siguiente celda basada en la dirección
 	var next_cell = grid.get_adjacent_cell(current_cell, direction_vector)
 	
-	print("🔄 Transfiriendo desde ", current_cell, " hacia ", get_direction_name(), " → celda: ", next_cell)
+	print("🔄 Conveyor [", current_cell, "] dir:", get_direction_name(), " vector:", direction_vector, " → next:", next_cell)
 	
 	# Verificar si la celda existe
 	if not grid.is_valid_cell(next_cell):
-		print("⚠️ Siguiente celda fuera de límites - destruyendo item")
+		print("   ⚠️ Celda fuera de límites - destruyendo item")
 		current_item.destroy()
 		current_item = null
 		return
@@ -118,9 +137,17 @@ func transfer_item_to_next() -> void:
 	var next_entity = grid.get_entity_at(next_cell)
 	
 	if next_entity != null:
-		print("   ✓ Hay entidad en ", next_cell, ": ", next_entity.name)
+		var entity_type = "?"
+		if next_entity is ConveyorBelt:
+			entity_type = "Conveyor(" + next_entity.get_direction_name() + ")"
+		elif next_entity is MaterialSpawner:
+			entity_type = "Spawner"
+		else:
+			entity_type = next_entity.get_class()
+		
+		print("   ✓ Entidad en [", next_cell, "]: ", entity_type)
 	else:
-		print("   ✗ NO hay entidad en ", next_cell)
+		print("   ✗ NO hay entidad en [", next_cell, "]")
 	
 	# Si hay una entidad, intentar pasarle el item
 	if next_entity != null:

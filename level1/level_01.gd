@@ -18,6 +18,43 @@ func _ready() -> void:
 	setup_objective_hub_ui() # <<< NUEVO
 
 
+## Para debug - presiona D para ver el mapa del grid
+func _input(event: InputEvent) -> void:
+	# Debug: presiona D para ver el mapa
+	if event is InputEventKey:
+		if event.pressed and event.keycode == KEY_D:
+			if grid:
+				grid.debug_print_all_entities()
+	
+	# Rotar cintas con clic derecho (mouse) o toque largo (móvil)
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			try_rotate_conveyor_at_position(event.global_position)
+	
+	# En móvil, usaremos doble tap para rotar
+	elif event is InputEventScreenTouch:
+		if event.pressed and event.double_tap:
+			var camera = get_viewport().get_camera_2d()
+			if camera:
+				var viewport_size = get_viewport().get_visible_rect().size
+				var offset = (event.position - viewport_size / 2) / camera.zoom
+				var world_pos = camera.get_screen_center_position() + offset
+				try_rotate_conveyor_at_position(world_pos)
+
+
+## Intenta rotar una cinta en la posición dada
+func try_rotate_conveyor_at_position(world_pos: Vector2) -> void:
+	if not grid:
+		return
+	
+	var cell = grid.world_to_grid(world_pos)
+	var entity = grid.get_entity_at(cell)
+	
+	if entity and entity is ConveyorBelt:
+		entity.rotate_direction()
+		print("🔄 Rotando cinta en celda: ", cell)
+
+
 ## Configura la cámara para móvil
 func setup_camera() -> void:
 	if camera:
