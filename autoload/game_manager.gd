@@ -53,7 +53,7 @@ func load_data_from_database() -> void:
 	db.path = DB_PATH
 	
 	if not db.open_db():
-		push_error("❌ No se pudo abrir la base de datos")
+		push_error("❌ No se pudo abrir la base de datos, usando datos hardcodeados")
 		_load_hardcoded_data()
 		return
 	
@@ -68,6 +68,11 @@ func load_data_from_database() -> void:
 		for row in elementos:
 			base_materials.append(row["nombre"])
 		print("📦 Cargados", len(base_materials), "materiales base:", base_materials)
+	else:
+		push_error("❌ No se pudieron cargar elementos, usando hardcoded")
+		_load_hardcoded_data()
+		db.close_db()
+		return
 	
 	# Cargar combinaciones
 	db.query("""
@@ -92,23 +97,61 @@ func load_data_from_database() -> void:
 			recipes[elem1 + "+" + elem2] = resultado
 			recipes[elem2 + "+" + elem1] = resultado
 		
-		print("🔬 Cargadas", len(combinaciones), "combinaciones")
+		print("🔬 Cargadas", len(combinaciones), "combinaciones:")
+		for key in recipes.keys():
+			print("   ", key, " -> ", recipes[key])
+	else:
+		push_error("❌ No se pudieron cargar recetas, usando hardcoded")
+		_load_hardcoded_data()
 	
 	db.close_db()
 
 
-## Datos hardcodeados de respaldo
+## Datos hardcodeados de respaldo (TODAS las combinaciones posibles)
 func _load_hardcoded_data() -> void:
 	base_materials = ["Papel", "Metal", "Plastico", "Madera", "Vidrio"]
 	recipes = {
+		# Lata con etiqueta (Papel + Metal)
 		"Papel+Metal": "Lata con etiqueta",
-		"Metal+Papel": "Lata con etiqueta", 
+		"Metal+Papel": "Lata con etiqueta",
+		
+		# Botella con etiqueta (Papel + Vidrio)
+		"Papel+Vidrio": "Botella con etiqueta",
+		"Vidrio+Papel": "Botella con etiqueta",
+		
+		# Libro (Papel + Papel)
+		"Papel+Papel": "Libro",
+		
+		# Caja de cartón prensado (Papel + Madera)
+		"Papel+Madera": "Caja de carton prensado",
+		"Madera+Papel": "Caja de carton prensado",
+		
+		# Botella con tapa metálica (Metal + Vidrio)
+		"Metal+Vidrio": "Botella con tapa metalica",
+		"Vidrio+Metal": "Botella con tapa metalica",
+		
+		# Cable recubierto (Metal + Plastico)
 		"Metal+Plastico": "Cable recubierto",
 		"Plastico+Metal": "Cable recubierto",
+		
+		# Herramienta con mango de madera (Metal + Madera)
+		"Metal+Madera": "Herramienta con mango de madera",
+		"Madera+Metal": "Herramienta con mango de madera",
+		
+		# Botella con tapa plástica (Plastico + Vidrio)
+		"Plastico+Vidrio": "Botella con tapa plastica",
+		"Vidrio+Plastico": "Botella con tapa plastica",
+		
+		# Juguete (Plastico + Madera)
 		"Plastico+Madera": "Juguete",
-		"Madera+Plastico": "Juguete"
+		"Madera+Plastico": "Juguete",
+		
+		# Ventana con marco de madera (Madera + Vidrio)
+		"Madera+Vidrio": "Ventana con marco de madera",
+		"Vidrio+Madera": "Ventana con marco de madera"
 	}
-	print("📦 Usando datos hardcodeados")
+	print("📦 Usando datos hardcodeados - TODAS las combinaciones cargadas")
+	print("🔬 Total de recetas:", recipes.size() / 2, "(", recipes.size(), "combinaciones con orden)")
 
 
 ## Verifica si existe una receta válida con dos materiales
@@ -116,11 +159,18 @@ func check_recipe(material_a: String, material_b: String) -> String:
 	var key1 = material_a + "+" + material_b
 	var key2 = material_b + "+" + material_a
 	
+	print("🔍 Buscando receta: ", key1)
+	print("   Recetas disponibles: ", recipes.size(), " combinaciones")
+	
 	if recipes.has(key1):
+		print("   ✅ Receta encontrada: ", recipes[key1])
 		return recipes[key1]
 	elif recipes.has(key2):
+		print("   ✅ Receta encontrada: ", recipes[key2])
 		return recipes[key2]
 	else:
+		print("   ❌ Receta NO encontrada")
+		print("   Recetas cargadas:", recipes.keys())
 		return ""
 
 
