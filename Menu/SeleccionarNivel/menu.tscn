@@ -50,6 +50,7 @@ offset_top = -107.5
 offset_bottom = 248.0
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 1
 
 [node name="SeleccionNivel" type="Button" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
