@@ -92,6 +92,16 @@ func is_cell_occupied(cell: Vector2i) -> bool:
 	return occupied_cells.has(cell)
 
 
+## Verifica si hay un item (producto o material) en una celda específica
+func has_item_at_cell(cell: Vector2i) -> bool:
+	# Buscar entre todos los hijos del grid si hay un item en esa celda
+	for child in get_children():
+		if child is Item:
+			if child.current_cell == cell:
+				return true
+	return false
+
+
 ## Obtiene la entidad en una celda específica
 func get_entity_at(cell: Vector2i) -> Node:
 	return occupied_cells.get(cell, null)
@@ -123,6 +133,11 @@ func place_entity(entity: Node2D, cell: Vector2i) -> bool:
 	
 	if is_cell_occupied(cell):
 		print("❌ Celda ocupada: ", cell, " por: ", occupied_cells[cell].name)
+		return false
+	
+	# NUEVO: Verificar si hay un item en la celda
+	if has_item_at_cell(cell):
+		print("❌ No se puede colocar: hay un item en la celda ", cell)
 		return false
 	
 	# Colocar entidad

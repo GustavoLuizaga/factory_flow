@@ -1,22 +1,18 @@
 extends Node2D
 
-## Level 1 - Tablero principal con spawners de materiales
+## Level 2 - Versión de prueba (solo Grid y Menú)
 
 @onready var grid: Grid = $Grid
 @onready var top_menu: CanvasLayer = $TopMenu
 @onready var camera: Camera2D = $Camera2D
 
-var hub_objective_scene: PackedScene = preload("res://ui//barra_objetivos/hub_objetive.tscn")
-var hub_objective: Node2D
 var delete_mode: bool = false
 
 func _ready() -> void:
-	print("=== Level 1 iniciado ===")
+	print("=== Level 2 iniciado (Versión de prueba) ===")
 	setup_camera()
-	center_grid()  # <<< NUEVO: Centrar el grid
-	setup_material_spawners()
-	ObjectiveManager.reset_for_level(1)  # <<< NUEVO: limpia y carga objetivos desde BD
-	setup_objective_hub_ui() # <<< NUEVO
+	center_grid()
+	setup_material_spawners()  # Agregar spawners estratégicos
 	
 	# Conectar la señal del modo borrar
 	if top_menu:
@@ -111,7 +107,6 @@ func _on_delete_mode_changed(is_active: bool) -> void:
 	print("🔄 Modo borrar cambiado a: ", "ACTIVO" if is_active else "INACTIVO")
 
 
-
 ## Configura la cámara para móvil
 func setup_camera() -> void:
 	if camera:
@@ -148,27 +143,24 @@ func center_grid() -> void:
 		print("Grid y cámara centrados. Grid en: ", grid.position, " Cámara en: ", camera.position)
 
 
-## Coloca los spawners de materiales en el grid
+## Coloca los spawners de materiales en posiciones estratégicas
 func setup_material_spawners() -> void:
-	# Crear spawners en posiciones aleatorias
-	var used_positions: Array[Vector2i] = []
-	var materials = ["Papel", "Metal", "Plastico", "Madera", "Vidrio"]
+	# Grid es 20x10, posiciones estratégicas para optimizar fusiones
+	# Distribución: materiales espaciados para facilitar rutas de fusión
 	
-	for material in materials:
-		var random_x = randi() % grid.grid_width
-		var random_y = randi() % grid.grid_height
-		var position = Vector2i(random_x, random_y)
-		
-		# Evitar posiciones duplicadas
-		while position in used_positions:
-			random_x = randi() % grid.grid_width
-			random_y = randi() % grid.grid_height
-			position = Vector2i(random_x, random_y)
-		
-		used_positions.append(position)
+	var spawner_positions = {
+		"Papel": Vector2i(2, 2),      # Esquina superior izquierda
+		"Metal": Vector2i(17, 2),     # Esquina superior derecha
+		"Vidrio": Vector2i(2, 7),     # Esquina inferior izquierda
+		"Plastico": Vector2i(17, 7),  # Esquina inferior derecha
+		"Madera": Vector2i(9, 4)      # Centro del grid
+	}
+	
+	for material in spawner_positions.keys():
+		var position = spawner_positions[material]
 		spawn_material_at(position, material)
 	
-	print("Spawners de materiales colocados")
+	print("✅ Spawners de materiales colocados estratégicamente en Level 2")
 
 
 ## Crea y coloca un spawner de material en una celda específica
@@ -176,52 +168,7 @@ func spawn_material_at(cell: Vector2i, material: String) -> void:
 	var spawner_scene = preload("res://entities/materials/material_spawner.tscn")
 	var spawner = spawner_scene.instantiate()
 	spawner.material_type = material
-	spawner.spawn_interval = randf_range(2.5, 4.0)  # Spawn aleatorio
+	spawner.spawn_interval = randf_range(3.0, 5.0)  # Intervalo un poco más largo para nivel 2
 	
 	grid.add_child(spawner)
 	grid.place_entity(spawner, cell)
-
-
-## --- NUEVO: crea e inserta la HUD de objetivos ---
-func setup_objective_hub_ui() -> void:
-	hub_objective = hub_objective_scene.instantiate()
-	add_child(hub_objective)
-
-	# Posición centrada bajo el grid
-	var hub_y = grid.position.y + (grid.grid_height * grid.cell_size) + 16
-	var grid_width_px = grid.grid_width * grid.cell_size
-	var hub_w = hub_objective.get_size().x
-	var hub_x = grid.position.x + (grid_width_px - hub_w) * 0.5
-	hub_objective.position = Vector2(hub_x, hub_y)
-	
-	# --- limpia antes de añadir nuevos ---
-	#hub_objective.populate_slots()
-	hub_objective.objectives.clear() # vacía la lista
-	
-	# --- NUEVO: poblar objetivos desde la base de datos a través del autoload ---
-	for obj in ObjectiveManager.get_all_for_ui():
-		hub_objective.add_objective_with_icon(
-			obj.title,
-			obj.target,
-			obj.icon_tex,
-			obj.current
-		)
-		
-	# ⬇️ Ajuste dinámico del HUD según la cantidad real
-	hub_objective.num_slots = ObjectiveManager.objectives.size()
-	hub_objective.setup_background()
-	hub_objective.setup_container()
-		
-		# --- Conexión de señales ---
-	if not ObjectiveManager.objective_updated.is_connected(hub_objective.on_objective_progress):
-		ObjectiveManager.objective_updated.connect(hub_objective.on_objective_progress)
-
-	if not ObjectiveManager.objective_completed.is_connected(hub_objective.on_objective_complete):
-		ObjectiveManager.objective_completed.connect(hub_objective.on_objective_complete)
-
-	if not ObjectiveManager.all_objectives_completed.is_connected(hub_objective.on_all_complete):
-		ObjectiveManager.all_objectives_completed.connect(hub_objective.on_all_complete)
-
-	hub_objective.refresh_from(ObjectiveManager.objectives)
-
-	print("Hub de objetivos centrado bajo el grid")
