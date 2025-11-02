@@ -8,6 +8,7 @@ extends Node2D
 
 var hub_objective_scene: PackedScene = preload("res://ui//barra_objetivos/hub_objetive.tscn")
 var hub_objective: Node2D
+var delete_mode: bool = false
 
 func _ready() -> void:
 	print("=== Level 1 iniciado ===")
@@ -16,6 +17,10 @@ func _ready() -> void:
 	setup_material_spawners()
 	ObjectiveManager.reset_for_level(1)  # <<< NUEVO: limpia y carga objetivos desde BD
 	setup_objective_hub_ui() # <<< NUEVO
+	
+	# Conectar la señal del modo borrar
+	if top_menu:
+		top_menu.delete_mode_changed.connect(_on_delete_mode_changed)
 
 
 ## Para debug - presiona D para ver el mapa del grid
@@ -26,6 +31,21 @@ func _input(event: InputEvent) -> void:
 			if grid:
 				grid.debug_print_all_entities()
 	
+	# Si el modo borrar está activo, manejar clics para borrar cintas
+	if delete_mode:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				try_delete_conveyor_at_position(event.global_position)
+		elif event is InputEventScreenTouch:
+			if event.pressed and not event.double_tap:  # Touch simple (no doble tap)
+				var camera_obj = get_viewport().get_camera_2d()
+				if camera_obj:
+					var viewport_size = get_viewport().get_visible_rect().size
+					var offset = (event.position - viewport_size / 2) / camera_obj.zoom
+					var world_pos = camera_obj.get_screen_center_position() + offset
+					try_delete_conveyor_at_position(world_pos)
+		return  # No procesar otros eventos en modo borrar
+	
 	# Rotar cintas con clic derecho (mouse) o toque largo (móvil)
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
@@ -34,11 +54,11 @@ func _input(event: InputEvent) -> void:
 	# En móvil, usaremos doble tap para rotar
 	elif event is InputEventScreenTouch:
 		if event.pressed and event.double_tap:
-			var camera = get_viewport().get_camera_2d()
-			if camera:
+			var camera_obj = get_viewport().get_camera_2d()
+			if camera_obj:
 				var viewport_size = get_viewport().get_visible_rect().size
-				var offset = (event.position - viewport_size / 2) / camera.zoom
-				var world_pos = camera.get_screen_center_position() + offset
+				var offset = (event.position - viewport_size / 2) / camera_obj.zoom
+				var world_pos = camera_obj.get_screen_center_position() + offset
 				try_rotate_conveyor_at_position(world_pos)
 
 
@@ -53,6 +73,43 @@ func try_rotate_conveyor_at_position(world_pos: Vector2) -> void:
 	if entity and entity is ConveyorBelt:
 		entity.rotate_direction()
 		print("🔄 Rotando cinta en celda: ", cell)
+
+
+## Intenta borrar una cinta en la posición dada
+func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
+	if not grid:
+		return
+	
+	var cell = grid.world_to_grid(world_pos)
+	var entity = grid.get_entity_at(cell)
+	
+	# Solo borrar si es una cinta transportadora
+	if entity and entity is ConveyorBelt:
+		print("🗑️ Borrando cinta en celda: ", cell)
+		
+		# Si la cinta tiene un item, destruirlo también
+		if entity.current_item:
+			entity.current_item.queue_free()
+		
+		# Remover del grid
+		grid.remove_entity(cell)
+		
+		# Destruir la entidad
+		entity.queue_free()
+		
+		print("✅ Cinta eliminada exitosamente")
+	else:
+		if entity:
+			print("⚠️ No se puede borrar: no es una cinta transportadora")
+		else:
+			print("⚠️ No hay nada en esa celda")
+
+
+## Callback cuando cambia el modo borrar
+func _on_delete_mode_changed(is_active: bool) -> void:
+	delete_mode = is_active
+	print("🔄 Modo borrar cambiado a: ", "ACTIVO" if is_active else "INACTIVO")
+
 
 
 ## Configura la cámara para móvil
