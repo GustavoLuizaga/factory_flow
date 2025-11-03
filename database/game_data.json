@@ -55,6 +55,13 @@
 		{
 			"numero": 2,
 			"nombre": "Nivel 2 - Super Fusiones",
+			"monedas_iniciales": 1500,
+			"economia": {
+				"cinta": 10,
+				"maquina": 50,
+				"super_maquina": 100,
+				"reembolso_porcentaje": 60
+			},
 			"objetivos": [16, 17, 18, 19, 20, 21, 22, 23, 24]
 		}
 	]

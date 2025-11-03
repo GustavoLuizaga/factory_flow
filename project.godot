@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 ObjectiveManager="*res://autoload/objective_manager.gd"
 GameManager="*res://autoload/game_manager.gd"
+EconomyManager="*res://autoload/economy_manager.gd"
 
 [display]
 

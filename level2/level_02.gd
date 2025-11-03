@@ -5,6 +5,7 @@ extends Node2D
 @onready var grid: Grid = $Grid
 @onready var top_menu: CanvasLayer = $TopMenu
 @onready var camera: Camera2D = $Camera2D
+@onready var money_display: CanvasLayer = null  # Se crea dinámicamente
 
 var delete_mode: bool = false
 
@@ -14,6 +15,11 @@ func _ready() -> void:
 	center_grid()
 	setup_material_spawners()  # Agregar spawners estratégicos
 	add_super_machine_button()  # NUEVO: Agregar botón de super-máquina
+	
+	# NUEVO: Inicializar sistema de economía
+	if EconomyManager:
+		EconomyManager.initialize_for_level(2)
+		add_money_display()
 	
 	# Conectar la señal del modo borrar
 	if top_menu:
@@ -83,14 +89,23 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 	# Borrar cintas o máquinas (fusión normal y super-fusión)
 	if entity and (entity is ConveyorBelt or entity is FusionMachine or entity is SuperFusionMachine):
 		var entity_type = "entidad"
+		var economy_type = ""
+		
 		if entity is ConveyorBelt:
 			entity_type = "cinta"
+			economy_type = "conveyor"
 		elif entity is SuperFusionMachine:
 			entity_type = "super-máquina"
+			economy_type = "super_fusion_machine"
 		elif entity is FusionMachine:
 			entity_type = "máquina"
+			economy_type = "fusion_machine"
 		
 		print("🗑️ Borrando ", entity_type, " en celda: ", cell)
+		
+		# NUEVO: Dar reembolso
+		if EconomyManager and economy_type != "":
+			EconomyManager.refund(economy_type)
 		
 		# Si es una cinta con item, destruirlo
 		if entity is ConveyorBelt and entity.current_item:
@@ -235,3 +250,11 @@ func add_super_machine_button() -> void:
 	super_machine_btn.drag_started.connect(top_menu._on_any_drag_started)
 	
 	print("✅ Botón de Super-Máquina agregado exitosamente")
+
+
+## Agrega el display de monedas a la UI
+func add_money_display() -> void:
+	var money_display_scene = preload("res://ui/money_display/money_display.tscn")
+	money_display = money_display_scene.instantiate()
+	add_child(money_display)
+	print("💰 Display de monedas agregado")
