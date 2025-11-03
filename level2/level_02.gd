@@ -13,6 +13,7 @@ func _ready() -> void:
 	setup_camera()
 	center_grid()
 	setup_material_spawners()  # Agregar spawners estratégicos
+	add_super_machine_button()  # NUEVO: Agregar botón de super-máquina
 	
 	# Conectar la señal del modo borrar
 	if top_menu:
@@ -71,7 +72,7 @@ func try_rotate_conveyor_at_position(world_pos: Vector2) -> void:
 		print("🔄 Rotando cinta en celda: ", cell)
 
 
-## Intenta borrar una cinta en la posición dada
+## Intenta borrar una cinta o máquina en la posición dada
 func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 	if not grid:
 		return
@@ -79,13 +80,28 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 	var cell = grid.world_to_grid(world_pos)
 	var entity = grid.get_entity_at(cell)
 	
-	# Solo borrar si es una cinta transportadora
-	if entity and entity is ConveyorBelt:
-		print("🗑️ Borrando cinta en celda: ", cell)
+	# Borrar cintas o máquinas (fusión normal y super-fusión)
+	if entity and (entity is ConveyorBelt or entity is FusionMachine or entity is SuperFusionMachine):
+		var entity_type = "entidad"
+		if entity is ConveyorBelt:
+			entity_type = "cinta"
+		elif entity is SuperFusionMachine:
+			entity_type = "super-máquina"
+		elif entity is FusionMachine:
+			entity_type = "máquina"
 		
-		# Si la cinta tiene un item, destruirlo también
-		if entity.current_item:
+		print("🗑️ Borrando ", entity_type, " en celda: ", cell)
+		
+		# Si es una cinta con item, destruirlo
+		if entity is ConveyorBelt and entity.current_item:
 			entity.current_item.queue_free()
+		
+		# Si es una máquina con inputs, destruirlos
+		if (entity is FusionMachine or entity is SuperFusionMachine):
+			if entity.input_a:
+				entity.input_a.queue_free()
+			if entity.input_b:
+				entity.input_b.queue_free()
 		
 		# Remover del grid
 		grid.remove_entity(cell)
@@ -93,10 +109,10 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 		# Destruir la entidad
 		entity.queue_free()
 		
-		print("✅ Cinta eliminada exitosamente")
+		print("✅ ", entity_type.capitalize(), " eliminada exitosamente")
 	else:
 		if entity:
-			print("⚠️ No se puede borrar: no es una cinta transportadora")
+			print("⚠️ No se puede borrar: ", entity.get_class())
 		else:
 			print("⚠️ No hay nada en esa celda")
 
@@ -172,3 +188,50 @@ func spawn_material_at(cell: Vector2i, material: String) -> void:
 	
 	grid.add_child(spawner)
 	grid.place_entity(spawner, cell)
+
+
+## Agrega el botón de Super-Máquina al menú superior (solo nivel 2)
+func add_super_machine_button() -> void:
+	if not top_menu:
+		print("❌ No se encontró TopMenu")
+		return
+	
+	var hbox = top_menu.get_node("Panel/HBoxContainer")
+	if not hbox:
+		print("❌ No se encontró HBoxContainer")
+		return
+	
+	print("📦 Creando botón de Super-Máquina para Nivel 2...")
+	
+	# Crear contenedor
+	var super_machine_container = MarginContainer.new()
+	super_machine_container.name = "SuperMachineContainer"
+	super_machine_container.add_theme_constant_override("margin_left", 10)
+	super_machine_container.add_theme_constant_override("margin_right", 10)
+	super_machine_container.add_theme_constant_override("margin_top", 10)
+	super_machine_container.add_theme_constant_override("margin_bottom", 10)
+	
+	# Insertar después del botón de máquina normal
+	var machine_container = hbox.get_node("MachineContainer")
+	if machine_container:
+		var machine_index = machine_container.get_index()
+		hbox.add_child(super_machine_container)
+		hbox.move_child(super_machine_container, machine_index + 1)
+	else:
+		hbox.add_child(super_machine_container)
+	
+	# Crear el botón draggable
+	var super_machine_btn = preload("res://ui/top_menu/draggable_button.gd").new()
+	super_machine_btn.name = "SuperMachineBtn"
+	super_machine_btn.custom_minimum_size = Vector2(64, 64)
+	super_machine_btn.texture_normal = load("res://assets/images/fusion_machine_level_two.png")
+	super_machine_btn.ignore_texture_size = true
+	super_machine_btn.stretch_mode = TextureButton.STRETCH_SCALE
+	super_machine_btn.entity_scene = preload("res://entities/machines/super_fusion_machine.tscn")
+	super_machine_btn.entity_name = "Super-Máquina"
+	super_machine_container.add_child(super_machine_btn)
+	
+	# Conectar señal para desactivar modo borrar
+	super_machine_btn.drag_started.connect(top_menu._on_any_drag_started)
+	
+	print("✅ Botón de Super-Máquina agregado exitosamente")
