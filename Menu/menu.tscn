@@ -50,16 +50,18 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -530.0
-offset_top = -43.0
-offset_right = 515.0
-offset_bottom = 203.0
+offset_left = -521.0
+offset_top = -23.0
+offset_right = 524.0
+offset_bottom = 244.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 30
+theme_override_constants/separation = 60
 
 [node name="SeleccionNivel" type="Button" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("3_8w4re")
 theme_override_font_sizes/font_size = 55
