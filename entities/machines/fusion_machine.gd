@@ -75,10 +75,12 @@ func update_status() -> void:
 
 ## Acepta un item en uno de los slots de entrada
 func accept_item(item: Item) -> bool:
-	# Solo aceptar materiales base, no productos
+	# Solo aceptar materiales base, no productos fusionados
 	if not GameManager.is_base_material(item.item_type):
-		print("⚠️ Máquina rechaza producto: ", item.item_type, " (solo acepta materiales base)")
-		return false
+		print("⚠️ Máquina rechaza y DESTRUYE producto fusionado: ", item.item_type, " (solo acepta materiales base)")
+		# Destruir el item para no bloquear el flujo
+		item.destroy()
+		return true  # Retornar true para que la cinta libere su referencia
 	
 	# Intentar colocar en input_a primero
 	if input_a == null:
@@ -96,7 +98,8 @@ func accept_item(item: Item) -> bool:
 		update_status()
 		return true
 	
-	# Ambos slots llenos
+	# Ambos slots llenos - rechazar
+	print("⏸️ Máquina llena, rechazando item")
 	return false
 
 
@@ -222,6 +225,10 @@ func produce_output(product_type: String) -> void:
 		grid.add_child(new_item)
 		new_item.setup(product_type, output_cell)
 		
+		# IMPORTANTE: Hacer que el producto funcione como spawner
+		new_item.is_static_spawner = true
+		new_item.spawn_interval = 3.0
+		
 		# Posicionar correctamente: como es hijo del grid, usar posición local
 		var local_pos = Vector2(
 			output_cell.x * grid.cell_size + grid.cell_size / 2,
@@ -229,7 +236,7 @@ func produce_output(product_type: String) -> void:
 		)
 		new_item.position = local_pos
 		
-		print("✅ Producto '", product_type, "' depositado en celda: ", output_cell)
+		print("✅ Producto '", product_type, "' depositado en celda: ", output_cell, " (funciona como spawner)")
 		return  # Éxito, salir
 	
 	# Si llegamos aquí, todas las celdas adyacentes están bloqueadas
