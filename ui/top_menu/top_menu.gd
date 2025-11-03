@@ -2,6 +2,8 @@ extends CanvasLayer
 
 ## Menú superior con botones de imagen para arrastrar entidades al grid
 
+signal delete_mode_changed(is_active: bool)
+
 @onready var conveyor_up_btn: DraggableButton = $Panel/HBoxContainer/ConveyorUpContainer/ConveyorUpBtn
 @onready var conveyor_down_btn: DraggableButton = $Panel/HBoxContainer/ConveyorDownContainer/ConveyorDownBtn
 @onready var conveyor_left_btn: DraggableButton = $Panel/HBoxContainer/ConveyorLeftContainer/ConveyorLeftBtn
@@ -14,6 +16,9 @@ extends CanvasLayer
 @onready var label_left: Label = $Panel/HBoxContainer/ConveyorLeftContainer/ConveyorLeftBtn/Label
 @onready var label_right: Label = $Panel/HBoxContainer/ConveyorRightContainer/ConveyorRightBtn/Label
 
+var delete_mode: bool = false
+var delete_btn: TextureButton = null  # Se crea dinámicamente
+
 
 func _ready() -> void:
 	# Estilizar solo las etiquetas de las cintas
@@ -21,6 +26,21 @@ func _ready() -> void:
 	style_label(label_down)
 	style_label(label_left)
 	style_label(label_right)
+	
+	# Crear botón de borrar si no existe en la escena
+	if not delete_btn:
+		create_delete_button()
+	
+	# Conectar el botón de borrar
+	if delete_btn:
+		delete_btn.pressed.connect(_on_delete_btn_pressed)
+	
+	# Conectar señales de los botones draggable para desactivar modo borrar
+	conveyor_up_btn.drag_started.connect(_on_any_drag_started)
+	conveyor_down_btn.drag_started.connect(_on_any_drag_started)
+	conveyor_left_btn.drag_started.connect(_on_any_drag_started)
+	conveyor_right_btn.drag_started.connect(_on_any_drag_started)
+	machine_btn.drag_started.connect(_on_any_drag_started)
 	
 	print("TopMenu inicializado con flechas superpuestas en cintas")
 
@@ -41,3 +61,80 @@ func style_label(label: Label) -> void:
 	
 	# Asegurar que no interfiera con los clics
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+## Callback cuando se presiona el botón de borrar
+func _on_delete_btn_pressed() -> void:
+	delete_mode = !delete_mode  # Toggle
+	
+	# Cambiar el color del botón para indicar el modo activo
+	if delete_btn:
+		if delete_mode:
+			delete_btn.modulate = Color(1.5, 0.5, 0.5, 1.0)  # Rojo brillante
+			print("🗑️ Modo BORRAR activado")
+		else:
+			delete_btn.modulate = Color(1, 1, 1, 1)  # Normal
+			print("✋ Modo BORRAR desactivado")
+	
+	# Emitir señal para que el nivel sepa del cambio
+	delete_mode_changed.emit(delete_mode)
+
+
+## Callback cuando se inicia el arrastre de cualquier botón
+func _on_any_drag_started(button: DraggableButton) -> void:
+	# Desactivar modo borrar automáticamente
+	if delete_mode:
+		delete_mode = false
+		if delete_btn:
+			delete_btn.modulate = Color(1, 1, 1, 1)
+		delete_mode_changed.emit(false)
+		print("✋ Modo BORRAR desactivado automáticamente (iniciando arrastre)")
+
+
+## Obtener el estado del modo borrar
+func is_delete_mode_active() -> bool:
+	return delete_mode
+
+
+## Crea el botón de borrar programáticamente
+func create_delete_button() -> void:
+	print("📦 Creando botón de borrar programáticamente...")
+	
+	var hbox = $Panel/HBoxContainer
+	if not hbox:
+		print("❌ No se encontró HBoxContainer")
+		return
+	
+	# Crear contenedor
+	var delete_container = MarginContainer.new()
+	delete_container.name = "DeleteContainer"
+	delete_container.add_theme_constant_override("margin_left", 10)
+	delete_container.add_theme_constant_override("margin_right", 10)
+	delete_container.add_theme_constant_override("margin_top", 10)
+	delete_container.add_theme_constant_override("margin_bottom", 10)
+	hbox.add_child(delete_container)
+	
+	# Crear botón
+	delete_btn = TextureButton.new()
+	delete_btn.name = "DeleteBtn"
+	delete_btn.custom_minimum_size = Vector2(64, 64)
+	delete_container.add_child(delete_btn)
+	
+	# Crear fondo rojo
+	var color_rect = ColorRect.new()
+	color_rect.color = Color(0.8, 0.2, 0.2, 1)
+	color_rect.custom_minimum_size = Vector2(64, 64)
+	color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	delete_btn.add_child(color_rect)
+	
+	# Crear etiqueta con emoji
+	var label = Label.new()
+	label.text = "🗑️"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	label.add_theme_font_size_override("font_size", 32)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	color_rect.add_child(label)
+	
+	print("✅ Botón de borrar creado exitosamente")

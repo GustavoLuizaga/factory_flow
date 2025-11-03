@@ -107,9 +107,15 @@ func create_drag_preview() -> void:
 	# Instanciar la entidad como preview
 	drag_preview = entity_scene.instantiate()
 	
-	# Agregar al nivel principal, no al CanvasLayer
-	var level = get_tree().root.get_node("Level01")
-	level.add_child(drag_preview)
+	# Agregar al nivel principal, no al CanvasLayer (buscar cualquier nivel activo)
+	var level = get_tree().current_scene
+	if level:
+		level.add_child(drag_preview)
+	else:
+		print("❌ Error: No se encontró el nivel actual")
+		drag_preview.queue_free()
+		drag_preview = null
+		return
 	
 	# Configurar dirección si es una cinta
 	if drag_preview is ConveyorBelt:

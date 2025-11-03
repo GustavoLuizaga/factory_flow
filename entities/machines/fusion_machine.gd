@@ -180,37 +180,57 @@ func produce_output(product_type: String) -> void:
 	if not grid:
 		return
 	
-	# Intentar colocar el producto en celdas adyacentes (prioridad: abajo, derecha, izquierda, arriba)
-	var directions = [Vector2.DOWN, Vector2.RIGHT, Vector2.LEFT, Vector2.UP]
+	# Intentar colocar el producto en celdas adyacentes
+	# Prioridad: abajo, derecha, arriba, izquierda, luego diagonales
+	var adjacent_offsets = [
+		Vector2i(0, 1),   # Abajo
+		Vector2i(1, 0),   # Derecha
+		Vector2i(0, -1),  # Arriba
+		Vector2i(-1, 0),  # Izquierda
+		Vector2i(1, 1),   # Diagonal: abajo-derecha
+		Vector2i(-1, 1),  # Diagonal: abajo-izquierda
+		Vector2i(1, -1),  # Diagonal: arriba-derecha
+		Vector2i(-1, -1)  # Diagonal: arriba-izquierda
+	]
 	
-	for direction in directions:
-		var output_cell = grid.get_adjacent_cell(current_cell, direction)
+	for offset in adjacent_offsets:
+		var output_cell = current_cell + offset
 		
+		# Verificar si la celda es válida
 		if not grid.is_valid_cell(output_cell):
-			continue  # Celda fuera del grid, probar siguiente dirección
+			continue  # Celda fuera del grid, probar siguiente
 		
-		# Verificar si la celda está ocupada (por entidades o items)
-		if grid.is_cell_occupied(output_cell):
-			continue  # Celda ocupada, probar siguiente dirección
+		# Verificar si hay una entidad en la celda
+		var entity_at_cell = grid.get_entity_at(output_cell)
+		if entity_at_cell != null:
+			continue  # Hay una entidad (máquina, cinta, spawner), probar siguiente
 		
-		var next_entity = grid.get_entity_at(output_cell)
+		# Verificar si hay items en la celda
+		var has_item = false
+		for child in grid.get_children():
+			if child is Item:
+				if child.current_cell == output_cell:
+					has_item = true
+					break
 		
-		# Solo colocar si la celda está completamente vacía (sin entidades)
-		if next_entity == null:
-			var item_scene = preload("res://entities/items/item.tscn")
-			var new_item = item_scene.instantiate()
-			grid.add_child(new_item)
-			new_item.setup(product_type, output_cell)
-			
-			# Posicionar correctamente: como es hijo del grid, usar posición local
-			var local_pos = Vector2(
-				output_cell.x * grid.cell_size + grid.cell_size / 2,
-				output_cell.y * grid.cell_size + grid.cell_size / 2
-			)
-			new_item.position = local_pos
-			
-			print("✅ Producto '", product_type, "' depositado en celda vacía: ", output_cell)
-			return  # Éxito, salir
+		if has_item:
+			continue  # Ya hay un item en esta celda, probar siguiente
+		
+		# ¡Celda libre! Colocar el producto aquí
+		var item_scene = preload("res://entities/items/item.tscn")
+		var new_item = item_scene.instantiate()
+		grid.add_child(new_item)
+		new_item.setup(product_type, output_cell)
+		
+		# Posicionar correctamente: como es hijo del grid, usar posición local
+		var local_pos = Vector2(
+			output_cell.x * grid.cell_size + grid.cell_size / 2,
+			output_cell.y * grid.cell_size + grid.cell_size / 2
+		)
+		new_item.position = local_pos
+		
+		print("✅ Producto '", product_type, "' depositado en celda: ", output_cell)
+		return  # Éxito, salir
 	
 	# Si llegamos aquí, todas las celdas adyacentes están bloqueadas
-	print("❌ MÁQUINA BLOQUEADA: No hay espacio libre adyacente para generar el producto '", product_type, "'")
+	print("❌ MÁQUINA BLOQUEADA: No hay espacio libre en las 8 celdas adyacentes para generar el producto '", product_type, "'")
