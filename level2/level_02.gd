@@ -6,6 +6,9 @@ extends Node2D
 @onready var top_menu: CanvasLayer = $TopMenu
 @onready var camera: Camera2D = $Camera2D
 
+var hub_objective_scene: PackedScene = preload("res://ui/barra_objetivos/hub_objetive.tscn")
+var hub_objective: Node2D
+
 var delete_mode: bool = false
 
 func _ready() -> void:
@@ -13,6 +16,8 @@ func _ready() -> void:
 	setup_camera()
 	center_grid()
 	setup_material_spawners()  # Agregar spawners estratégicos
+	ObjectiveManager.reset_for_level(2)   # ← nivel 2
+	setup_objective_hub_ui()              # ← crea HUD
 	
 	# Conectar la señal del modo borrar
 	if top_menu:
@@ -172,3 +177,41 @@ func spawn_material_at(cell: Vector2i, material: String) -> void:
 	
 	grid.add_child(spawner)
 	grid.place_entity(spawner, cell)
+
+
+##NUEVO
+func setup_objective_hub_ui() -> void:
+	hub_objective = hub_objective_scene.instantiate()
+	add_child(hub_objective)
+
+	# poblar primero
+	hub_objective.objectives.clear()
+	for obj in ObjectiveManager.get_all_for_ui():
+		hub_objective.add_objective_with_icon(obj.title, obj.target, obj.icon_tex, obj.current)
+
+	hub_objective.num_slots = ObjectiveManager.objectives.size()
+	hub_objective.setup_background()
+	hub_objective.setup_container()
+	hub_objective.refresh_from(ObjectiveManager.objectives)
+
+	# conectar señales
+	if not ObjectiveManager.objective_updated.is_connected(hub_objective.on_objective_progress):
+		ObjectiveManager.objective_updated.connect(hub_objective.on_objective_progress)
+	if not ObjectiveManager.objective_completed.is_connected(hub_objective.on_objective_complete):
+		ObjectiveManager.objective_completed.connect(hub_objective.on_objective_complete)
+	if not ObjectiveManager.all_objectives_completed.is_connected(hub_objective.on_all_complete):
+		ObjectiveManager.all_objectives_completed.connect(hub_objective.on_all_complete)
+
+	_position_hub()
+
+func _position_hub() -> void:
+	var grid_width_px = grid.grid_width * grid.cell_size
+	var hub_size = hub_objective.get_size()         # ya actualizado
+	var hub_x = grid.position.x + (grid_width_px - hub_size.x) * 0.5
+	var hub_y = grid.position.y + grid.grid_height * grid.cell_size + 16
+	hub_objective.position = Vector2(hub_x, hub_y)
+
+func _on_vp_resized() -> void:
+	center_grid()
+	if is_instance_valid(hub_objective):
+		_position_hub()

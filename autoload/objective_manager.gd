@@ -222,6 +222,24 @@ func _icon_for(element_id: int) -> Texture2D:
 			return load("res://assets/images/Juguete.png") as Texture2D
 		15: # Ventana con marco de madera
 			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		16: # Pack de bebidas reciclado
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		17: # Biblioteca reciclada
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		18: # Colección de envases
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		19: # Kit electrico reciclado
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		20: # Botella de colección
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		21: # Invernadero basico
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		22: # E-book
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		23: # Botella con sorpresa
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		24: # Casa infantil de juguetes
+			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
 		_:
 			var name = elem_id_to_name.get(element_id, "Desconocido")
 			print("⚠️ No se encontró imagen para elemento ID: ", element_id, " (", name, ")")
@@ -313,4 +331,3 @@ func reset_for_level(nivel_num: int) -> void:
 	_check_all_done()
 	
 	print("[ObjectiveManager] ✅ Reset completado")
-
