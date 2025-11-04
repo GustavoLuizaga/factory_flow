@@ -32,7 +32,19 @@ var sprite_paths: Dictionary = {
 	"Cable recubierto": "res://assets/images/Cable_recubierto.png",
 	"Herramienta con mango de madera": "res://assets/images/Herramienta_con_mango_de_madera.png",
 	"Juguete": "res://assets/images/Juguete.png",
-	"Ventana con marco de madera": "res://assets/images/Ventana_con_marco_de_madera.png"
+	"Ventana con marco de madera": "res://assets/images/Ventana_con_marco_de_madera.png",
+	# Super fusiones (Nivel 2)
+	"Pack de bebidas reciclado": "res://assets/images/subFusiones/Pack_de_bebidas_reciclado.png",
+	"Biblioteca reciclada": "res://assets/images/subFusiones/Biblioteca_reciclada.png",
+	"Coleccion de envases": "res://assets/images/subFusiones/Coleccion_de_envases.png",
+	"Kit electrico reciclado": "res://assets/images/subFusiones/Kit_electrico_reciclado.png",
+	"Botella de coleccion": "res://assets/images/subFusiones/Botella_de_coleccion.png",
+	"Invernadero basico": "res://assets/images/subFusiones/Invernadero_basico.png",
+	"E-book": "res://assets/images/subFusiones/E_book.png",
+	"Botella con sorpresa": "res://assets/images/subFusiones/Botella_con_sorpresa.png",
+	"Casa infantil de juguetes": "res://assets/images/subFusiones/Casa_infantil_de_juguetes.png",
+	# Mesa de crafteo (si existe)
+	"Mesa de crafteo": "res://assets/images/subFusiones/Mesa_de_crafteo.png"
 }
 
 @onready var sprite: Sprite2D = $Sprite
