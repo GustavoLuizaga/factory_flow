@@ -105,6 +105,9 @@ func accept_item(item: Item) -> bool:
 	current_item = item
 	transfer_timer = 0.0
 	
+	# Actualizar la celda del item para que coincida con la de esta cinta
+	item.current_cell = current_cell
+	
 	# Mover el item a la posición de esta cinta
 	if GameManager.current_grid:
 		item.move_to_position(global_position)
@@ -187,3 +190,4 @@ func adjust_sprite_size() -> void:
 		
 		# Aplicamos la escala al sprite
 		sprite.scale = Vector2(scale_x, scale_y)
+

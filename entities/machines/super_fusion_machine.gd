@@ -1,8 +1,9 @@
 extends Node2D
-class_name FusionMachine
+class_name SuperFusionMachine
 
-## Máquina que recibe 2 materiales y los fusiona según recetas
-## Tiene 2 entradas (input_a, input_b) y 1 salida
+## Máquina de Super-Fusión (Nivel 2)
+## Recibe 2 PRODUCTOS FUSIONADOS y los combina en super-fusiones
+## Solo acepta fusiones (elementos 6-15), NO materiales base
 
 @export var fusion_time: float = 2.0  # Tiempo de procesamiento
 
@@ -44,13 +45,16 @@ func _process(delta: float) -> void:
 ## Callback cuando se coloca en el grid
 func on_placed_in_grid(cell: Vector2i) -> void:
 	current_cell = cell
-	print("Máquina colocada en: ", cell)
+	print("Super-Máquina colocada en: ", cell)
 
 
 ## Actualiza el visual de la máquina
 func update_visual() -> void:
-	# El sprite ya no necesita cambios de color
-	# Solo actualizamos los marcadores de input
+	# Cargar el sprite de nivel 2
+	if sprite:
+		sprite.texture = load("res://assets/images/fusion_machine_level_two.png")
+	
+	# Actualizar los marcadores de input
 	if input_a_marker:
 		input_a_marker.color = Color(1, 0, 0, 0.5) if input_a == null else Color(0, 1, 0, 0.8)
 	
@@ -75,10 +79,10 @@ func update_status() -> void:
 
 ## Acepta un item en uno de los slots de entrada
 func accept_item(item: Item) -> bool:
-	# Solo aceptar materiales base, no productos fusionados
-	if not GameManager.is_base_material(item.item_type):
-		print("⚠️ Máquina rechaza y DESTRUYE producto fusionado: ", item.item_type, " (solo acepta materiales base)")
-		# Destruir el item para no bloquear el flujo
+	# IMPORTANTE: Solo aceptar productos fusionados (NO materiales base)
+	if GameManager.is_base_material(item.item_type):
+		print("⚠️ Super-Máquina rechaza y DESTRUYE material base: ", item.item_type, " (solo acepta fusiones)")
+		# Destruir el material base para no bloquear el flujo
 		item.destroy()
 		return true  # Retornar true para que la cinta libere su referencia
 	
@@ -86,7 +90,7 @@ func accept_item(item: Item) -> bool:
 	if input_a == null:
 		input_a = item
 		item.move_to_position(global_position + Vector2(-15, 0))
-		print("Máquina recibió item A: ", item.item_type)
+		print("Super-Máquina recibió fusión A: ", item.item_type)
 		update_status()
 		return true
 	
@@ -94,16 +98,16 @@ func accept_item(item: Item) -> bool:
 	if input_b == null:
 		input_b = item
 		item.move_to_position(global_position + Vector2(15, 0))
-		print("Máquina recibió item B: ", item.item_type)
+		print("Super-Máquina recibió fusión B: ", item.item_type)
 		update_status()
 		return true
 	
 	# Ambos slots llenos - rechazar
-	print("⏸️ Máquina llena, rechazando item")
+	print("⏸️ Super-Máquina llena, rechazando item")
 	return false
 
 
-## Intenta fusionar los dos materiales
+## Intenta fusionar los dos productos
 func try_fuse() -> void:
 	if not input_a or not input_b:
 		return
@@ -112,7 +116,7 @@ func try_fuse() -> void:
 	
 	# Verificar si este producto ya fue creado en ESTA máquina
 	if result != "" and result in completed_products:
-		print("⚠️ Esta máquina ya produjo: ", result, " - Rechazando combinación")
+		print("⚠️ Esta super-máquina ya produjo: ", result, " - Rechazando combinación")
 		# Destruir items porque ya se produjo este producto aquí
 		input_a.destroy()
 		input_b.destroy()
@@ -122,12 +126,12 @@ func try_fuse() -> void:
 		return
 	
 	if result != "":
-		print("¡Receta válida! ", input_a.item_type, " + ", input_b.item_type, " = ", result)
+		print("¡Super-fusión válida! ", input_a.item_type, " + ", input_b.item_type, " = ", result)
 		is_processing = true
 		process_timer = 0.0
 	else:
-		print("Receta inválida: ", input_a.item_type, " + ", input_b.item_type)
-		# Destruir items inválidos o expulsarlos
+		print("Super-fusión inválida: ", input_a.item_type, " + ", input_b.item_type)
+		# Destruir items inválidos
 		input_a.destroy()
 		input_b.destroy()
 		input_a = null
@@ -145,12 +149,12 @@ func complete_fusion() -> void:
 	if result == "":
 		return
 	
-	print("¡Fusión completada! Producto: ", result)
+	print("¡Super-fusión completada! Producto: ", result)
 	
 	# Marcar este producto como completado en ESTA máquina
 	if result not in completed_products:
 		completed_products.append(result)
-		print("✅ Máquina en ", current_cell, " completó: ", result)
+		print("✅ Super-Máquina en ", current_cell, " completó: ", result)
 	
 	# Registrar la fusión en el GameManager para objetivos
 	GameManager.register_completed_fusion(result)
@@ -164,13 +168,8 @@ func complete_fusion() -> void:
 	# Crear item de salida
 	produce_output(result)
 	
-	#NUEVO actualizar objetivos y métricas
+	# Actualizar objetivos
 	ObjectiveManager.inc_by_element_name(result, 1)
-
-	
-	# -NUEVO-- PROGRESO OBJETIVOS (por nombre, evita choque de IDs duplicados)
-	print("[OBJ] result=", result)
-	#ObjectiveManager.inc_by_element_name(result, 1)
 
 	# Registrar fusión
 	GameManager.register_fusion()
@@ -236,8 +235,8 @@ func produce_output(product_type: String) -> void:
 		)
 		new_item.position = local_pos
 		
-		print("✅ Producto '", product_type, "' depositado en celda: ", output_cell, " (funciona como spawner)")
+		print("✅ Super-Producto '", product_type, "' depositado en celda: ", output_cell, " (funciona como spawner)")
 		return  # Éxito, salir
 	
 	# Si llegamos aquí, todas las celdas adyacentes están bloqueadas
-	print("❌ MÁQUINA BLOQUEADA: No hay espacio libre en las 8 celdas adyacentes para generar el producto '", product_type, "'")
+	print("❌ SUPER-MÁQUINA BLOQUEADA: No hay espacio libre en las 8 celdas adyacentes para generar el producto '", product_type, "'")
