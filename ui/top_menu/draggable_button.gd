@@ -13,6 +13,7 @@ signal drag_ended()
 var is_dragging: bool = false
 var drag_preview: Node2D = null
 var is_touch_inside: bool = false
+var price_label: Label = null  # NUEVO: Label para mostrar el precio
 
 
 func _ready() -> void:
@@ -24,6 +25,70 @@ func _ready() -> void:
 	
 	# Permitir que los eventos pasen a través después de procesarlos
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# NUEVO: Esperar un frame para que el nivel inicialice la economía
+	await get_tree().process_frame
+	
+	# NUEVO: Crear label de precio
+	create_price_label()
+	
+	# NUEVO: Actualizar precio cuando cambie la economía
+	if EconomyManager:
+		EconomyManager.money_changed.connect(_on_money_changed)
+
+
+## NUEVO: Crea el label que muestra el precio
+func create_price_label() -> void:
+	if not EconomyManager:
+		return
+	
+	if not EconomyManager.has_economy():
+		return
+	
+	var entity_type = get_entity_type_name()
+	var cost = EconomyManager.get_cost(entity_type)
+	
+	if cost == 0:
+		return  # Sin costo, no mostrar precio
+	
+	# Si ya existe un label, eliminarlo primero
+	if price_label:
+		price_label.queue_free()
+	
+	price_label = Label.new()
+	price_label.name = "PriceLabel"
+	price_label.text = str(cost) + "💰"
+	price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	price_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	price_label.add_theme_font_size_override("font_size", 16)
+	price_label.add_theme_color_override("font_color", Color(1, 0.85, 0, 1))
+	price_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	price_label.add_theme_constant_override("outline_size", 2)
+	price_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	# Usar anchors para posicionar
+	price_label.anchor_left = 0
+	price_label.anchor_top = 1
+	price_label.anchor_right = 1
+	price_label.anchor_bottom = 1
+	price_label.offset_top = -20
+	price_label.offset_bottom = 0
+	price_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	price_label.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	
+	add_child(price_label)
+
+
+## NUEVO: Actualiza el color del precio según el balance
+func _on_money_changed(new_amount: int) -> void:
+	if not price_label:
+		return
+	
+	var entity_type = get_entity_type_name()
+	if EconomyManager.can_afford(entity_type):
+		price_label.add_theme_color_override("font_color", Color(1, 0.85, 0, 1))  # Dorado
+	else:
+		price_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3, 1))  # Rojo
 
 
 func _on_gui_input(event: InputEvent) -> void:
@@ -87,6 +152,16 @@ func start_drag() -> void:
 		return
 	
 	if is_dragging:
+		return
+	
+	# NUEVO: Verificar si hay suficiente dinero
+	var entity_type = get_entity_type_name()
+	if EconomyManager and not EconomyManager.can_afford(entity_type):
+		print("❌ No hay suficiente dinero para: ", entity_type)
+		# Feedback visual
+		modulate = Color(1, 0.3, 0.3, 1.0)
+		await get_tree().create_timer(0.2).timeout
+		modulate = Color(1, 1, 1, 1.0)
 		return
 	
 	is_dragging = true
@@ -157,6 +232,14 @@ func end_drag() -> void:
 	
 	# Verificar si se puede colocar
 	if grid.is_valid_cell(cell) and not grid.is_cell_occupied(cell):
+		# NUEVO: Intentar comprar la entidad
+		var entity_type = get_entity_type_name()
+		if EconomyManager and not EconomyManager.try_purchase(entity_type):
+			print("❌ Compra cancelada: fondos insuficientes")
+			drag_preview.queue_free()
+			drag_preview = null
+			return
+		
 		# Remover del nivel y agregar al grid
 		drag_preview.get_parent().remove_child(drag_preview)
 		grid.add_child(drag_preview)
@@ -175,3 +258,14 @@ func end_drag() -> void:
 		drag_preview.queue_free()
 	
 	drag_preview = null
+
+
+## Obtiene el tipo de entidad para el sistema de economía
+func get_entity_type_name() -> String:
+	if entity_name.contains("Cinta"):
+		return "conveyor"
+	elif entity_name.contains("Super-Máquina"):
+		return "super_fusion_machine"
+	elif entity_name.contains("Máquina"):
+		return "fusion_machine"
+	return ""
