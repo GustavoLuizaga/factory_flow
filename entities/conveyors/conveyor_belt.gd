@@ -190,4 +190,3 @@ func adjust_sprite_size() -> void:
 		
 		# Aplicamos la escala al sprite
 		sprite.scale = Vector2(scale_x, scale_y)
-
