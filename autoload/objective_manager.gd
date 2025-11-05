@@ -222,6 +222,7 @@ func _icon_for(element_id: int) -> Texture2D:
 			return load("res://assets/images/Juguete.png") as Texture2D
 		15: # Ventana con marco de madera
 			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
+		##De momento las la img por defecto esta ventana
 		16: # Pack de bebidas reciclado
 			return load("res://assets/images/Ventana_con_marco_de_madera.png") as Texture2D
 		17: # Biblioteca reciclada
