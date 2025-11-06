@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="factory_flow"
-run/main_scene="uid://dpvs7kjy8qrjm"
+run/main_scene="uid://7lylhtm1rwho"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 ObjectiveManager="*res://autoload/objective_manager.gd"
 GameManager="*res://autoload/game_manager.gd"
 EconomyManager="*res://autoload/economy_manager.gd"
+ProgressManager="*res://autoload/progress_manager.gd"
 
 [display]
 

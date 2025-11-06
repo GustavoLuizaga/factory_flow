@@ -21,7 +21,10 @@ func _ready() -> void:
 	# Conectar la señal del modo borrar
 	if top_menu:
 		top_menu.delete_mode_changed.connect(_on_delete_mode_changed)
-
+	
+	#Desbloquear nivel 2
+	if not ObjectiveManager.all_objectives_completed.is_connected(_on_all_done):
+		ObjectiveManager.all_objectives_completed.connect(_on_all_done)
 
 ## Para debug - presiona D para ver el mapa del grid
 func _input(event: InputEvent) -> void:
@@ -225,3 +228,8 @@ func setup_objective_hub_ui() -> void:
 	hub_objective.refresh_from(ObjectiveManager.objectives)
 
 	print("Hub de objetivos centrado bajo el grid")
+	
+##NUEVO unlock level
+func _on_all_done() -> void:
+	ProgressManager.unlock(2)
+	# feedback opcional: popup “Nivel 2 desbloqueado”

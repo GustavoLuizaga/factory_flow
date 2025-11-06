@@ -1,0 +1,111 @@
+[gd_scene load_steps=8 format=3 uid="uid://bydrqjch8agkc"]
+
+[ext_resource type="Texture2D" uid="uid://djgdjb1wtam54" path="res://assets/images/Fondo_Menu.png" id="1_078cu"]
+[ext_resource type="Script" uid="uid://cqntastf7pekd" path="res://Scripts/level_select.gd" id="1_tafqu"]
+[ext_resource type="FontFile" uid="uid://by8s55j3r8lk" path="res://assets/scenes/dogica.ttf" id="2_xip3m"]
+[ext_resource type="Texture2D" uid="uid://48b4m4eytwh3" path="res://assets/images/TituloJuego.png" id="4_7dfk8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xip3m"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tafqu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7dfk8"]
+
+[node name="LevelSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tafqu")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_078cu")
+expand_mode = 1
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 1142.0
+offset_bottom = 648.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_xip3m")
+theme_override_font_sizes/font_size = 60
+text = "Selecciona nivel"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+size_flags_stretch_ratio = 2.0
+theme_override_constants/separation = 60
+
+[node name="btnNivel1" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+theme_override_fonts/font = ExtResource("2_xip3m")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_xip3m")
+text = "Nivel1"
+
+[node name="Lock1" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "✔"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="btnNivel2" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_xip3m")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tafqu")
+text = "Nivel2"
+
+[node name="Lock2" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "🔒"
+
+[node name="btnvolver" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_fonts/font = ExtResource("2_xip3m")
+theme_override_font_sizes/font_size = 55
+theme_override_styles/normal = SubResource("StyleBoxFlat_7dfk8")
+text = "Volver"
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 556.0
+offset_top = 57.0
+offset_right = 1207.0
+offset_bottom = 429.0
+texture = ExtResource("4_7dfk8")
+
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/btnNivel1" to="." method="_on_BtnLevel1_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer2/btnNivel2" to="." method="_on_BtnLevel2_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/btnvolver" to="." method="_on_BtnVolver_pressed"]
