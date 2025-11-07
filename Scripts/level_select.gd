@@ -1,11 +1,14 @@
 extends Control
 
-@onready var btn1: Button = $"PanelContainer/VBoxContainer/HBoxContainer/btnNivel1"
-@onready var lock1: Label = $"PanelContainer/VBoxContainer/HBoxContainer/Lock1"
-@onready var btn2: Button = $"PanelContainer/VBoxContainer/HBoxContainer2/btnNivel2"
-@onready var lock2: Label = $"PanelContainer/VBoxContainer/HBoxContainer2/Lock2"
+# Referencias a los botones y etiquetas
+@onready var btn1: Button = $"ColorRect/VBoxContainer/HBoxContainer/btnNivel1"
+@onready var lock1: Label = $"ColorRect/VBoxContainer/HBoxContainer/Lock1"
+@onready var btn2: Button = $"ColorRect/VBoxContainer/HBoxContainer2/btnNivel2"
+@onready var lock2: Label = $"ColorRect/VBoxContainer/HBoxContainer2/Lock2"
+@onready var btnvolver: Button = $"ColorRect/VBoxContainer/btnvolver"
 
 func _ready() -> void:
+	# Cuando la escena se carga, actualiza el estado de los botones
 	_refresh()
 
 func _refresh() -> void:
@@ -26,7 +29,3 @@ func _on_BtnLevel2_pressed() -> void:
 
 func _on_BtnVolver_pressed() -> void:
 	get_tree().change_scene_to_file("res://Menu/menu.tscn")
-
-
-func _on_btn_nivel_1_pressed() -> void:
-	pass # Replace with function body.
