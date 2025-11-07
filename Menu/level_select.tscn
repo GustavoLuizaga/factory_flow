@@ -1,15 +1,21 @@
-[gd_scene load_steps=8 format=3 uid="uid://bydrqjch8agkc"]
+[gd_scene load_steps=9 format=3 uid="uid://bydrqjch8agkc"]
 
 [ext_resource type="Texture2D" uid="uid://djgdjb1wtam54" path="res://assets/images/Fondo_Menu.png" id="1_078cu"]
 [ext_resource type="Script" uid="uid://cqntastf7pekd" path="res://Scripts/level_select.gd" id="1_tafqu"]
 [ext_resource type="FontFile" uid="uid://by8s55j3r8lk" path="res://assets/scenes/dogica.ttf" id="2_xip3m"]
 [ext_resource type="Texture2D" uid="uid://48b4m4eytwh3" path="res://assets/images/TituloJuego.png" id="4_7dfk8"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xip3m"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ygsgx"]
+bg_color = Color(0, 0, 0, 0.03137255)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tafqu"]
+bg_color = Color(0.6, 0.6, 0.6, 0.03137255)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7tm22"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7dfk8"]
+bg_color = Color(0.6, 0.6, 0.6, 0.015686275)
 
 [node name="LevelSelect" type="Control"]
 layout_mode = 3
@@ -41,75 +47,97 @@ color = Color(0.4189422, 0.28309524, 0.10091866, 0)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 7
 anchor_left = 0.5
-anchor_top = 0.5
+anchor_top = 1.0
 anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -480.0
-offset_top = -80.0
-offset_right = 480.0
-offset_bottom = 80.0
+anchor_bottom = 1.0
+offset_left = -552.5
+offset_top = -388.0
+offset_right = 552.5
+offset_bottom = -8.0
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
+theme_override_constants/separation = 16
 
 [node name="Label" type="Label" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("2_xip3m")
-theme_override_font_sizes/font_size = 60
-text = "Selecciona nivel"
+theme_override_font_sizes/font_size = 65
+text = "Seleccionar Nivel"
 horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 4
 size_flags_vertical = 4
-size_flags_stretch_ratio = 2.0
-theme_override_constants/separation = 60
 
 [node name="btnNivel1" type="Button" parent="ColorRect/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.8745098, 0.8745098, 0.8745098, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_xip3m")
-theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = SubResource("StyleBoxFlat_xip3m")
-text = "Nivel1"
+theme_override_font_sizes/font_size = 55
+theme_override_styles/normal = SubResource("StyleBoxFlat_ygsgx")
+text = "Nivel 1"
+icon_alignment = 1
 
 [node name="Lock1" type="Label" parent="ColorRect/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 55
 text = "✔"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="btnNivel2" type="Button" parent="ColorRect/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_xip3m")
+theme_override_font_sizes/font_size = 55
 theme_override_styles/normal = SubResource("StyleBoxFlat_tafqu")
-text = "Nivel2"
+text = "Nivel 2"
 
 [node name="Lock2" type="Label" parent="ColorRect/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 55
+text = "🔒"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="ColorRect/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="btnNivel3" type="Button" parent="ColorRect/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_xip3m")
+theme_override_font_sizes/font_size = 55
+theme_override_styles/normal = SubResource("StyleBoxFlat_7tm22")
+text = "Nivel 3"
+
+[node name="Lock3" type="Label" parent="ColorRect/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 55
 text = "🔒"
 
 [node name="btnvolver" type="Button" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_xip3m")
-theme_override_font_sizes/font_size = 55
+theme_override_font_sizes/font_size = 35
 theme_override_styles/normal = SubResource("StyleBoxFlat_7dfk8")
 text = "Volver"
 
 [node name="TextureRect2" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = 282.0
-offset_top = -32.0
-offset_right = 933.0
-offset_bottom = 340.0
+offset_left = 245.0
+offset_top = -48.0
+offset_right = 896.0
+offset_bottom = 324.0
 texture = ExtResource("4_7dfk8")
 
 [connection signal="pressed" from="ColorRect/VBoxContainer/HBoxContainer/btnNivel1" to="." method="_on_BtnLevel1_pressed"]
