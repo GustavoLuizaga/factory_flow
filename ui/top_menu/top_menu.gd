@@ -9,6 +9,7 @@ signal delete_mode_changed(is_active: bool)
 @onready var conveyor_left_btn: DraggableButton = $Panel/HBoxContainer/ConveyorLeftContainer/ConveyorLeftBtn
 @onready var conveyor_right_btn: DraggableButton = $Panel/HBoxContainer/ConveyorRightContainer/ConveyorRightBtn
 @onready var machine_btn: DraggableButton = $Panel/HBoxContainer/MachineContainer/MachineBtn
+@onready var delete_icon_normal = preload("res://assets/images/eliminar.png")
 
 # Referencias a las etiquetas (ahora son hijos de los botones)
 @onready var label_up: Label = $Panel/HBoxContainer/ConveyorUpContainer/ConveyorUpBtn/Label
@@ -105,7 +106,7 @@ func create_delete_button() -> void:
 		print("❌ No se encontró HBoxContainer")
 		return
 	
-	# Crear contenedor
+
 	var delete_container = MarginContainer.new()
 	delete_container.name = "DeleteContainer"
 	delete_container.add_theme_constant_override("margin_left", 10)
@@ -114,27 +115,30 @@ func create_delete_button() -> void:
 	delete_container.add_theme_constant_override("margin_bottom", 10)
 	hbox.add_child(delete_container)
 	
-	# Crear botón
 	delete_btn = TextureButton.new()
 	delete_btn.name = "DeleteBtn"
-	delete_btn.custom_minimum_size = Vector2(64, 64)
+	
+	delete_btn.texture_normal = delete_icon_normal
+	delete_btn.ignore_texture_size = true 
+	delete_btn.custom_minimum_size = Vector2(50, 50)
+	
+	delete_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+
 	delete_container.add_child(delete_btn)
 	
-	# Crear fondo rojo
-	var color_rect = ColorRect.new()
-	color_rect.color = Color(0.8, 0.2, 0.2, 1)
-	color_rect.custom_minimum_size = Vector2(64, 64)
-	color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	delete_btn.add_child(color_rect)
 	
-	# Crear etiqueta con emoji
-	var label = Label.new()
-	label.text = "🗑️"
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	label.add_theme_font_size_override("font_size", 32)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	color_rect.add_child(label)
+	# Crear fondo rojo (BORRADO)
+	#var color_rect = ColorRect.new()
+	#color_rect.color = Color(0.8, 0.2, 0.2, 1)
+	#color_rect.custom_minimum_size = Vector2(64, 64)
+	#color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	#delete_btn.add_child(color_rect)
 	
-	print("✅ Botón de borrar creado exitosamente")
+	# Crear etiqueta con emoji (BORRADO)
+	#var label = Label.new()
+	#label.text = "🗑️"
+	#label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# ... (más propiedades del label) ...
+	#color_rect.add_child(label)
+	
+	print("✅ Botón de borrar con imagen PNG creado exitosamente")
