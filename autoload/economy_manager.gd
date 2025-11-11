@@ -6,6 +6,7 @@ extends Node
 
 signal money_changed(new_amount: int)
 signal purchase_failed(item_name: String, cost: int)
+signal game_over_no_money()  # NUEVA señal para cuando se pierde por falta de dinero
 
 # Balance actual de monedas
 var current_money: int = 0
@@ -120,10 +121,18 @@ func try_purchase(entity_type: String) -> bool:
 		current_money -= cost
 		print("💸 Compra: ", entity_type, " por ", cost, " monedas. Balance: ", current_money)
 		money_changed.emit(current_money)
+		
+		# Verificar si se quedó sin dinero suficiente para continuar
+		check_game_over_condition()
+		
 		return true
 	else:
 		print("❌ Fondos insuficientes para ", entity_type, ". Costo: ", cost, ", Balance: ", current_money)
 		purchase_failed.emit(entity_type, cost)
+		
+		# Verificar si perdió el juego
+		check_game_over_condition()
+		
 		return false
 
 
@@ -165,3 +174,31 @@ func can_afford(entity_type: String) -> bool:
 ## Verifica si el nivel actual tiene economía activa
 func has_economy() -> bool:
 	return not entity_costs.is_empty()
+
+
+## Verifica si el jugador puede comprar al menos un item más barato
+func can_buy_something() -> bool:
+	if not has_economy():
+		return true  # Sin economía, siempre puede "comprar"
+	
+	# Encontrar el costo más barato disponible
+	var min_cost = 999999
+	for entity_type in entity_costs.keys():
+		var cost = entity_costs[entity_type]
+		if cost > 0 and cost < min_cost:
+			min_cost = cost
+	
+	return current_money >= min_cost
+
+
+## Verifica la condición de Game Over (sin dinero suficiente)
+func check_game_over_condition() -> void:
+	if not has_economy():
+		return  # No hay economía activa
+	
+	# Verificar si no puede comprar nada
+	if not can_buy_something():
+		print("💀 ¡GAME OVER! El jugador se quedó sin dinero suficiente")
+		print("   Balance actual: ", current_money)
+		print("   No puede comprar ninguna entidad más")
+		game_over_no_money.emit()

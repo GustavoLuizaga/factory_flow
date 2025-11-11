@@ -29,6 +29,9 @@ func _ready() -> void:
 		EconomyManager.initialize_for_level(2)
 		add_money_display()
 
+		if not EconomyManager.game_over_no_money.is_connected(_on_game_over_no_money):
+			EconomyManager.game_over_no_money.connect(_on_game_over_no_money)
+
 	
 	# Conectar la señal del modo borrar
 	if top_menu:
@@ -305,3 +308,12 @@ func _on_vp_resized() -> void:
 	center_grid()
 	if is_instance_valid(hub_objective):
 		_position_hub()
+
+
+##Leo aqui puedes implementar la llamada a tu modallll
+## Callback cuando el jugador pierde por falta de dinero
+func _on_game_over_no_money() -> void:
+	
+	print("💀 ¡PERDISTE EL JUEGO! 💀")
+	
+	
