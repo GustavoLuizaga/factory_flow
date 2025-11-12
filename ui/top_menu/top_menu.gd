@@ -17,11 +17,15 @@ signal delete_mode_changed(is_active: bool)
 @onready var label_left: Label = $Panel/HBoxContainer/ConveyorLeftContainer/ConveyorLeftBtn/Label
 @onready var label_right: Label = $Panel/HBoxContainer/ConveyorRightContainer/ConveyorRightBtn/Label
 
+var pause_btn: TextureButton = null
 var delete_mode: bool = false
 var delete_btn: TextureButton = null  # Se crea dinámicamente
 
 
 func _ready() -> void:
+	# Obtener el botón de pausa
+	pause_btn = $Panel/HBoxContainer/PauseButtonContainer/PauseBtn
+	
 	# Estilizar solo las etiquetas de las cintas
 	style_label(label_up)
 	style_label(label_down)
@@ -35,6 +39,13 @@ func _ready() -> void:
 	# Conectar el botón de borrar
 	if delete_btn:
 		delete_btn.pressed.connect(_on_delete_btn_pressed)
+	
+	# Conectar el botón de pausa
+	if pause_btn:
+		pause_btn.pressed.connect(_on_pause_btn_pressed)
+		print("✅ Botón de pausa conectado correctamente")
+	else:
+		print("❌ No se encontró el botón de pausa")
 	
 	# Conectar señales de los botones draggable para desactivar modo borrar
 	conveyor_up_btn.drag_started.connect(_on_any_drag_started)
@@ -126,6 +137,10 @@ func create_delete_button() -> void:
 
 	delete_container.add_child(delete_btn)
 	
+	# Mover el botón de pausa al final (después del botón de eliminar)
+	if pause_btn and pause_btn.get_parent():
+		var pause_button_container = pause_btn.get_parent()
+		hbox.move_child(pause_button_container, hbox.get_child_count() - 1)
 	
 	# Crear fondo rojo (BORRADO)
 	#var color_rect = ColorRect.new()
@@ -142,3 +157,16 @@ func create_delete_button() -> void:
 	#color_rect.add_child(label)
 	
 	print("✅ Botón de borrar con imagen PNG creado exitosamente")
+
+
+## Callback cuando se presiona el botón de pausa
+func _on_pause_btn_pressed() -> void:
+	# Buscar el menú de pausa en el nivel actual
+	var current_scene = get_tree().current_scene
+	var pause_menu = current_scene.find_child("PauseMenu", true, false)
+	
+	if pause_menu:
+		pause_menu.toggle_pause()
+		print("⏸️ Botón de pausa presionado")
+	else:
+		print("❌ No se encontró PauseMenu en la escena actual")
