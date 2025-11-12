@@ -177,10 +177,22 @@ script = ExtResource("2_draggable")
 entity_scene = ExtResource("4_machine")
 entity_name = "Máquina de Fusión"
 
+[node name="AlmanacButtonContainer" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="AlmanacBtn" type="Button" parent="Panel/HBoxContainer/AlmanacButtonContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+text = "📖"
+
 [node name="PauseButtonContainer" type="MarginContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 10
-theme_override_constants/margin_left = 10
+theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 5
@@ -191,3 +203,4 @@ layout_mode = 2
 texture_normal = ExtResource("10_pause_btn")
 ignore_texture_size = true
 stretch_mode = 5
+

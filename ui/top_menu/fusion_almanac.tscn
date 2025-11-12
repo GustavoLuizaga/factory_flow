@@ -1,0 +1,59 @@
+[gd_scene load_steps=1 format=3 uid="uid://dj86cq3aujlyt"]
+
+[ext_resource type="Script" path="res://ui/top_menu/fusion_almanac.gd" id="1_almanac"]
+
+[node name="FusionAlmanac" type="CanvasLayer"]
+layer = 99
+process_mode = 3
+script = ExtResource("1_almanac")
+
+[node name="BackgroundPanel" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.7)
+mouse_filter = 1
+
+[node name="MainPanel" type="Panel" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -350.0
+offset_right = 300.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="MainPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 590.0
+offset_bottom = 40.0
+text = "ALMANAQUE DE FUSIONES"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 50.0
+offset_right = 590.0
+offset_bottom = 650.0
+
+[node name="GridContainer" type="GridContainer" parent="MainPanel/ScrollContainer"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+
+[node name="CloseButton" type="Button" parent="MainPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 660.0
+offset_right = 150.0
+offset_bottom = 690.0
+text = "Cerrar (ESC)"

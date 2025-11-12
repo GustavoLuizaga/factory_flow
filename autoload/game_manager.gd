@@ -9,6 +9,9 @@ const DB_PATH = "res://database/factory_db.db"
 # Diccionario de recetas: "Material1+Material2" -> "Producto"
 var recipes: Dictionary = {}
 
+# Array de todos los elementos
+var elements: Array[Dictionary] = []
+
 # Colores únicos para cada tipo de material/producto (provisional hasta tener sprites)
 var material_colors: Dictionary = {
 	"Papel": Color.WHITE,
@@ -73,13 +76,15 @@ func _load_from_json() -> void:
 	var data = json.data
 	print("✅ JSON cargado exitosamente")
 	
-	# Limpiar diccionarios
+	# Limpiar diccionarios y arrays
 	recipes.clear()
 	base_materials.clear()
+	elements.clear()
 	
-	# Cargar elementos base
+	# Cargar elementos
 	if data.has("elementos"):
 		for elem in data["elementos"]:
+			elements.append(elem)
 			if elem.get("es_base", false):
 				base_materials.append(elem["nombre"])
 	

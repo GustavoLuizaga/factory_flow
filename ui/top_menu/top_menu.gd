@@ -18,13 +18,18 @@ signal delete_mode_changed(is_active: bool)
 @onready var label_right: Label = $Panel/HBoxContainer/ConveyorRightContainer/ConveyorRightBtn/Label
 
 var pause_btn: TextureButton = null
+var almanac_btn: Button = null
 var delete_mode: bool = false
 var delete_btn: TextureButton = null  # Se crea dinámicamente
+var fusion_almanac: Node = null
 
 
 func _ready() -> void:
 	# Obtener el botón de pausa
 	pause_btn = $Panel/HBoxContainer/PauseButtonContainer/PauseBtn
+	
+	# Obtener el botón del almanaque
+	almanac_btn = $Panel/HBoxContainer/AlmanacButtonContainer/AlmanacBtn
 	
 	# Estilizar solo las etiquetas de las cintas
 	style_label(label_up)
@@ -46,6 +51,13 @@ func _ready() -> void:
 		print("✅ Botón de pausa conectado correctamente")
 	else:
 		print("❌ No se encontró el botón de pausa")
+	
+	# Conectar el botón del almanaque
+	if almanac_btn:
+		almanac_btn.pressed.connect(_on_almanac_btn_pressed)
+		print("✅ Botón del almanaque conectado correctamente")
+	else:
+		print("❌ No se encontró el botón del almanaque")
 	
 	# Conectar señales de los botones draggable para desactivar modo borrar
 	conveyor_up_btn.drag_started.connect(_on_any_drag_started)
@@ -157,6 +169,19 @@ func create_delete_button() -> void:
 	#color_rect.add_child(label)
 	
 	print("✅ Botón de borrar con imagen PNG creado exitosamente")
+
+
+## Callback cuando se presiona el botón del almanaque
+func _on_almanac_btn_pressed() -> void:
+	# Buscar el almanaque de fusiones en el nivel actual
+	var current_scene = get_tree().current_scene
+	var fusion_almanac = current_scene.find_child("FusionAlmanac", true, false)
+	
+	if fusion_almanac:
+		fusion_almanac.toggle_almanac()
+		print("📖 Botón del almanaque presionado")
+	else:
+		print("❌ No se encontró FusionAlmanac en la escena actual")
 
 
 ## Callback cuando se presiona el botón de pausa
