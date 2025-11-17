@@ -23,7 +23,12 @@
 		{ "id": 21, "nombre": "Invernadero basico", "es_base": false },
 		{ "id": 22, "nombre": "E-book", "es_base": false },
 		{ "id": 23, "nombre": "Botella con sorpresa", "es_base": false },
-		{ "id": 24, "nombre": "Casa infantil de juguetes", "es_base": false }
+		{ "id": 24, "nombre": "Casa infantil de juguetes", "es_base": false },
+		{ "id": 25, "nombre": "Centro educativo de reciclaje", "es_base": false },
+		{ "id": 26, "nombre": "Taller de proyectos domésticos reciclados", "es_base": false },
+		{ "id": 27, "nombre": "Invernadero experimental", "es_base": false },
+		{ "id": 28, "nombre": "Estación educativa interactiva", "es_base": false },
+		{ "id": 29, "nombre": "Taller de manualidades", "es_base": false }
 	],
 	"combinaciones": [
 		{ "elemento1": 1, "elemento2": 2, "resultado": 6 },
@@ -44,7 +49,12 @@
 		{ "elemento1": 13, "elemento2": 15, "resultado": 21 },
 		{ "elemento1": 8, "elemento2": 11, "resultado": 22 },
 		{ "elemento1": 13, "elemento2": 14, "resultado": 23 },
-		{ "elemento1": 15, "elemento2": 14, "resultado": 24 }
+		{ "elemento1": 15, "elemento2": 14, "resultado": 24 },
+		{ "elemento1": 16, "elemento2": 17, "resultado": 25 },
+		{ "elemento1": 18, "elemento2": 19, "resultado": 26 },
+		{ "elemento1": 20, "elemento2": 21, "resultado": 27 },
+		{ "elemento1": 22, "elemento2": 23, "resultado": 28 },
+		{ "elemento1": 12, "elemento2": 24, "resultado": 29 }
 	],
 	"niveles": [
 		{
@@ -63,6 +73,18 @@
 				"reembolso_porcentaje": 60
 			},
 			"objetivos": [16, 17, 18, 19, 20, 21, 22, 23, 24]
+		},
+		{
+			"numero": 3,
+			"nombre": "Nivel 3 - Fusiones Definitivas",
+			"monedas_iniciales": 2000,
+			"economia": {
+				"cinta": 10,
+				"maquina": 50,
+				"super_maquina": 100,
+				"reembolso_porcentaje": 60
+			},
+			"objetivos": [26, 28, 29]
 		}
 	]
 }
