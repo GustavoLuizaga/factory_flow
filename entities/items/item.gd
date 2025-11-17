@@ -119,7 +119,11 @@ func update_visual() -> void:
 		var color_rect = ColorRect.new()
 		color_rect.size = Vector2(40, 40)
 		color_rect.position = Vector2(-20, -20)
-		color_rect.color = GameManager.get_material_color(item_type)
+		
+		# Usar color específico del GameManager si está disponible
+		var item_color = GameManager.get_material_color(item_type)
+		color_rect.color = item_color
+		
 		add_child(color_rect)
 		sprite.visible = false
 	

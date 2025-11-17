@@ -1,6 +1,6 @@
 extends Node2D
 
-## Level 2 - Versión de prueba (solo Grid y Menú)
+## Level 3 - Fusiones Definitivas (Ultimate Fusions)
 
 @onready var grid: Grid = $Grid
 @onready var top_menu: CanvasLayer = $TopMenu
@@ -13,20 +13,21 @@ var hub_objective: Node2D
 var delete_mode: bool = false
 
 func _ready() -> void:
-	print("=== Level 2 iniciado (Versión de prueba) ===")
+	print("=== Level 3 iniciado (Fusiones Definitivas) ===")
 	setup_camera()
 	center_grid()
 	setup_material_spawners()  # Agregar spawners estratégicos
 	
 	##NUEVO
-	ObjectiveManager.reset_for_level(2)   # ← nivel 2
+	ObjectiveManager.reset_for_level(3)   # ← nivel 3
 	setup_objective_hub_ui()              # ← crea HUD
 
-	add_super_machine_button()  # NUEVO: Agregar botón de super-máquina
+	add_super_machine_button()  # Agregar botón de super-máquina
+	add_ultimate_machine_button()  # NUEVO: Agregar botón de ultimate-máquina
 	
-	# NUEVO: Inicializar sistema de economía
+	# Inicializar sistema de economía
 	if EconomyManager:
-		EconomyManager.initialize_for_level(2)
+		EconomyManager.initialize_for_level(3)
 		add_money_display()
 
 		if not EconomyManager.game_over_no_money.is_connected(_on_game_over_no_money):
@@ -98,14 +99,17 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 	var cell = grid.world_to_grid(world_pos)
 	var entity = grid.get_entity_at(cell)
 	
-	# Borrar cintas o máquinas (fusión normal y super-fusión)
-	if entity and (entity is ConveyorBelt or entity is FusionMachine or entity is SuperFusionMachine):
+	# Borrar cintas o máquinas (fusión normal, super-fusión y ultimate-fusión)
+	if entity and (entity is ConveyorBelt or entity is FusionMachine or entity is SuperFusionMachine or entity is UltimateFusionMachine):
 		var entity_type = "entidad"
 		var economy_type = ""
 		
 		if entity is ConveyorBelt:
 			entity_type = "cinta"
 			economy_type = "conveyor"
+		elif entity is UltimateFusionMachine:
+			entity_type = "ultimate-máquina"
+			economy_type = "ultimate_fusion_machine"
 		elif entity is SuperFusionMachine:
 			entity_type = "super-máquina"
 			economy_type = "super_fusion_machine"
@@ -115,7 +119,7 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 		
 		print("🗑️ Borrando ", entity_type, " en celda: ", cell)
 		
-		# NUEVO: Dar reembolso
+		# Dar reembolso
 		if EconomyManager and economy_type != "":
 			EconomyManager.refund(economy_type)
 		
@@ -124,7 +128,7 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 			entity.current_item.queue_free()
 		
 		# Si es una máquina con inputs, destruirlos
-		if (entity is FusionMachine or entity is SuperFusionMachine):
+		if (entity is FusionMachine or entity is SuperFusionMachine or entity is UltimateFusionMachine):
 			if entity.input_a:
 				entity.input_a.queue_free()
 			if entity.input_b:
@@ -203,7 +207,7 @@ func setup_material_spawners() -> void:
 		var position = spawner_positions[material]
 		spawn_material_at(position, material)
 	
-	print("✅ Spawners de materiales colocados estratégicamente en Level 2")
+	print("✅ Spawners de materiales colocados estratégicamente en Level 3")
 
 
 ## Crea y coloca un spawner de material en una celda específica
@@ -211,13 +215,13 @@ func spawn_material_at(cell: Vector2i, material: String) -> void:
 	var spawner_scene = preload("res://entities/materials/material_spawner.tscn")
 	var spawner = spawner_scene.instantiate()
 	spawner.material_type = material
-	spawner.spawn_interval = randf_range(3.0, 5.0)  # Intervalo un poco más largo para nivel 2
+	spawner.spawn_interval = randf_range(3.0, 5.0)  # Intervalo un poco más largo para nivel 3
 	
 	grid.add_child(spawner)
 	grid.place_entity(spawner, cell)
 
 
-## Agrega el botón de Super-Máquina al menú superior (solo nivel 2)
+## Agrega el botón de Super-Máquina al menú superior
 func add_super_machine_button() -> void:
 	if not top_menu:
 		print("❌ No se encontró TopMenu")
@@ -228,7 +232,7 @@ func add_super_machine_button() -> void:
 		print("❌ No se encontró HBoxContainer")
 		return
 	
-	print("📦 Creando botón de Super-Máquina para Nivel 2...")
+	print("📦 Creando botón de Super-Máquina para Nivel 3...")
 	
 	# Crear contenedor
 	var super_machine_container = MarginContainer.new()
@@ -264,7 +268,7 @@ func add_super_machine_button() -> void:
 	print("✅ Botón de Super-Máquina agregado exitosamente")
 
 
-## Agrega el botón de Ultimate-Máquina al menú superior (solo nivel 2 y 3)
+## Agrega el botón de Ultimate-Máquina al menú superior (nivel 3)
 func add_ultimate_machine_button() -> void:
 	if not top_menu:
 		print("❌ No se encontró TopMenu")
@@ -275,7 +279,7 @@ func add_ultimate_machine_button() -> void:
 		print("❌ No se encontró HBoxContainer")
 		return
 	
-	print("📦 Creando botón de Ultimate-Máquina para Nivel 2/3...")
+	print("📦 Creando botón de Ultimate-Máquina para Nivel 3...")
 	
 	# Crear contenedor
 	var ultimate_machine_container = MarginContainer.new()
@@ -361,6 +365,6 @@ func _on_vp_resized() -> void:
 ## Callback cuando el jugador pierde por falta de dinero
 func _on_game_over_no_money() -> void:
 	
-	print("💀 ¡PERDISTE EL JUEGO! 💀")
+	print("💀 ¡PERDISTE EL JUEGO EN NIVEL 3! 💀")
 	
 	
