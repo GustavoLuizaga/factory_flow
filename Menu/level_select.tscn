@@ -142,4 +142,5 @@ texture = ExtResource("4_7dfk8")
 
 [connection signal="pressed" from="ColorRect/VBoxContainer/HBoxContainer/btnNivel1" to="." method="_on_BtnLevel1_pressed"]
 [connection signal="pressed" from="ColorRect/VBoxContainer/HBoxContainer2/btnNivel2" to="." method="_on_BtnLevel2_pressed"]
+[connection signal="pressed" from="ColorRect/VBoxContainer/HBoxContainer3/btnNivel3" to="." method="_on_BtnLevel3_pressed"]
 [connection signal="pressed" from="ColorRect/VBoxContainer/btnvolver" to="." method="_on_BtnVolver_pressed"]

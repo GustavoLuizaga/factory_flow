@@ -18,8 +18,18 @@ var material_colors: Dictionary = {
 	"Vidrio": Color.CYAN,
 	"Lata con etiqueta": Color.ORANGE_RED,
 	"Cable recubierto": Color.GREEN,
-	"Juguete": Color.PURPLE
+	"Juguete": Color.PURPLE,
+	# Ultimate Fusions (Nivel 3) - Color Azul
+	"Centro educativo de reciclaje": Color(0.2, 0.5, 1.0),
+	"Taller de proyectos domésticos reciclados": Color(0.3, 0.6, 1.0),
+	"Invernadero experimental": Color(0.4, 0.7, 1.0),
+	"Estación educativa interactiva": Color(0.5, 0.8, 1.0),
+	"Taller de manualidades": Color(0.1, 0.4, 0.9)
 }
+
+# Mapa de ID a nombre de elemento (se carga desde JSON)
+var element_id_to_name: Dictionary = {}
+var element_name_to_id: Dictionary = {}
 
 # Tipos de materiales base disponibles
 var base_materials: Array[String] = []
@@ -79,9 +89,15 @@ func _load_from_json() -> void:
 	
 	# Cargar elementos base
 	if data.has("elementos"):
+		# Primero cargar el mapa de IDs
 		for elem in data["elementos"]:
+			var id = elem["id"]
+			var nombre = elem["nombre"]
+			element_id_to_name[id] = nombre
+			element_name_to_id[nombre] = id
+			
 			if elem.get("es_base", false):
-				base_materials.append(elem["nombre"])
+				base_materials.append(nombre)
 	
 	# Cargar combinaciones
 	if data.has("combinaciones"):
@@ -256,3 +272,13 @@ func reset_stats() -> void:
 	completed_fusions.clear()
 	print("📊 Estadísticas reiniciadas")
 	print("   Array de fusiones limpiado")
+
+
+## Obtiene el ID de un elemento por su nombre
+func get_element_id_by_name(element_name: String) -> int:
+	return element_name_to_id.get(element_name, -1)
+
+
+## Obtiene el nombre de un elemento por su ID
+func get_element_name_by_id(element_id: int) -> String:
+	return element_id_to_name.get(element_id, "")

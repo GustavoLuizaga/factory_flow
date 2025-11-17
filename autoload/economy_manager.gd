@@ -51,7 +51,8 @@ func initialize_for_level(level_number: int) -> void:
 		entity_costs = {
 			"conveyor": economia.get("cinta", 0),
 			"fusion_machine": economia.get("maquina", 0),
-			"super_fusion_machine": economia.get("super_maquina", 0)
+			"super_fusion_machine": economia.get("super_maquina", 0),
+			"ultimate_fusion_machine": economia.get("ultimate_maquina", 150)
 		}
 		refund_percentage = economia.get("reembolso_porcentaje", 60)
 		
@@ -60,6 +61,7 @@ func initialize_for_level(level_number: int) -> void:
 		print("   - Cinta: ", entity_costs["conveyor"], " monedas")
 		print("   - Máquina: ", entity_costs["fusion_machine"], " monedas")
 		print("   - Super-Máquina: ", entity_costs["super_fusion_machine"], " monedas")
+		print("   - Ultimate-Máquina: ", entity_costs["ultimate_fusion_machine"], " monedas")
 		print("   - Reembolso: ", refund_percentage, "%")
 	
 	money_changed.emit(current_money)

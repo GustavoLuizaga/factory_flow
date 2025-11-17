@@ -264,6 +264,8 @@ func end_drag() -> void:
 func get_entity_type_name() -> String:
 	if entity_name.contains("Cinta"):
 		return "conveyor"
+	elif entity_name.contains("Ultimate-Máquina"):
+		return "ultimate_fusion_machine"
 	elif entity_name.contains("Super-Máquina"):
 		return "super_fusion_machine"
 	elif entity_name.contains("Máquina"):
