@@ -98,6 +98,14 @@ func _load_from_json() -> void:
 			
 			if elem.get("es_base", false):
 				base_materials.append(nombre)
+		
+		print("\n📋 Mapa de elementos ID->Nombre cargado:")
+		for id in element_id_to_name.keys():
+			print("   ", id, " → '", element_id_to_name[id], "'")
+		
+		print("\n📋 Mapa de elementos Nombre->ID cargado:")
+		for nombre in element_name_to_id.keys():
+			print("   '", nombre, "' → ", element_name_to_id[nombre])
 	
 	# Cargar combinaciones
 	if data.has("combinaciones"):
@@ -276,9 +284,22 @@ func reset_stats() -> void:
 
 ## Obtiene el ID de un elemento por su nombre
 func get_element_id_by_name(element_name: String) -> int:
-	return element_name_to_id.get(element_name, -1)
+	var result = element_name_to_id.get(element_name, -1)
+	if result == -1:
+		print("⚠️ get_element_id_by_name: No se encontró ID para '", element_name, "'")
+		print("   Elementos disponibles en mapa:")
+		for name in element_name_to_id.keys():
+			if name.contains("bebidas") or name.contains("Biblioteca"):
+				print("      '", name, "' → ", element_name_to_id[name])
+	return result
 
 
 ## Obtiene el nombre de un elemento por su ID
 func get_element_name_by_id(element_id: int) -> String:
-	return element_id_to_name.get(element_id, "")
+	if element_id_to_name.has(element_id):
+		return element_id_to_name[element_id]
+	
+	print("⚠️ get_element_name_by_id: No se encontró nombre para ID ", element_id)
+	print("   Tamaño del mapa element_id_to_name: ", element_id_to_name.size())
+	print("   IDs disponibles: ", element_id_to_name.keys())
+	return ""

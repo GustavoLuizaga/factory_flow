@@ -19,15 +19,6 @@ var completed_products: Array[String] = []
 # IDs de elementos que esta máquina acepta (super-fusiones nivel 2)
 const ACCEPTED_ELEMENTS: Array[int] = [12, 16, 17, 18, 19, 20, 21, 22, 23, 24]
 
-# Combinaciones válidas para Ultimate Fusion
-const VALID_COMBINATIONS: Array[Dictionary] = [
-	{"elemento1": 16, "elemento2": 17, "resultado": 25},
-	{"elemento1": 18, "elemento2": 19, "resultado": 26},
-	{"elemento1": 20, "elemento2": 21, "resultado": 27},
-	{"elemento1": 22, "elemento2": 23, "resultado": 28},
-	{"elemento1": 12, "elemento2": 24, "resultado": 29}
-]
-
 @onready var sprite: Sprite2D = $Sprite
 @onready var status_label: Label = $StatusLabel
 @onready var input_a_marker: ColorRect = $InputAMarker
@@ -127,17 +118,29 @@ func accept_item(item: Item) -> bool:
 
 ## Verifica si una combinación es válida para Ultimate Fusion
 func check_ultimate_recipe(item_a_type: String, item_b_type: String) -> String:
-	var id_a = GameManager.get_element_id_by_name(item_a_type)
-	var id_b = GameManager.get_element_id_by_name(item_b_type)
+	# Usar el sistema de recetas global del GameManager
+	var result = GameManager.check_recipe(item_a_type, item_b_type)
 	
-	for combo in VALID_COMBINATIONS:
-		# Verificar ambas direcciones de la combinación
-		if (combo["elemento1"] == id_a and combo["elemento2"] == id_b) or \
-		   (combo["elemento1"] == id_b and combo["elemento2"] == id_a):
-			var result_id = combo["resultado"]
-			return GameManager.get_element_name_by_id(result_id)
+	print("\n🔍 ULTIMATE FUSION - Verificando combinación:")
+	print("   Item A: '", item_a_type, "'")
+	print("   Item B: '", item_b_type, "'")
+	print("   Resultado de GameManager: '", result, "'")
 	
-	return ""
+	# Si no hay resultado, no es una combinación válida
+	if result == "":
+		print("   ❌ No es una combinación válida")
+		return ""
+	
+	# Verificar que el resultado sea una fusión ultimate (elementos 25-29)
+	var result_id = GameManager.get_element_id_by_name(result)
+	
+	if result_id >= 25 and result_id <= 29:
+		print("   ✅ FUSIÓN ULTIMATE VÁLIDA! Resultado: '", result, "' (ID: ", result_id, ")")
+		return result
+	else:
+		print("   ❌ La combinación es válida pero NO es una fusión ultimate (ID: ", result_id, ")")
+		print("      Las fusiones ultimate son IDs 25-29")
+		return ""
 
 
 ## Intenta fusionar los dos productos
