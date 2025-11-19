@@ -1,34 +1,157 @@
+# res://autoload/progress_manager.gd
 extends Node
-const SAVE_PATH := "user://save.json"
 
-var highest_unlocked := 1  # nivel máximo desbloqueado
+# Archivo donde se guardan TODOS los perfiles en el dispositivo
+const SAVE_PATH := "user://profiles.json"
+
+# username -> diccionario de perfil
+var profiles: Dictionary = {}
+# nombre del usuario que está usando el juego ahora
+var current_user: String = ""
 
 func _ready() -> void:
-	_load()
+	_load_profiles()
 
-func unlock(level:int) -> void:
-	# Si el jugador completa un nivel nuevo, lo desbloquea
-	if level > highest_unlocked:
-		highest_unlocked = level
-		_save()
 
-func is_unlocked(level:int) -> bool:
-	# Devuelve true si el nivel ya está desbloqueado
-	return level <= highest_unlocked
+# CARGA / GUARDADO
+func _load_profiles() -> void:
+	# Si no existe el archivo aún, iniciamos vacío
+	if not FileAccess.file_exists(SAVE_PATH):
+		profiles = {}
+		current_user = ""
+		return
 
-func _save() -> void:
-	# Guarda un archivo JSON simple en user://save.json
-	var f = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var f := FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if f:
-		f.store_string(JSON.stringify({"highest_unlocked": highest_unlocked}))
+		var d : Variant = JSON.parse_string(f.get_as_text())
 		f.close()
-
-func _load() -> void:
-	# Si no existe, deja el valor por defecto (nivel 1)
-	if not FileAccess.file_exists(SAVE_PATH): return
-	var f = FileAccess.open(SAVE_PATH, FileAccess.READ)
-	if f:
-		var d = JSON.parse_string(f.get_as_text())
+		
+		# Estructura esperada:
+		# { "profiles": { ... }, "current_user": "nombre" }
 		if typeof(d) == TYPE_DICTIONARY:
-			highest_unlocked = int(d.get("highest_unlocked", 1))
-		f.close()
+			var dict: Dictionary = d as Dictionary
+			profiles = dict.get("profiles", {}) as Dictionary
+			current_user = String(dict.get("current_user", ""))
+		else:
+			profiles = {}
+			current_user = ""
+
+func _save_profiles() -> void:
+	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if not f:
+		return
+
+	var data := {
+		"profiles": profiles,
+		"current_user": current_user
+	}
+	f.store_string(JSON.stringify(data))
+	f.close()
+
+
+# API DE PERFILES (HU)
+
+# Registrar un nuevo usuario
+func register_user(full_name: String, username: String, password: String) -> bool:
+	full_name = full_name.strip_edges()
+	username = username.strip_edges()
+	password = password.strip_edges()
+	
+	# Validación básica: nombre vacío o duplicado
+	if full_name == "" or username == "" or password == "":
+		return false
+	
+	# Usuario ya existe
+	if profiles.has(username):
+		return false
+	
+	# Perfil que se guardará en el JSON
+	var profile := {
+		"full_name": full_name,
+		"username": username,
+		"password": password,  #por ahora en texto plano
+		"highest_unlocked": 1,  # siempre empieza en nivel 1
+		"created_at": Time.get_unix_time_from_system(),
+		"stats": {}
+	}
+	
+
+	profiles[username] = profile
+	current_user = username    # al registrarse, se deja logueado
+	_save_profiles()
+	return true
+
+# Iniciar sesión con un usuario ya existente
+func login(username: String, password: String) -> bool:
+	username = username.strip_edges()
+	password = password.strip_edges()
+	
+	if not profiles.has(username):
+		return false
+
+	var profile: Dictionary = profiles[username]
+
+	# Si el perfil tiene contraseña, comparamos
+	if profile.has("password"):
+		if String(profile["password"]) != password:
+			return false
+	else:
+		# Perfiles antiguos sin contraseña: solo aceptar si password viene vacío
+		if password != "":
+			return false
+	
+	current_user = username
+	_save_profiles()
+	return true
+
+# Devuelve el perfil actual (o {} si no hay nadie logueado)
+func get_current_profile() -> Dictionary:
+	if current_user != "" and profiles.has(current_user):
+		return profiles[current_user]
+	return {}
+
+# Lista de nombres de todos los usuarios guardados (para combobox si quieres)
+func get_all_usernames() -> Array[String]:
+	var arr: Array[String] = []
+	for name in profiles.keys():
+		arr.append(str(name))
+	return arr
+
+# -------------------------
+# PROGRESO POR USUARIO
+# (MISMA API QUE TENÍAS)
+# -------------------------
+
+func unlock(level: int) -> void:
+	# No hay usuario actual => no guardamos nada
+	if current_user == "":
+		return
+
+	var profile : Dictionary = profiles.get(current_user, {}) as Dictionary
+	var current_max := int(profile.get("highest_unlocked", 1))
+
+	# Solo actualizamos si es un nivel más alto
+	if level <= current_max:
+		return
+
+	profile["highest_unlocked"] = level
+	profiles[current_user] = profile
+	_save_profiles()
+
+func is_unlocked(level: int) -> bool:
+	if level <= 1:
+		return true  # nivel 1 siempre disponible
+
+	if current_user == "":
+		# si no hay usuario, solo habilitamos el nivel 1
+		return false
+
+	var profile : Dictionary = profiles.get(current_user, {}) as Dictionary
+	var current_max := int(profile.get("highest_unlocked", 1))
+	return level <= current_max
+
+func get_highest_unlocked() -> int:
+	if current_user == "":
+		return 1
+	var profile : Dictionary = profiles.get(current_user, {}) as Dictionary
+	return int(profile.get("highest_unlocked", 1))

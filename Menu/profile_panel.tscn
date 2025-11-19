@@ -1,0 +1,107 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvaja8b5djo73"]
+
+[ext_resource type="Script" uid="uid://bxchtfebdffi3" path="res://Scripts/profile_panel.gd" id="1_g3630"]
+
+[node name="ProfilePanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_g3630")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.19607843)
+
+[node name="Panel" type="Panel" parent="ColorRect"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/Panel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -179.0
+offset_bottom = 179.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="IniciarSesion" type="Button" parent="ColorRect/Panel/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Registrarse" type="Button" parent="ColorRect/Panel/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="LoginContainer" type="VBoxContainer" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Usuario" type="Label" parent="ColorRect/Panel/VBoxContainer/LoginContainer"]
+layout_mode = 2
+
+[node name="LoginUsername" type="LineEdit" parent="ColorRect/Panel/VBoxContainer/LoginContainer"]
+layout_mode = 2
+
+[node name="Entrar" type="Button" parent="ColorRect/Panel/VBoxContainer/LoginContainer"]
+layout_mode = 2
+
+[node name="RegisterContainer" type="VBoxContainer" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Usuario" type="Label" parent="ColorRect/Panel/VBoxContainer/RegisterContainer"]
+layout_mode = 2
+
+[node name="RegisterUsername" type="LineEdit" parent="ColorRect/Panel/VBoxContainer/RegisterContainer"]
+layout_mode = 2
+
+[node name="Edad" type="Label" parent="ColorRect/Panel/VBoxContainer/RegisterContainer"]
+layout_mode = 2
+
+[node name="RegisterAge" type="LineEdit" parent="ColorRect/Panel/VBoxContainer/RegisterContainer"]
+layout_mode = 2
+
+[node name="Colegio" type="Label" parent="ColorRect/Panel/VBoxContainer/RegisterContainer"]
+layout_mode = 2
+
+[node name="RegisterSchool" type="LineEdit" parent="ColorRect/Panel/VBoxContainer/RegisterContainer"]
+layout_mode = 2
+
+[node name="Crear perfil" type="Button" parent="ColorRect/Panel/VBoxContainer/RegisterContainer"]
+layout_mode = 2
+
+[node name="ErrorLabel" type="Label" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Cerrar" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/VBoxContainer2/IniciarSesion" to="ColorRect/Panel/VBoxContainer/VBoxContainer2/IniciarSesion" method="_on_login_tab_button_pressed"]
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/VBoxContainer2/Registrarse" to="ColorRect/Panel/VBoxContainer/VBoxContainer2/IniciarSesion" method="_on_register_tab_button_pressed"]
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/LoginContainer/Entrar" to="ColorRect/Panel/VBoxContainer/VBoxContainer2/IniciarSesion" method="_on_login_button_pressed"]
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/RegisterContainer/Crear perfil" to="ColorRect/Panel/VBoxContainer/VBoxContainer2/IniciarSesion" method="_on_register_button_pressed"]
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/Cerrar" to="ColorRect/Panel/VBoxContainer/VBoxContainer2/IniciarSesion" method="_on_close_button_pressed"]

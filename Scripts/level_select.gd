@@ -18,7 +18,7 @@ func _refresh() -> void:
 	btn1.disabled = false
 	lock1.visible = true   # muestra "✔"
 	
-	# Nivel 2 según progreso
+	# Nivel 2 según progreso del usuario actual
 	var unlocked2 := ProgressManager.is_unlocked(2)
 	btn2.disabled = not unlocked2
 	lock2.text = "✔" if unlocked2 else "🔒"

@@ -99,6 +99,15 @@ offset_bottom = 327.0
 grow_horizontal = 2
 texture = ExtResource("3_raj00")
 
+[node name="UserMenu" type="MenuButton" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 1
+offset_left = 1046.0
+offset_top = -55.0
+offset_right = 1179.0
+offset_bottom = 84.0
+pivot_offset = Vector2(-30, 30)
+
 [connection signal="pressed" from="ColorRect/VBoxContainer/SeleccionNivel" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="ColorRect/VBoxContainer/Opciones" to="." method="_on_button_2_pressed"]
 [connection signal="pressed" from="ColorRect/VBoxContainer/Salir" to="." method="_on_button_3_pressed"]
