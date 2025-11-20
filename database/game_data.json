@@ -78,6 +78,7 @@
 			"numero": 3,
 			"nombre": "Nivel 3 - Fusiones Definitivas",
 			"monedas_iniciales": 2000,
+			"tiempo_limite_segundos": 300,
 			"economia": {
 				"cinta": 10,
 				"maquina": 50,

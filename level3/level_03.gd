@@ -13,12 +13,16 @@ var hub_objective: Node2D
 var delete_mode: bool = false
 
 # Temporizador para Nivel 3
-var tiempo_total: float = 60.0  # 1 minuto
+var tiempo_total: float = 60.0  # Valor por defecto si falla JSON
 var tiempo_restante: float = 60.0
 var timer_label: Label
 
 func _ready() -> void:
 	print("=== Level 3 iniciado (Fusiones Definitivas) ===")
+	
+	# Cargar tiempo límite desde JSON
+	load_level_time_limit(3)
+	
 	setup_camera()
 	center_grid()
 	setup_material_spawners()  # Agregar spawners estratégicos
@@ -72,7 +76,44 @@ func setup_timer() -> void:
 	else:
 		add_child(timer_label)  # Fallback si no hay top_menu
 	
-	print("⏱️ Temporizador configurado para Nivel 3")
+	print("⏱️ Temporizador configurado para Nivel 3 con tiempo límite:", tiempo_total, "segundos")
+
+
+## Carga el tiempo límite del nivel desde el JSON
+func load_level_time_limit(nivel_num: int) -> void:
+	var json_path = "res://database/game_data.json"
+	
+	if not FileAccess.file_exists(json_path):
+		print("❌ JSON no encontrado, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var file = FileAccess.open(json_path, FileAccess.READ)
+	if not file:
+		print("❌ Error al abrir JSON, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var json_text = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	
+	if error != OK:
+		print("❌ Error al parsear JSON, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var data = json.data
+	
+	if data.has("niveles"):
+		for nivel in data["niveles"]:
+			if nivel["numero"] == nivel_num:
+				if nivel.has("tiempo_limite_segundos"):
+					tiempo_total = float(nivel["tiempo_limite_segundos"])
+					tiempo_restante = tiempo_total
+					print("✅ Tiempo límite cargado desde JSON: ", tiempo_total, "segundos (", tiempo_total/60, " minutos)")
+					return
+	
+	print("⚠️ No se encontró tiempo_limite_segundos para nivel", nivel_num, ", usando valor por defecto:", tiempo_total, "segundos")
 
 ## Actualiza el display del temporizador
 func update_timer_display() -> void:
