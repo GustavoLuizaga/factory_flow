@@ -10,7 +10,6 @@ extends Node2D
 var hub_objective_scene: PackedScene = preload("res://ui/barra_objetivos/hub_objetive.tscn")
 var hub_objective: Node2D
 
-const RestartScene = preload("res://level_modal/reinicioNivel.tscn")
 var delete_mode: bool = false
 
 
@@ -368,6 +367,7 @@ func _on_game_over_no_money() -> void:
 	get_tree().paused = true
 	
 <<<<<<< HEAD
+<<<<<<< HEAD
 	# 2. Crea (instancia) la escena de reinicio
 	var restart_instance = RestartScene.instantiate()
 	
@@ -388,4 +388,6 @@ func _on_game_over_no_money() -> void:
 	# 4. Añade la ventana a la escena (usamos 'root' para asegurarnos que esté encima de todo)
 >>>>>>> a7e84b1 (Se añadio modal de reinicio al llegar las monedas a 0 y se cambio el diseño de las monedas)
 	get_tree().root.add_child(restart_instance)
+=======
+>>>>>>> 73cb13a (Revert "Se añadio modal de reinicio al llegar las monedas a 0 y se cambio el diseño de las monedas")
 	
