@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://b8kx9dy3wqrs"]
+[gd_scene load_steps=3 format=3 uid="uid://b8kyady3wqrs"]
 
 [ext_resource type="Script" path="res://entities/machines/ultimate_fusion_machine.gd" id="1_ultimate_machine"]
 [ext_resource type="Texture2D" path="res://assets/images/fusion_machine_level_three.png" id="2_texture"]
