@@ -57,7 +57,7 @@ func create_price_label() -> void:
 	
 	price_label = Label.new()
 	price_label.name = "PriceLabel"
-	price_label.text = str(cost) + "💰"
+	price_label.text = str(cost) + "🪙"
 	price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	price_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	price_label.add_theme_font_size_override("font_size", 16)
