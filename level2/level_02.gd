@@ -367,6 +367,7 @@ func _on_game_over_no_money() -> void:
 	# 1. Pausa el juego
 	get_tree().paused = true
 	
+<<<<<<< HEAD
 	# 2. Crea (instancia) la escena de reinicio
 	var restart_instance = RestartScene.instantiate()
 	
@@ -374,5 +375,17 @@ func _on_game_over_no_money() -> void:
 	restart_instance.process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	# 4. Añade la ventana a la escena
+=======
+	# 1. Pausa el juego
+	get_tree().paused = true
+	
+	# 2. Crea (instancia) la escena de reinicio
+	var restart_instance = RestartScene.instantiate()
+	
+	# 3. IMPORTANTE: Hace que la ventana de reinicio funcione aunque el juego esté pausado
+	restart_instance.process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	# 4. Añade la ventana a la escena (usamos 'root' para asegurarnos que esté encima de todo)
+>>>>>>> a7e84b1 (Se añadio modal de reinicio al llegar las monedas a 0 y se cambio el diseño de las monedas)
 	get_tree().root.add_child(restart_instance)
 	
