@@ -10,7 +10,9 @@ extends Node2D
 var hub_objective_scene: PackedScene = preload("res://ui/barra_objetivos/hub_objetive.tscn")
 var hub_objective: Node2D
 
+const RestartScene = preload("res://level_modal/reinicioNivel.tscn")
 var delete_mode: bool = false
+
 
 func _ready() -> void:
 	print("=== Level 2 iniciado (Versión de prueba) ===")
@@ -362,5 +364,15 @@ func _on_vp_resized() -> void:
 func _on_game_over_no_money() -> void:
 	
 	print("💀 ¡PERDISTE EL JUEGO! 💀")
+	# 1. Pausa el juego
+	get_tree().paused = true
 	
+	# 2. Crea (instancia) la escena de reinicio
+	var restart_instance = RestartScene.instantiate()
+	
+	# 3.  que la ventana de reinicio funcione aunque el juego esté pausado
+	restart_instance.process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	# 4. Añade la ventana a la escena
+	get_tree().root.add_child(restart_instance)
 	
