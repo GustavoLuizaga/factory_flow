@@ -10,7 +10,16 @@ var profile_panel: Control
 func _ready() -> void:
 	_setup_user_menu()
 	user_menu.text = "☰"
-	user_menu.add_theme_font_size_override("font_size", 35)
+	user_menu.add_theme_font_size_override("font_size", 55)
+	# COLORES DEL TEXTO
+	user_menu.add_theme_color_override("font_color", Color.BLACK)                 # normal
+	user_menu.add_theme_color_override("font_hover_color", Color(0.1, 0.1, 0.1)) # cuando pasas el mouse
+	user_menu.add_theme_color_override("font_pressed_color", Color(0.2, 0.2, 0.2))
+	user_menu.add_theme_color_override("font_focus_color", Color(0, 0, 0))
+
+	# CONTORNO PARA HACERLO MÁS LLAMATIVO
+	user_menu.add_theme_constant_override("outline_size", 2)
+	user_menu.add_theme_color_override("font_outline_color", Color(1, 1, 1))  # borde blanco
 
 func _on_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Menu/level_select.tscn")

@@ -28,6 +28,10 @@ func _ready() -> void:
 	center_grid()
 	setup_material_spawners()  # Agregar spawners estratégicos
 	
+	# NUEVO: cuando cambie el tamaño de la ventana, recoloca el grid y la HUD
+	get_viewport().size_changed.connect(_on_vp_resized)
+	
+	
 	##NUEVO
 	ObjectiveManager.reset_for_level(3)   # ← nivel 3
 	setup_objective_hub_ui()              # ← crea HUD

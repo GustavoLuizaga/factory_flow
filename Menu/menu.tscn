@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://7lylhtm1rwho"]
+[gd_scene load_steps=9 format=3 uid="uid://7lylhtm1rwho"]
 
 [ext_resource type="Script" uid="uid://c6vwlw74xnpjb" path="res://Scripts/menu.gd" id="1_ihied"]
 [ext_resource type="Texture2D" uid="uid://djgdjb1wtam54" path="res://assets/images/Fondo_Menu.png" id="1_rwxi6"]
@@ -13,6 +13,18 @@ bg_color = Color(0, 0, 0, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ofseh"]
 bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w6voe"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -100,13 +112,16 @@ grow_horizontal = 2
 texture = ExtResource("3_raj00")
 
 [node name="UserMenu" type="MenuButton" parent="."]
-custom_minimum_size = Vector2(48, 48)
+custom_minimum_size = Vector2(110, 80)
 layout_mode = 1
-offset_left = 1046.0
-offset_top = -55.0
-offset_right = 1179.0
-offset_bottom = 84.0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -133.0
+offset_bottom = 139.0
+grow_horizontal = 0
 pivot_offset = Vector2(-30, 30)
+theme_override_styles/normal = SubResource("StyleBoxFlat_w6voe")
 
 [connection signal="pressed" from="ColorRect/VBoxContainer/SeleccionNivel" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="ColorRect/VBoxContainer/Opciones" to="." method="_on_button_2_pressed"]
