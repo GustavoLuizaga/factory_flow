@@ -72,12 +72,13 @@
 				"super_maquina": 100,
 				"reembolso_porcentaje": 60
 			},
-			"objetivos": [16, 17, 18, 19, 20, 21, 22, 23, 24]
+			"objetivos": [16]
 		},
 		{
 			"numero": 3,
 			"nombre": "Nivel 3 - Fusiones Definitivas",
 			"monedas_iniciales": 2000,
+			"tiempo_limite_segundos": 300,
 			"economia": {
 				"cinta": 10,
 				"maquina": 50,
@@ -85,7 +86,7 @@
 				"ultimate_maquina": 150,
 				"reembolso_porcentaje": 60
 			},
-			"objetivos": [26, 28, 29]
+			"objetivos": [26, 25, 29]
 		}
 	]
 }

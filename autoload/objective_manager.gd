@@ -241,6 +241,16 @@ func _icon_for(element_id: int) -> Texture2D:
 			return load("res://assets/images/subFusiones/Botella_con_sorpresa.png") as Texture2D
 		24: # Casa infantil de juguetes
 			return load("res://assets/images/subFusiones/Casa_infantil_de_juguetes.png") as Texture2D
+		25: # Centro educativo de reciclaje
+			return load("res://assets/images/FucionesDefinitivas/Centro_educativo_de_reciclaje.png") as Texture2D
+		26: # Taller de proyectos domésticos reciclados
+			return load("res://assets/images/FucionesDefinitivas/Taller_de_proyectos_domesticos_reciclados.png") as Texture2D
+		27: # Invernadero experimental
+			return load("res://assets/images/FucionesDefinitivas/Invernadero_experimental.png") as Texture2D
+		28: # Estación educativa interactiva
+			return load("res://assets/images/FucionesDefinitivas/Estacion_educativa_interactiva.png") as Texture2D
+		29: # Taller de manualidades
+			return load("res://assets/images/FucionesDefinitivas/Taller_de_manualidades_infantil.png") as Texture2D
 		_:
 			var name = elem_id_to_name.get(element_id, "Desconocido")
 			print("⚠️ No se encontró imagen para elemento ID: ", element_id, " (", name, ")")

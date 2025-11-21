@@ -12,8 +12,17 @@ var hub_objective: Node2D
 
 var delete_mode: bool = false
 
+# Temporizador para Nivel 3
+var tiempo_total: float = 60.0  # Valor por defecto si falla JSON
+var tiempo_restante: float = 60.0
+var timer_label: Label
+
 func _ready() -> void:
 	print("=== Level 3 iniciado (Fusiones Definitivas) ===")
+	
+	# Cargar tiempo límite desde JSON
+	load_level_time_limit(3)
+	
 	setup_camera()
 	center_grid()
 	setup_material_spawners()  # Agregar spawners estratégicos
@@ -37,6 +46,102 @@ func _ready() -> void:
 	# Conectar la señal del modo borrar
 	if top_menu:
 		top_menu.delete_mode_changed.connect(_on_delete_mode_changed)
+	
+	# Configurar temporizador
+	setup_timer()
+
+func _process(delta: float) -> void:
+	# Actualizar temporizador
+	if tiempo_restante > 0:
+		tiempo_restante -= delta
+		if tiempo_restante <= 0:
+			tiempo_restante = 0
+			show_timeout_message()
+		update_timer_display()
+
+## Configura el temporizador y su display
+func setup_timer() -> void:
+	timer_label = Label.new()
+	timer_label.add_theme_font_size_override("font_size", 32)
+	timer_label.add_theme_color_override("font_color", Color.WHITE)
+	timer_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	timer_label.add_theme_constant_override("shadow_offset_x", 2)
+	timer_label.add_theme_constant_override("shadow_offset_y", 2)
+	timer_label.position = Vector2(50, 50)  # Esquina superior izquierda
+	update_timer_display()
+	
+	# Añadir al top_menu para que esté sobre la UI
+	if top_menu:
+		top_menu.add_child(timer_label)
+	else:
+		add_child(timer_label)  # Fallback si no hay top_menu
+	
+	print("⏱️ Temporizador configurado para Nivel 3 con tiempo límite:", tiempo_total, "segundos")
+
+
+## Carga el tiempo límite del nivel desde el JSON
+func load_level_time_limit(nivel_num: int) -> void:
+	var json_path = "res://database/game_data.json"
+	
+	if not FileAccess.file_exists(json_path):
+		print("❌ JSON no encontrado, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var file = FileAccess.open(json_path, FileAccess.READ)
+	if not file:
+		print("❌ Error al abrir JSON, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var json_text = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	
+	if error != OK:
+		print("❌ Error al parsear JSON, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var data = json.data
+	
+	if data.has("niveles"):
+		for nivel in data["niveles"]:
+			if nivel["numero"] == nivel_num:
+				if nivel.has("tiempo_limite_segundos"):
+					tiempo_total = float(nivel["tiempo_limite_segundos"])
+					tiempo_restante = tiempo_total
+					print("✅ Tiempo límite cargado desde JSON: ", tiempo_total, "segundos (", tiempo_total/60, " minutos)")
+					return
+	
+	print("⚠️ No se encontró tiempo_limite_segundos para nivel", nivel_num, ", usando valor por defecto:", tiempo_total, "segundos")
+
+## Actualiza el display del temporizador
+func update_timer_display() -> void:
+	if timer_label:
+		var minutos = int(tiempo_restante / 60)
+		var segundos = int(tiempo_restante) % 60
+		timer_label.text = "Tiempo: %02d:%02d" % [minutos, segundos]
+		
+		# Cambiar color cuando queden menos de 10 segundos
+		if tiempo_restante <= 10:
+			timer_label.add_theme_color_override("font_color", Color.RED)
+		else:
+			timer_label.add_theme_color_override("font_color", Color.WHITE)
+
+## Muestra el mensaje de tiempo agotado LEO aqui puedes agregar tu menu de perdiste cuando el tiempo se termina
+func show_timeout_message() -> void:
+	var dialog = AcceptDialog.new()
+	dialog.title = "⏰ Tiempo Agotado"
+	dialog.dialog_text = "Se acabó el tiempo para completar el nivel 3.\nDebes reiniciar el nivel."
+	dialog.connect("confirmed", Callable(self, "_on_timeout_confirmed"))
+	add_child(dialog)
+	dialog.popup_centered()
+	print("⏰ Tiempo agotado - Mostrando mensaje")
+
+## Callback cuando se confirma el mensaje de timeout
+func _on_timeout_confirmed() -> void:
+	print("🔄 Reiniciando Nivel 3...")
+	get_tree().reload_current_scene()
 
 
 ## Para debug - presiona D para ver el mapa del grid
@@ -361,7 +466,7 @@ func _on_vp_resized() -> void:
 		_position_hub()
 
 
-##Leo aqui puedes implementar la llamada a tu modallll
+##Leo aqui puedes implementar la llamada a tu modallll para el nivel 3
 ## Callback cuando el jugador pierde por falta de dinero
 func _on_game_over_no_money() -> void:
 	
