@@ -86,7 +86,7 @@
 				"ultimate_maquina": 150,
 				"reembolso_porcentaje": 60
 			},
-			"objetivos": [29]
+			"objetivos": [26, 25, 29]
 		}
 	]
 }
