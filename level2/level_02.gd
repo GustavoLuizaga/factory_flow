@@ -6,7 +6,7 @@ extends Node2D
 @onready var top_menu: CanvasLayer = $TopMenu
 @onready var camera: Camera2D = $Camera2D
 @onready var money_display: CanvasLayer = null  # Se crea dinámicamente
-
+@export var congratulation_scene: PackedScene = preload("res://level_modal/level_complete_modal.tscn")
 var hub_objective_scene: PackedScene = preload("res://ui/barra_objetivos/hub_objetive.tscn")
 var hub_objective: Node2D
 
@@ -37,7 +37,38 @@ func _ready() -> void:
 	# Conectar la señal del modo borrar
 	if top_menu:
 		top_menu.delete_mode_changed.connect(_on_delete_mode_changed)
+		
+	if not ObjectiveManager.all_objectives_completed.is_connected(_on_level_won):
+		ObjectiveManager.all_objectives_completed.connect(_on_level_won)
+	
 
+## Callback cuando se gana el nivel
+func _on_level_won() -> void:
+	print("¡NIVEL 2 COMPLETADO!")
+	if ProgressManager:
+		ProgressManager.unlock(3)
+	
+	if congratulation_scene:
+		var modal = congratulation_scene.instantiate()
+		
+		if modal.has_signal("menu_requested"):
+			modal.menu_requested.connect(_on_go_to_menu)
+		if modal.has_signal("next_level_requested"):
+			modal.next_level_requested.connect(_on_go_to_next_level)
+		
+		add_child(modal)
+		
+		if modal.has_method("show_modal"):
+			modal.show_modal(true)
+			
+		get_tree().paused = true
+
+func _on_go_to_menu() -> void:
+	print("Volviendo al Menú Principal...")
+	get_tree().change_scene_to_file("res://Menu/menu.tscn")
+
+func _on_go_to_next_level() -> void:
+	get_tree().change_scene_to_file("res://level3/level_03.tscn")
 
 ## Para debug - presiona D para ver el mapa del grid
 func _input(event: InputEvent) -> void:

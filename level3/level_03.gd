@@ -6,6 +6,7 @@ extends Node2D
 @onready var top_menu: CanvasLayer = $TopMenu
 @onready var camera: Camera2D = $Camera2D
 @onready var money_display: CanvasLayer = null  # Se crea dinámicamente
+@export var congratulation_scene: PackedScene = preload("res://level_modal/level_congratulation.tscn")
 
 var hub_objective_scene: PackedScene = preload("res://ui/barra_objetivos/hub_objetive.tscn")
 var hub_objective: Node2D
@@ -49,7 +50,37 @@ func _ready() -> void:
 	
 	# Configurar temporizador
 	setup_timer()
+	if not ObjectiveManager.all_objectives_completed.is_connected(_on_level_won):
+		ObjectiveManager.all_objectives_completed.connect(_on_level_won)
 
+## Callback cuando se completan todos los objetivos (GANASTE)
+func _on_level_won() -> void:
+	print("NIVEL 3 COMPLETADO!")
+	
+	# 1. Evitar que el tiempo siga corriendo o que pierdas mientras celebras
+	tiempo_restante = 9999 # Truco simple para que no salte el timeout
+	
+	# 2. Crear el modal
+	if congratulation_scene:
+		var modal = congratulation_scene.instantiate()
+		
+		# 3. Conectar la señal del botón "Volver al menú"
+		if modal.has_signal("menu_requested"):
+			modal.menu_requested.connect(_on_return_to_menu)
+		
+		# 4. Mostrarlo
+		add_child(modal)
+		
+		# 5. Pausar el juego (el modal debe tener process_mode = WHEN_PAUSED)
+		get_tree().paused = true
+	else:
+		print("❌ Error: No se ha asignado la escena congratulation_scene")
+
+## Callback para volver al menú principal
+func _on_return_to_menu() -> void:
+	print("🏠 Volviendo al Menú Principal...")
+	# Asegúrate de que esta ruta exista
+	get_tree().change_scene_to_file("res://Menu/menu.tscn")
 func _process(delta: float) -> void:
 	# Actualizar temporizador
 	if tiempo_restante > 0:
