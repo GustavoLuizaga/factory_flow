@@ -102,7 +102,9 @@ func setup_timer() -> void:
 	timer_label.add_theme_color_override("font_shadow_color", Color.BLACK)
 	timer_label.add_theme_constant_override("shadow_offset_x", 2)
 	timer_label.add_theme_constant_override("shadow_offset_y", 2)
-	timer_label.position = Vector2(50, 50)  # Esquina superior izquierda
+	var viewport_size = get_viewport().get_visible_rect().size
+	timer_label.position = Vector2(50, viewport_size.y - 60)  # Esquina inferior izquierda
+	
 	update_timer_display()
 	
 	# Añadir al top_menu para que esté sobre la UI
