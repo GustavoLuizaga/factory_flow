@@ -44,7 +44,13 @@ var sprite_paths: Dictionary = {
 	"Botella con sorpresa": "res://assets/images/subFusiones/Botella_con_sorpresa.png",
 	"Casa infantil de juguetes": "res://assets/images/subFusiones/Casa_infantil_de_juguetes.png",
 	# Mesa de crafteo (si existe)
-	"Mesa de crafteo": "res://assets/images/subFusiones/Mesa_de_crafteo.png"
+	"Mesa de crafteo": "res://assets/images/subFusiones/Mesa_de_crafteo.png",
+	# Fusiones definitivas (Nivel 3)
+	"Centro educativo de reciclaje": "res://assets/images/FucionesDefinitivas/Centro_educativo_de_reciclaje.png",
+	"Estación educativa interactiva": "res://assets/images/FucionesDefinitivas/Estacion_educativa_interactiva.png",
+	"Invernadero experimental": "res://assets/images/FucionesDefinitivas/Invernadero_experimental.png",
+	"Taller de manualidades": "res://assets/images/FucionesDefinitivas/Taller_de_manualidades_infantil.png",
+	"Taller de proyectos domésticos reciclados": "res://assets/images/FucionesDefinitivas/Taller_de_proyectos_domesticos_reciclados.png"
 }
 
 @onready var sprite: Sprite2D = $Sprite
@@ -119,7 +125,11 @@ func update_visual() -> void:
 		var color_rect = ColorRect.new()
 		color_rect.size = Vector2(40, 40)
 		color_rect.position = Vector2(-20, -20)
-		color_rect.color = GameManager.get_material_color(item_type)
+		
+		# Usar color específico del GameManager si está disponible
+		var item_color = GameManager.get_material_color(item_type)
+		color_rect.color = item_color
+		
 		add_child(color_rect)
 		sprite.visible = false
 	

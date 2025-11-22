@@ -1,33 +1,47 @@
 extends Node2D
 
-## Level 2 - Versión de prueba (solo Grid y Menú)
+## Level 3 - Fusiones Definitivas (Ultimate Fusions)
 
 @onready var grid: Grid = $Grid
 @onready var top_menu: CanvasLayer = $TopMenu
 @onready var camera: Camera2D = $Camera2D
 @onready var money_display: CanvasLayer = null  # Se crea dinámicamente
-@export var congratulation_scene: PackedScene = preload("res://level_modal/level_complete_modal.tscn")
+@export var congratulation_scene: PackedScene = preload("res://level_modal/level_congratulation.tscn")
+
 var hub_objective_scene: PackedScene = preload("res://ui/barra_objetivos/hub_objetive.tscn")
 var hub_objective: Node2D
 
-const RestartScene = preload("res://level_modal/reinicioNivel.tscn")
 var delete_mode: bool = false
 
+# Temporizador para Nivel 3
+var tiempo_total: float = 60.0  # Valor por defecto si falla JSON
+var tiempo_restante: float = 60.0
+var timer_label: Label
+
 func _ready() -> void:
-	print("=== Level 2 iniciado (Versión de prueba) ===")
+	print("=== Level 3 iniciado (Fusiones Definitivas) ===")
+	
+	# Cargar tiempo límite desde JSON
+	load_level_time_limit(3)
+	
 	setup_camera()
 	center_grid()
 	setup_material_spawners()  # Agregar spawners estratégicos
 	
+	# NUEVO: cuando cambie el tamaño de la ventana, recoloca el grid y la HUD
+	get_viewport().size_changed.connect(_on_vp_resized)
+	
+	
 	##NUEVO
-	ObjectiveManager.reset_for_level(2)   # ← nivel 2
+	ObjectiveManager.reset_for_level(3)   # ← nivel 3
 	setup_objective_hub_ui()              # ← crea HUD
 
-	add_super_machine_button()  # NUEVO: Agregar botón de super-máquina
+	add_super_machine_button()  # Agregar botón de super-máquina
+	add_ultimate_machine_button()  # NUEVO: Agregar botón de ultimate-máquina
 	
-	# NUEVO: Inicializar sistema de economía
+	# Inicializar sistema de economía
 	if EconomyManager:
-		EconomyManager.initialize_for_level(2)
+		EconomyManager.initialize_for_level(3)
 		add_money_display()
 
 		if not EconomyManager.game_over_no_money.is_connected(_on_game_over_no_money):
@@ -37,38 +51,133 @@ func _ready() -> void:
 	# Conectar la señal del modo borrar
 	if top_menu:
 		top_menu.delete_mode_changed.connect(_on_delete_mode_changed)
-		
+	
+	# Configurar temporizador
+	setup_timer()
 	if not ObjectiveManager.all_objectives_completed.is_connected(_on_level_won):
 		ObjectiveManager.all_objectives_completed.connect(_on_level_won)
-	
 
-## Callback cuando se gana el nivel
+## Callback cuando se completan todos los objetivos (GANASTE)
 func _on_level_won() -> void:
-	print("¡NIVEL 2 COMPLETADO!")
-	if ProgressManager:
-		ProgressManager.unlock(3)
+	print("NIVEL 3 COMPLETADO!")
 	
+	# 1. Evitar que el tiempo siga corriendo o que pierdas mientras celebras
+	tiempo_restante = 9999 # Truco simple para que no salte el timeout
+	
+	# 2. Crear el modal
 	if congratulation_scene:
 		var modal = congratulation_scene.instantiate()
 		
+		# 3. Conectar la señal del botón "Volver al menú"
 		if modal.has_signal("menu_requested"):
-			modal.menu_requested.connect(_on_go_to_menu)
-		if modal.has_signal("next_level_requested"):
-			modal.next_level_requested.connect(_on_go_to_next_level)
+			modal.menu_requested.connect(_on_return_to_menu)
 		
+		# 4. Mostrarlo
 		add_child(modal)
 		
-		if modal.has_method("show_modal"):
-			modal.show_modal(true)
-			
+		# 5. Pausar el juego (el modal debe tener process_mode = WHEN_PAUSED)
 		get_tree().paused = true
+	else:
+		print("❌ Error: No se ha asignado la escena congratulation_scene")
 
-func _on_go_to_menu() -> void:
-	print("Volviendo al Menú Principal...")
+## Callback para volver al menú principal
+func _on_return_to_menu() -> void:
+	print("🏠 Volviendo al Menú Principal...")
+	# Asegúrate de que esta ruta exista
 	get_tree().change_scene_to_file("res://Menu/menu.tscn")
+func _process(delta: float) -> void:
+	# Actualizar temporizador
+	if tiempo_restante > 0:
+		tiempo_restante -= delta
+		if tiempo_restante <= 0:
+			tiempo_restante = 0
+			show_timeout_message()
+		update_timer_display()
 
-func _on_go_to_next_level() -> void:
-	get_tree().change_scene_to_file("res://level3/level_03.tscn")
+## Configura el temporizador y su display
+func setup_timer() -> void:
+	timer_label = Label.new()
+	timer_label.add_theme_font_size_override("font_size", 32)
+	timer_label.add_theme_color_override("font_color", Color.WHITE)
+	timer_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	timer_label.add_theme_constant_override("shadow_offset_x", 2)
+	timer_label.add_theme_constant_override("shadow_offset_y", 2)
+	timer_label.position = Vector2(50, 50)  # Esquina superior izquierda
+	update_timer_display()
+	
+	# Añadir al top_menu para que esté sobre la UI
+	if top_menu:
+		top_menu.add_child(timer_label)
+	else:
+		add_child(timer_label)  # Fallback si no hay top_menu
+	
+	print("⏱️ Temporizador configurado para Nivel 3 con tiempo límite:", tiempo_total, "segundos")
+
+
+## Carga el tiempo límite del nivel desde el JSON
+func load_level_time_limit(nivel_num: int) -> void:
+	var json_path = "res://database/game_data.json"
+	
+	if not FileAccess.file_exists(json_path):
+		print("❌ JSON no encontrado, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var file = FileAccess.open(json_path, FileAccess.READ)
+	if not file:
+		print("❌ Error al abrir JSON, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var json_text = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	
+	if error != OK:
+		print("❌ Error al parsear JSON, usando tiempo por defecto:", tiempo_total, "segundos")
+		return
+	
+	var data = json.data
+	
+	if data.has("niveles"):
+		for nivel in data["niveles"]:
+			if nivel["numero"] == nivel_num:
+				if nivel.has("tiempo_limite_segundos"):
+					tiempo_total = float(nivel["tiempo_limite_segundos"])
+					tiempo_restante = tiempo_total
+					print("✅ Tiempo límite cargado desde JSON: ", tiempo_total, "segundos (", tiempo_total/60, " minutos)")
+					return
+	
+	print("⚠️ No se encontró tiempo_limite_segundos para nivel", nivel_num, ", usando valor por defecto:", tiempo_total, "segundos")
+
+## Actualiza el display del temporizador
+func update_timer_display() -> void:
+	if timer_label:
+		var minutos = int(tiempo_restante / 60)
+		var segundos = int(tiempo_restante) % 60
+		timer_label.text = "Tiempo: %02d:%02d" % [minutos, segundos]
+		
+		# Cambiar color cuando queden menos de 10 segundos
+		if tiempo_restante <= 10:
+			timer_label.add_theme_color_override("font_color", Color.RED)
+		else:
+			timer_label.add_theme_color_override("font_color", Color.WHITE)
+
+## Muestra el mensaje de tiempo agotado LEO aqui puedes agregar tu menu de perdiste cuando el tiempo se termina
+func show_timeout_message() -> void:
+	var dialog = AcceptDialog.new()
+	dialog.title = "⏰ Tiempo Agotado"
+	dialog.dialog_text = "Se acabó el tiempo para completar el nivel 3.\nDebes reiniciar el nivel."
+	dialog.connect("confirmed", Callable(self, "_on_timeout_confirmed"))
+	add_child(dialog)
+	dialog.popup_centered()
+	print("⏰ Tiempo agotado - Mostrando mensaje")
+
+## Callback cuando se confirma el mensaje de timeout
+func _on_timeout_confirmed() -> void:
+	print("🔄 Reiniciando Nivel 3...")
+	get_tree().reload_current_scene()
+
 
 ## Para debug - presiona D para ver el mapa del grid
 func _input(event: InputEvent) -> void:
@@ -130,14 +239,17 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 	var cell = grid.world_to_grid(world_pos)
 	var entity = grid.get_entity_at(cell)
 	
-	# Borrar cintas o máquinas (fusión normal y super-fusión)
-	if entity and (entity is ConveyorBelt or entity is FusionMachine or entity is SuperFusionMachine):
+	# Borrar cintas o máquinas (fusión normal, super-fusión y ultimate-fusión)
+	if entity and (entity is ConveyorBelt or entity is FusionMachine or entity is SuperFusionMachine or entity is UltimateFusionMachine):
 		var entity_type = "entidad"
 		var economy_type = ""
 		
 		if entity is ConveyorBelt:
 			entity_type = "cinta"
 			economy_type = "conveyor"
+		elif entity is UltimateFusionMachine:
+			entity_type = "ultimate-máquina"
+			economy_type = "ultimate_fusion_machine"
 		elif entity is SuperFusionMachine:
 			entity_type = "super-máquina"
 			economy_type = "super_fusion_machine"
@@ -147,7 +259,7 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 		
 		print("🗑️ Borrando ", entity_type, " en celda: ", cell)
 		
-		# NUEVO: Dar reembolso
+		# Dar reembolso
 		if EconomyManager and economy_type != "":
 			EconomyManager.refund(economy_type)
 		
@@ -156,7 +268,7 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 			entity.current_item.queue_free()
 		
 		# Si es una máquina con inputs, destruirlos
-		if (entity is FusionMachine or entity is SuperFusionMachine):
+		if (entity is FusionMachine or entity is SuperFusionMachine or entity is UltimateFusionMachine):
 			if entity.input_a:
 				entity.input_a.queue_free()
 			if entity.input_b:
@@ -235,7 +347,7 @@ func setup_material_spawners() -> void:
 		var position = spawner_positions[material]
 		spawn_material_at(position, material)
 	
-	print("✅ Spawners de materiales colocados estratégicamente en Level 2")
+	print("✅ Spawners de materiales colocados estratégicamente en Level 3")
 
 
 ## Crea y coloca un spawner de material en una celda específica
@@ -243,13 +355,13 @@ func spawn_material_at(cell: Vector2i, material: String) -> void:
 	var spawner_scene = preload("res://entities/materials/material_spawner.tscn")
 	var spawner = spawner_scene.instantiate()
 	spawner.material_type = material
-	spawner.spawn_interval = randf_range(3.0, 5.0)  # Intervalo un poco más largo para nivel 2
+	spawner.spawn_interval = randf_range(3.0, 5.0)  # Intervalo un poco más largo para nivel 3
 	
 	grid.add_child(spawner)
 	grid.place_entity(spawner, cell)
 
 
-## Agrega el botón de Super-Máquina al menú superior (solo nivel 2)
+## Agrega el botón de Super-Máquina al menú superior
 func add_super_machine_button() -> void:
 	if not top_menu:
 		print("❌ No se encontró TopMenu")
@@ -260,7 +372,7 @@ func add_super_machine_button() -> void:
 		print("❌ No se encontró HBoxContainer")
 		return
 	
-	print("📦 Creando botón de Super-Máquina para Nivel 2...")
+	print("📦 Creando botón de Super-Máquina para Nivel 3...")
 	
 	# Crear contenedor
 	var super_machine_container = MarginContainer.new()
@@ -296,7 +408,7 @@ func add_super_machine_button() -> void:
 	print("✅ Botón de Super-Máquina agregado exitosamente")
 
 
-## Agrega el botón de Ultimate-Máquina al menú superior (solo nivel 2 y 3)
+## Agrega el botón de Ultimate-Máquina al menú superior (nivel 3)
 func add_ultimate_machine_button() -> void:
 	if not top_menu:
 		print("❌ No se encontró TopMenu")
@@ -307,7 +419,7 @@ func add_ultimate_machine_button() -> void:
 		print("❌ No se encontró HBoxContainer")
 		return
 	
-	print("📦 Creando botón de Ultimate-Máquina para Nivel 2/3...")
+	print("📦 Creando botón de Ultimate-Máquina para Nivel 3...")
 	
 	# Crear contenedor
 	var ultimate_machine_container = MarginContainer.new()
@@ -389,21 +501,10 @@ func _on_vp_resized() -> void:
 		_position_hub()
 
 
-##Leo aqui puedes implementar la llamada a tu modallll
+##Leo aqui puedes implementar la llamada a tu modallll para el nivel 3
 ## Callback cuando el jugador pierde por falta de dinero
 func _on_game_over_no_money() -> void:
 	
-	print("💀 ¡PERDISTE EL JUEGO! 💀")
+	print("💀 ¡PERDISTE EL JUEGO EN NIVEL 3! 💀")
 	
-	# 1. Pausa el juego
-	get_tree().paused = true
-	
-	# 2. Crea (instancia) la escena de reinicio
-	var restart_instance = RestartScene.instantiate()
-	
-	# Hace que la ventana de reinicio funcione aunque el juego esté pausado
-	restart_instance.process_mode = Node.PROCESS_MODE_ALWAYS
-	
-	# Añade la ventana a la escena 
-	get_tree().root.add_child(restart_instance)
 	

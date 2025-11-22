@@ -16,7 +16,7 @@ func _ready() -> void:
 
 func _on_money_changed(new_amount: int) -> void:
 	if money_label:
-		money_label.text = "💰 " + str(new_amount)
+		money_label.text = "🪙 " + str(new_amount)
 
 
 func _on_purchase_failed(item_name: String, cost: int) -> void:
