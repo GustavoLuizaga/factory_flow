@@ -104,7 +104,7 @@ func create_buttons() -> void:
 	volume_container.alignment = BoxContainer.ALIGNMENT_CENTER
 	volume_container.add_theme_constant_override("separation", 10)
 	
-	volume_down_btn = create_button("🔊 -", 60)
+	volume_down_btn = create_button("-", 60)
 	volume_down_btn.pressed.connect(_on_volume_down)
 	volume_container.add_child(volume_down_btn)
 	
@@ -118,7 +118,7 @@ func create_buttons() -> void:
 	volume_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	volume_container.add_child(volume_label)
 	
-	volume_up_btn = create_button("🔊 +", 60)
+	volume_up_btn = create_button("+", 60)
 	volume_up_btn.pressed.connect(_on_volume_up)
 	volume_container.add_child(volume_up_btn)
 	
@@ -235,7 +235,7 @@ func _on_exit_pressed() -> void:
 
 
 func _on_volume_up() -> void:
-	print("🔊+ Aumentar volumen")
+	print("Aumentar volumen")
 	var current_db = AudioServer.get_bus_volume_db(audio_bus_index)
 	var current_volume = db_to_linear(current_db)
 	
@@ -245,11 +245,11 @@ func _on_volume_up() -> void:
 	
 	var percentage = int(current_volume * 100)
 	volume_label.text = "Volumen: %d%%" % percentage
-	print("🔊 Volumen: ", percentage, "%")
+	print("Volumen: ", percentage, "%")
 
 
 func _on_volume_down() -> void:
-	print("🔊- Disminuir volumen")
+	print("Disminuir volumen")
 	var current_db = AudioServer.get_bus_volume_db(audio_bus_index)
 	var current_volume = db_to_linear(current_db)
 	
@@ -259,7 +259,7 @@ func _on_volume_down() -> void:
 	
 	var percentage = int(current_volume * 100)
 	volume_label.text = "Volumen: %d%%" % percentage
-	print("🔊 Volumen: ", percentage, "%")
+	print("Volumen: ", percentage, "%")
 
 
 func get_current_volume() -> int:

@@ -41,10 +41,16 @@ var color_palette = {
 	"text": Color.WHITE
 }
 
+# Diccionario para almacenar información de máquinas por receta
+var machine_for_recipe: Dictionary = {}
+
 
 func _ready() -> void:
 	# Ocultar inicialmente
 	visible = false
+	
+	# Cargar información de máquinas desde JSON
+	_load_machine_info()
 	
 	# Estilizar título
 	if title_label:
@@ -96,9 +102,58 @@ func populate_fusion_cards() -> void:
 	print("✅ %d tarjetas de fusión creadas" % all_elements.size())
 
 
+func _load_machine_info() -> void:
+	"""Carga la información de máquinas desde el JSON"""
+	var json_path = "res://database/game_data.json"
+	
+	if not FileAccess.file_exists(json_path):
+		print("❌ JSON no encontrado para máquinas")
+		return
+	
+	var file = FileAccess.open(json_path, FileAccess.READ)
+	if not file:
+		print("❌ Error al abrir JSON")
+		return
+	
+	var json_text = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	
+	if error != OK:
+		print("❌ Error al parsear JSON: ", json.get_error_message())
+		return
+	
+	var data = json.data
+	
+	if data.has("combinaciones"):
+		# Mapear elementos ID a nombre
+		var id_to_name: Dictionary = {}
+		if data.has("elementos"):
+			for elem in data["elementos"]:
+				id_to_name[elem["id"]] = elem["nombre"]
+		
+		# Cargar información de máquinas
+		for combo in data["combinaciones"]:
+			if combo.has("maquina"):
+				var mat1_id = combo["elemento1"]
+				var mat2_id = combo["elemento2"]
+				var resultado_id = combo["resultado"]
+				var maquina = combo["maquina"]
+				
+				var mat1_nombre = id_to_name.get(mat1_id, "")
+				var mat2_nombre = id_to_name.get(mat2_id, "")
+				var resultado_nombre = id_to_name.get(resultado_id, "")
+				
+				if mat1_nombre != "" and resultado_nombre != "":
+					machine_for_recipe[resultado_nombre] = maquina
+					print("🔧 ", resultado_nombre, " requiere: ", maquina)
+
+
 func create_fusion_card(element: Dictionary, recipes: Dictionary) -> Control:
 	var card = PanelContainer.new()
-	card.custom_minimum_size = Vector2(140, 200)
+	card.custom_minimum_size = Vector2(200, 200)
 	
 	# Determinar si es elemento base o fusión
 	var is_base = element.get("es_base", false)
@@ -127,10 +182,10 @@ func create_fusion_card(element: Dictionary, recipes: Dictionary) -> Control:
 	
 	# Contenedor para la imagen/ícono
 	var image_container = CenterContainer.new()
-	image_container.custom_minimum_size = Vector2(0, 70)
+	image_container.custom_minimum_size = Vector2(0, 60)
 	
 	var texture_rect = TextureRect.new()
-	texture_rect.custom_minimum_size = Vector2(60, 60)
+	texture_rect.custom_minimum_size = Vector2(50, 50)
 	texture_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	
 	# Cargar imagen si existe
@@ -143,13 +198,13 @@ func create_fusion_card(element: Dictionary, recipes: Dictionary) -> Control:
 			# Crear un rectángulo de color como fallback
 			var color_rect = ColorRect.new()
 			color_rect.color = GameManager.material_colors.get(element_name, Color.GRAY)
-			color_rect.custom_minimum_size = Vector2(60, 60)
+			color_rect.custom_minimum_size = Vector2(50, 50)
 			image_container.add_child(color_rect)
 	else:
 		# Usar color del GameManager
 		var color_rect = ColorRect.new()
 		color_rect.color = GameManager.material_colors.get(element_name, Color.GRAY)
-		color_rect.custom_minimum_size = Vector2(60, 60)
+		color_rect.custom_minimum_size = Vector2(50, 50)
 		image_container.add_child(color_rect)
 	
 	if texture_rect.texture:
@@ -164,7 +219,7 @@ func create_fusion_card(element: Dictionary, recipes: Dictionary) -> Control:
 	name_label.add_theme_font_size_override("font_size", 12)
 	name_label.add_theme_color_override("font_color", color_palette["text"])
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.custom_minimum_size = Vector2(0, 30)
+	name_label.custom_minimum_size = Vector2(0, 25)
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	vbox.add_child(name_label)
 	
@@ -172,21 +227,33 @@ func create_fusion_card(element: Dictionary, recipes: Dictionary) -> Control:
 	var type_label = Label.new()
 	type_label.text = "BASE" if is_base else "FUSIÓN"
 	type_label.add_theme_font_override("font", dogica_font)
-	type_label.add_theme_font_size_override("font_size", 9)
+	type_label.add_theme_font_size_override("font_size", 10)
 	type_label.add_theme_color_override("font_color", Color.YELLOW if is_base else Color.LIME)
 	type_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(type_label)
+	
+	# Información de máquina si es fusión
+	if not is_base and machine_for_recipe.has(element_name):
+		var machine_label = Label.new()
+		machine_label.text = "🔧 " + machine_for_recipe[element_name]
+		machine_label.add_theme_font_override("font", dogica_font)
+		machine_label.add_theme_font_size_override("font_size", 9)
+		machine_label.add_theme_color_override("font_color", Color.ORANGE)
+		machine_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		machine_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+		machine_label.custom_minimum_size = Vector2(0, 15)
+		vbox.add_child(machine_label)
 	
 	# Descripción de cómo obtenerlo
 	var description = get_fusion_description(element, recipes)
 	var desc_label = Label.new()
 	desc_label.text = description
 	desc_label.add_theme_font_override("font", dogica_font)
-	desc_label.add_theme_font_size_override("font_size", 8)
+	desc_label.add_theme_font_size_override("font_size", 9)
 	desc_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 	desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	desc_label.custom_minimum_size = Vector2(0, 60)
+	desc_label.custom_minimum_size = Vector2(0, 40)
 	vbox.add_child(desc_label)
 	
 	return card

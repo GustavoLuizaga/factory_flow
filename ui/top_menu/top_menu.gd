@@ -18,7 +18,7 @@ signal delete_mode_changed(is_active: bool)
 @onready var label_right: Label = $Panel/HBoxContainer/ConveyorRightContainer/ConveyorRightBtn/Label
 
 var pause_btn: TextureButton = null
-var almanac_btn: Button = null
+var almanac_btn: TextureButton = null
 var delete_mode: bool = false
 var delete_btn: TextureButton = null  # Se crea dinámicamente
 var fusion_almanac: Node = null
@@ -132,41 +132,46 @@ func create_delete_button() -> void:
 
 	var delete_container = MarginContainer.new()
 	delete_container.name = "DeleteContainer"
-	delete_container.add_theme_constant_override("margin_left", 10)
-	delete_container.add_theme_constant_override("margin_right", 10)
-	delete_container.add_theme_constant_override("margin_top", 10)
-	delete_container.add_theme_constant_override("margin_bottom", 10)
-	hbox.add_child(delete_container)
+	delete_container.add_theme_constant_override("margin_left", 5)
+	delete_container.add_theme_constant_override("margin_right", 5)
+	delete_container.add_theme_constant_override("margin_top", 5)
+	delete_container.add_theme_constant_override("margin_bottom", 5)
 	
 	delete_btn = TextureButton.new()
 	delete_btn.name = "DeleteBtn"
 	
 	delete_btn.texture_normal = delete_icon_normal
 	delete_btn.ignore_texture_size = true 
-	delete_btn.custom_minimum_size = Vector2(50, 50)
+	delete_btn.custom_minimum_size = Vector2(60, 60)
 	
 	delete_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 
 	delete_container.add_child(delete_btn)
 	
-	# Mover el botón de pausa al final (después del botón de eliminar)
-	if pause_btn and pause_btn.get_parent():
-		var pause_button_container = pause_btn.get_parent()
-		hbox.move_child(pause_button_container, hbox.get_child_count() - 1)
+	# Insertar el botón delete antes del almanaque
+	# Encontrar índice del AlmanacButtonContainer
+	var almanac_container_index = -1
+	for i in range(hbox.get_child_count()):
+		if hbox.get_child(i).name == "AlmanacButtonContainer":
+			almanac_container_index = i
+			break
 	
-	# Crear fondo rojo (BORRADO)
-	#var color_rect = ColorRect.new()
-	#color_rect.color = Color(0.8, 0.2, 0.2, 1)
-	#color_rect.custom_minimum_size = Vector2(64, 64)
-	#color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	#delete_btn.add_child(color_rect)
-	
-	# Crear etiqueta con emoji (BORRADO)
-	#var label = Label.new()
-	#label.text = "🗑️"
-	#label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	# ... (más propiedades del label) ...
-	#color_rect.add_child(label)
+	if almanac_container_index >= 0:
+		hbox.add_child(delete_container)
+		hbox.move_child(delete_container, almanac_container_index)
+	else:
+		# Si no está, agregar antes del PauseButtonContainer
+		var pause_container_index = -1
+		for i in range(hbox.get_child_count()):
+			if hbox.get_child(i).name == "PauseButtonContainer":
+				pause_container_index = i
+				break
+		
+		if pause_container_index >= 0:
+			hbox.add_child(delete_container)
+			hbox.move_child(delete_container, pause_container_index)
+		else:
+			hbox.add_child(delete_container)
 	
 	print("✅ Botón de borrar con imagen PNG creado exitosamente")
 
