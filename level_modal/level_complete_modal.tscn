@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bmou5abcmvo05"]
 
 [ext_resource type="Script" uid="uid://c6wc2bc8kphf8" path="res://level_modal/level_complete_modal.gd" id="1_t0dcd"]
-[ext_resource type="Texture2D" uid="uid://bhtvq6q5fkdhw" path="res://assets/images/ganar.png" id="2_xc3w1"]
+[ext_resource type="Texture2D" uid="uid://chvis0j4mvw55" path="res://assets/images/ganar.png" id="2_xc3w1"]
 
 [node name="LevelCompleteModal" type="CanvasLayer"]
 script = ExtResource("1_t0dcd")
@@ -37,7 +37,7 @@ offset_bottom = 315.0
 
 [node name="NextLevelButton" type="TextureButton" parent="TextureRect"]
 layout_mode = 0
-offset_left = 261.0
-offset_top = 262.0
-offset_right = 407.0
-offset_bottom = 316.0
+offset_left = 262.0
+offset_top = 258.0
+offset_right = 408.0
+offset_bottom = 312.0
