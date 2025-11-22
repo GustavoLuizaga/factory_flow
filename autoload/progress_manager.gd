@@ -108,6 +108,43 @@ func get_current_profile() -> Dictionary:
 		return profiles[current_user]
 	return {}
 
+# Guarda la ruta del avatar para el usuario actual
+func set_avatar(path: String) -> void:
+	if current_user == "":
+		return
+
+	var profile: Dictionary = profiles.get(current_user, {}) as Dictionary
+	profile["avatar_path"] = path
+	profiles[current_user] = profile
+	_save_profiles()
+
+
+# Devuelve una textura lista para usar en UI
+func get_avatar_texture() -> Texture2D:
+	var default_tex: Texture2D = preload("res://assets/images/avatar_default.png") # CREA esta imagen
+
+	if current_user == "":
+		return default_tex
+
+	var profile: Dictionary = profiles.get(current_user, {}) as Dictionary
+	var path := String(profile.get("avatar_path", ""))
+
+	# Sin avatar -> usamos el predeterminado
+	if path == "":
+		return default_tex
+
+	# Si el archivo ya no existe, volvemos al default
+	if not FileAccess.file_exists(path):
+		return default_tex
+
+	var img := Image.new()
+	var err := img.load(path)
+	if err != OK:
+		return default_tex
+
+	var tex := ImageTexture.create_from_image(img)
+	return tex
+
 # Lista de nombres de todos los usuarios guardados (para combobox si quieres)
 #func get_all_usernames() -> Array[String]:
 #	var arr: Array[String] = []
@@ -183,7 +220,8 @@ func ensure_simple_user(username: String) -> String:
 			"username": candidate,
 			"created_at": Time.get_unix_time_from_system(),
 			"highest_unlocked": 1,
-			"stats": {}
+			"stats": {},
+			"avatar_path": ""          # <- NUEVO (cadena vacía = usar avatar por defecto)
 		}
 		profiles[candidate] = profile
 		current_user = candidate
@@ -201,7 +239,8 @@ func ensure_simple_user(username: String) -> String:
 		"username": username,
 		"created_at": Time.get_unix_time_from_system(),
 		"highest_unlocked": 1,
-		"stats": {}
+		"stats": {},
+		"avatar_path": ""
 	}
 	profiles[username] = new_profile
 	current_user = username

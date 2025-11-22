@@ -29,10 +29,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -328.0
-offset_top = -214.0
-offset_right = 346.0
-offset_bottom = 151.0
+offset_left = -393.0
+offset_top = -307.0
+offset_right = 385.0
+offset_bottom = 293.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -54,6 +54,20 @@ grow_vertical = 2
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_4sxs6")
 text = "BIENVENIDO/A!"
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AvatarRect" type="TextureRect" parent="Panel/VBoxContainer/CenterContainer"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SelectAvatarButton" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Subir foto"
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
@@ -83,5 +97,13 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("2_4sxs6")
 text = "Nombre aleatorio"
 
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.png", "*.jpg", "**.jpeg")
+
+[connection signal="pressed" from="Panel/VBoxContainer/SelectAvatarButton" to="." method="_on_SelectAvatarButton_pressed"]
 [connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/OkButton" to="." method="_on_OkButton_pressed"]
 [connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/RandomButton" to="." method="_on_RandomButton_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]

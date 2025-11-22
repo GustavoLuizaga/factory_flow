@@ -7,10 +7,17 @@ signal username_confirmed(username: String)
 @onready var username_edit: LineEdit = $Panel/VBoxContainer/UsernameEdit
 @onready var error_label: Label      = $Panel/VBoxContainer/ErrorLabel
 @onready var title_label: Label      = $Panel/VBoxContainer/TitleLabel
-@onready var trophy_icon: TextureRect = $Panel/VBoxContainer/TrophyIcon
+#@onready var trophy_icon: TextureRect = $Panel/VBoxContainer/TrophyIcon
 @onready var ok_button: Button       = $Panel/VBoxContainer/HBoxContainer/OkButton
 @onready var random_button: Button   = $Panel/VBoxContainer/HBoxContainer/RandomButton
+@onready var avatar_rect: TextureRect  = $Panel/VBoxContainer/CenterContainer/AvatarRect
+@onready var file_dialog: FileDialog   = $FileDialog
+@onready var select_avatar_button: Button = $Panel/VBoxContainer/SelectAvatarButton
 
+const DEFAULT_AVATAR: Texture2D = preload("res://assets/images/avatar_default.png")
+
+# Ruta del avatar elegido para este modal (user://...)
+var _selected_avatar_path: String = ""
 
 func _ready() -> void:
 	# Empieza oculto; lo abrirá el menú si hace falta
@@ -19,8 +26,12 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	# IMPORTANTE: este nodo sigue procesando aunque el árbol esté en pausa
 	#pause_mode = Node.PAUSE_MODE_PROCESS
-
+	
+	# Mostrar avatar por defecto al abrir el modal
+	if avatar_rect:
+		avatar_rect.texture = DEFAULT_AVATAR
 	# ESTILOS VISUALES
+	
 	_setup_panel_style()
 	_setup_text_style()
 	_setup_buttons_style()
@@ -55,6 +66,7 @@ func _on_RandomButton_pressed() -> void:
 
 # Lógica común para ambos botones que llama al backend
 func _confirm_username(raw_name: String) -> void:
+	# 1) El backend asegura que haya usuario (crea o selecciona)
 	var final_name := ProgressManager.ensure_simple_user(raw_name)
 
 	if final_name == "":
@@ -62,7 +74,11 @@ func _confirm_username(raw_name: String) -> void:
 		error_label.text = "No se pudo crear el perfil."
 		return
 
-	# Avisamos a quien nos llamó
+	# 2) Si se eligió un avatar, lo guardamos en el perfil
+	if _selected_avatar_path != "":
+		ProgressManager.set_avatar(_selected_avatar_path)
+		
+	# 3) Avisamos al menu que el usuario ya esta listo
 	username_confirmed.emit(final_name)
 	_close()
 
@@ -165,9 +181,9 @@ func _setup_text_style() -> void:
 		username_edit.add_theme_stylebox_override("focus", sb)
 
 	# Icono de trofeo (por si quieres tocar algo de tamaño)
-	if trophy_icon:
-		trophy_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		trophy_icon.custom_minimum_size = Vector2(96, 96)
+	#if trophy_icon:
+	#	trophy_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	#	trophy_icon.custom_minimum_size = Vector2(96, 96)
 
 # Botones tipo “VOLVER AL MENÚ / SIGUIENTE NIVEL”
 func _setup_buttons_style() -> void:
@@ -175,6 +191,9 @@ func _setup_buttons_style() -> void:
 		_style_main_button(ok_button, Color(0.10, 0.70, 0.30))      # azul
 	if random_button:
 		_style_main_button(random_button, Color(0.16, 0.55, 1.0))  # verde
+	# --- Botón de SUBIR FOTO (naranja) ---
+	#if select_avatar_button:
+	#	_style_main_button(select_avatar_button, Color(1.0, 0.55, 0.15))  # naranja
 
 func _style_main_button(btn: Button, base_color: Color) -> void:
 	# Estado normal
@@ -210,3 +229,40 @@ func _style_main_button(btn: Button, base_color: Color) -> void:
 
 	# Tamaño mínimo tipo botón grande
 	btn.custom_minimum_size = Vector2(240, 64)
+
+
+
+func _on_SelectAvatarButton_pressed() -> void:
+	# Abrir el FileDialog para elegir imagen
+	if file_dialog:
+		file_dialog.popup_centered()
+
+#cuando el usuario elige su imagen
+func _on_FileDialog_file_selected(path: String) -> void:
+	var img := Image.new()
+	var err := img.load(path)
+	if err != OK:
+		error_label.text = "No se pudo cargar la imagen."
+		return
+
+	# Aseguramos carpeta user://avatars
+	var dir := DirAccess.open("user://")
+	if dir and not dir.dir_exists("avatars"):
+		dir.make_dir("avatars")
+
+	# Guardamos una copia en user:// (para que el apk no dependa de rutas externas)
+	var filename := "avatar_%d.png" % int(Time.get_unix_time_from_system())
+	var save_path := "user://avatars/%s" % filename
+
+	var save_err := img.save_png(save_path)
+	if save_err != OK:
+		error_label.text = "No se pudo guardar el avatar."
+		return
+
+	# Mostrar en el TextureRect
+	var tex := ImageTexture.create_from_image(img)
+	if avatar_rect:
+		avatar_rect.texture = tex
+
+	# Recordar la ruta para guardarla cuando se confirme el usuario
+	_selected_avatar_path = save_path
