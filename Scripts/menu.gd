@@ -5,7 +5,7 @@ extends Control
 var UsernameModalScene := preload("res://Menu/username_modal.tscn")
 var username_modal: UsernameModal = null
 # Panel de perfil
-var profile_panel_scene : PackedScene = preload("res://Menu/profile_panel.tscn")
+#var profile_panel_scene : PackedScene = preload("res://Menu/profile_panel.tscn")
 # SOLO declaramos el tipo, sin asignar null
 var profile_panel: Control
 
