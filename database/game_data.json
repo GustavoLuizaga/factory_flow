@@ -31,7 +31,6 @@
 		{ "id": 29, "nombre": "Taller de manualidades", "es_base": false }
 	],
 	"combinaciones": [
-<<<<<<< HEAD
 		{ "elemento1": 1, "elemento2": 2, "resultado": 6, "maquina": "Fusion Basica" },
 		{ "elemento1": 1, "elemento2": 5, "resultado": 7, "maquina": "Fusion Basica" },
 		{ "elemento1": 1, "elemento2": 3, "resultado": 8, "maquina": "Fusion Basica" },
@@ -51,32 +50,6 @@
 		{ "elemento1": 8, "elemento2": 11, "resultado": 22, "maquina": "Super Fusion" },
 		{ "elemento1": 13, "elemento2": 14, "resultado": 23, "maquina": "Super Fusion" },
 		{ "elemento1": 15, "elemento2": 14, "resultado": 24, "maquina": "Super Fusion" }
-=======
-		{ "elemento1": 1, "elemento2": 2, "resultado": 6 },
-		{ "elemento1": 1, "elemento2": 5, "resultado": 7 },
-		{ "elemento1": 1, "elemento2": 3, "resultado": 8 },
-		{ "elemento1": 1, "elemento2": 4, "resultado": 9 },
-		{ "elemento1": 2, "elemento2": 5, "resultado": 10 },
-		{ "elemento1": 2, "elemento2": 3, "resultado": 11 },
-		{ "elemento1": 2, "elemento2": 4, "resultado": 12 },
-		{ "elemento1": 3, "elemento2": 5, "resultado": 13 },
-		{ "elemento1": 3, "elemento2": 4, "resultado": 14 },
-		{ "elemento1": 4, "elemento2": 5, "resultado": 15 },
-		{ "elemento1": 6, "elemento2": 7, "resultado": 16 },
-		{ "elemento1": 8, "elemento2": 9, "resultado": 17 },
-		{ "elemento1": 6, "elemento2": 10, "resultado": 18 },
-		{ "elemento1": 11, "elemento2": 12, "resultado": 19 },
-		{ "elemento1": 7, "elemento2": 10, "resultado": 20 },
-		{ "elemento1": 13, "elemento2": 15, "resultado": 21 },
-		{ "elemento1": 8, "elemento2": 11, "resultado": 22 },
-		{ "elemento1": 13, "elemento2": 14, "resultado": 23 },
-		{ "elemento1": 15, "elemento2": 14, "resultado": 24 },
-		{ "elemento1": 16, "elemento2": 17, "resultado": 25 },
-		{ "elemento1": 18, "elemento2": 19, "resultado": 26 },
-		{ "elemento1": 20, "elemento2": 21, "resultado": 27 },
-		{ "elemento1": 22, "elemento2": 23, "resultado": 28 },
-		{ "elemento1": 12, "elemento2": 24, "resultado": 29 }
->>>>>>> origin/dev
 	],
 	"niveles": [
 		{
