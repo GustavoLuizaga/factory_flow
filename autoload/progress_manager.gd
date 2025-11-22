@@ -152,6 +152,14 @@ func get_avatar_texture() -> Texture2D:
 #		arr.append(str(name))
 #	return arr
 
+func get_avatar_path() -> String:
+	if current_user == "":
+		return ""
+	if not profiles.has(current_user):
+		return ""
+	var profile: Dictionary = profiles[current_user]
+	return String(profile.get("avatar_path", "")) 
+
 # -------------------------
 # PROGRESO POR USUARIO
 # (MISMA API QUE TENÍAS)
