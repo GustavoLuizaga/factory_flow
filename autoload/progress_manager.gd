@@ -221,7 +221,8 @@ func ensure_simple_user(username: String) -> String:
 			"created_at": Time.get_unix_time_from_system(),
 			"highest_unlocked": 1,
 			"stats": {},
-			"avatar_path": ""          # <- NUEVO (cadena vacía = usar avatar por defecto)
+			"avatar_path": "",          # <- NUEVO (cadena vacía = usar avatar por defecto)
+			"name_changes_count": 0      # <- NUEVO: contador de cambios de nombre
 		}
 		profiles[candidate] = profile
 		current_user = candidate
@@ -240,9 +241,75 @@ func ensure_simple_user(username: String) -> String:
 		"created_at": Time.get_unix_time_from_system(),
 		"highest_unlocked": 1,
 		"stats": {},
-		"avatar_path": ""
+		"avatar_path": "",
+		"name_changes_count": 0  # <- NUEVO: contador de cambios de nombre
 	}
 	profiles[username] = new_profile
 	current_user = username
 	_save_profiles()
 	return username
+
+
+# Actualiza el nombre del usuario actual
+# Retorna true si tuvo éxito, false si el nuevo nombre ya está en uso o si se alcanzó el límite
+func update_username(new_username: String) -> bool:
+	new_username = new_username.strip_edges()
+	
+	# Validar que no esté vacío
+	if new_username == "":
+		return false
+	
+	# Validar longitud máxima de 6 caracteres
+	if new_username.length() > 6:
+		return false
+	
+	# Si no hay usuario actual, no se puede actualizar
+	if current_user == "":
+		return false
+	
+	# Si el nuevo nombre es igual al actual, no hay nada que hacer
+	if new_username == current_user:
+		return true
+	
+	# Verificar límite de cambios de nombre
+	var profile: Dictionary = profiles[current_user]
+	var changes_count: int = profile.get("name_changes_count", 0)
+	
+	if changes_count >= 5:
+		print("⚠️ Límite de cambios de nombre alcanzado (5/5)")
+		return false
+	
+	# Si el nuevo nombre ya está en uso por otro usuario
+	if profiles.has(new_username):
+		return false
+	
+	# Eliminar el perfil con el nombre antiguo
+	profiles.erase(current_user)
+	
+	# Actualizar el username dentro del perfil
+	profile["username"] = new_username
+	
+	# Incrementar contador de cambios
+	profile["name_changes_count"] = changes_count + 1
+	
+	# Guardar con el nuevo nombre
+	profiles[new_username] = profile
+	current_user = new_username
+	
+	print("✅ Nombre actualizado. Cambios: %d/5" % profile["name_changes_count"])
+	_save_profiles()
+	return true
+
+
+# Obtiene el número de cambios de nombre realizados
+func get_name_changes_count() -> int:
+	if current_user == "":
+		return 0
+	
+	var profile: Dictionary = profiles.get(current_user, {})
+	return profile.get("name_changes_count", 0)
+
+
+# Obtiene cuántos cambios de nombre quedan disponibles
+func get_remaining_name_changes() -> int:
+	return max(0, 5 - get_name_changes_count())

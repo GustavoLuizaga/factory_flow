@@ -116,16 +116,19 @@ texture = ExtResource("3_raj00")
 layout_mode = 1
 
 [node name="UserMenu" type="MenuButton" parent="."]
-custom_minimum_size = Vector2(110, 80)
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -133.0
-offset_bottom = 139.0
+offset_left = -220.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = 75.0
 grow_horizontal = 0
-pivot_offset = Vector2(-30, 30)
-theme_override_styles/normal = SubResource("StyleBoxFlat_w6voe")
+text = "Usuario"
+flat = false
+icon_alignment = 0
 
 [connection signal="pressed" from="ColorRect/VBoxContainer/SeleccionNivel" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="ColorRect/VBoxContainer/Opciones" to="." method="_on_button_2_pressed"]
