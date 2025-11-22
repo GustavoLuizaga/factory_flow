@@ -16,11 +16,14 @@ var dogica_font = preload("res://assets/scenes/dogica.ttf")
 
 # Diccionario de rutas de imágenes para cada elemento
 var element_images: Dictionary = {
+	# Elementos base
 	"Papel": "res://assets/images/item_paper.png",
 	"Metal": "res://assets/images/item_metal.png",
 	"Plastico": "res://assets/images/item_plastic.png",
 	"Madera": "res://assets/images/item_wood.png",
 	"Vidrio": "res://assets/images/item_glass.png",
+	
+	# Fusiones básicas (nivel 1)
 	"Lata con etiqueta": "res://assets/images/Lata_con_etiqueta.png",
 	"Botella con etiqueta": "res://assets/images/Botella_con_etiqueta.png",
 	"Libro": "res://assets/images/Libro.png",
@@ -30,15 +33,38 @@ var element_images: Dictionary = {
 	"Herramienta con mango de madera": "res://assets/images/Herramienta_con_mango_de_madera.png",
 	"Botella con tapa plastica": "res://assets/images/Botella_con_tapa_plastica.png",
 	"Juguete": "res://assets/images/Juguete.png",
-	"Ventana con marco de madera": "res://assets/images/Ventana_con_marco_de_madera.png"
+	"Ventana con marco de madera": "res://assets/images/Ventana_con_marco_de_madera.png",
+	
+	# Super fusiones (nivel 2)
+	"Pack de bebidas reciclado": "res://assets/images/subFusiones/Pack_de_bebidas_reciclado.png",
+	"Biblioteca reciclada": "res://assets/images/subFusiones/Biblioteca_reciclada.png",
+	"Coleccion de envases": "res://assets/images/subFusiones/Coleccion_de_envases.png",
+	"Kit electrico reciclado": "res://assets/images/subFusiones/Kit_electrico_reciclado.png",
+	"Botella de coleccion": "res://assets/images/subFusiones/Botella_de_coleccion.png",
+	"Invernadero basico": "res://assets/images/subFusiones/Invernadero_basico.png",
+	"E-book": "res://assets/images/subFusiones/E_book.png",
+	"Botella con sorpresa": "res://assets/images/subFusiones/Botella_con_sorpresa.png",
+	"Casa infantil de juguetes": "res://assets/images/subFusiones/Casa_infantil_de_juguetes.png",
+	
+	# Fusiones definitivas (nivel 3)
+	"Centro educativo de reciclaje": "res://assets/images/FucionesDefinitivas/Centro_educativo_de_reciclaje.png",
+	"Taller de proyectos domésticos reciclados": "res://assets/images/FucionesDefinitivas/Taller_de_proyectos_domesticos_reciclados.png",
+	"Invernadero experimental": "res://assets/images/FucionesDefinitivas/Invernadero_experimental.png",
+	"Estación educativa interactiva": "res://assets/images/FucionesDefinitivas/Estacion_educativa_interactiva.png",
+	"Taller de manualidades": "res://assets/images/FucionesDefinitivas/Taller_de_manualidades_infantil.png"
 }
 
-# Colores para los ítems
+# Colores para los ítems - Mejorados
 var color_palette = {
-	"base": Color(0.15, 0.15, 0.15),
-	"fusion": Color(0.2, 0.3, 0.2),
-	"border": Color.WHITE,
-	"text": Color.WHITE
+	"base": Color(0.12, 0.15, 0.22),  # Azul oscuro para base
+	"fusion": Color(0.15, 0.25, 0.15),  # Verde oscuro para fusiones
+	"ultimate": Color(0.25, 0.15, 0.22),  # Púrpura para fusiones definitivas
+	"border": Color(0.8, 0.85, 1.0),  # Borde azul claro
+	"border_base": Color(0.9, 0.85, 0.4),  # Dorado para base
+	"border_fusion": Color(0.4, 0.9, 0.5),  # Verde brillante para fusiones
+	"border_ultimate": Color(0.9, 0.4, 0.8),  # Rosa/púrpura para definitivas
+	"text": Color.WHITE,
+	"text_shadow": Color(0.0, 0.0, 0.0, 0.5)
 }
 
 # Diccionario para almacenar información de máquinas por receta
@@ -55,18 +81,28 @@ func _ready() -> void:
 	# Estilizar título
 	if title_label:
 		title_label.add_theme_font_override("font", dogica_font)
-		title_label.add_theme_font_size_override("font_size", 24)
-		title_label.add_theme_color_override("font_color", Color.YELLOW)
+		title_label.add_theme_font_size_override("font_size", 32)
+		title_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.2))  # Dorado brillante
+		# Agregar sombra al título
+		title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+		title_label.add_theme_constant_override("shadow_offset_x", 2)
+		title_label.add_theme_constant_override("shadow_offset_y", 2)
 	
-	# Estilizar panel principal
+	# Estilizar panel principal con gradiente
 	if main_panel:
 		var panel_style = StyleBoxFlat.new()
-		panel_style.bg_color = Color(0.1, 0.1, 0.1, 0.95)
-		panel_style.border_color = Color.WHITE
-		panel_style.set_border_width(SIDE_LEFT, 3)
-		panel_style.set_border_width(SIDE_RIGHT, 3)
-		panel_style.set_border_width(SIDE_TOP, 3)
-		panel_style.set_border_width(SIDE_BOTTOM, 3)
+		panel_style.bg_color = Color(0.08, 0.08, 0.12, 0.97)
+		panel_style.border_color = Color(0.9, 0.85, 0.4)  # Borde dorado
+		panel_style.set_border_width(SIDE_LEFT, 4)
+		panel_style.set_border_width(SIDE_RIGHT, 4)
+		panel_style.set_border_width(SIDE_TOP, 4)
+		panel_style.set_border_width(SIDE_BOTTOM, 4)
+		panel_style.set_corner_radius(CORNER_TOP_LEFT, 12)
+		panel_style.set_corner_radius(CORNER_TOP_RIGHT, 12)
+		panel_style.set_corner_radius(CORNER_BOTTOM_LEFT, 12)
+		panel_style.set_corner_radius(CORNER_BOTTOM_RIGHT, 12)
+		panel_style.shadow_color = Color(0, 0, 0, 0.6)
+		panel_style.shadow_size = 10
 		main_panel.add_theme_stylebox_override("panel", panel_style)
 	
 	# Estilizar botón de cerrar
@@ -153,24 +189,40 @@ func _load_machine_info() -> void:
 
 func create_fusion_card(element: Dictionary, recipes: Dictionary) -> Control:
 	var card = PanelContainer.new()
-	card.custom_minimum_size = Vector2(200, 200)
+	card.custom_minimum_size = Vector2(240, 260)  # Tarjetas más grandes
 	
-	# Determinar si es elemento base o fusión
+	# Determinar si es elemento base, fusión o fusión definitiva
 	var is_base = element.get("es_base", false)
-	var bg_color = color_palette["base"] if is_base else color_palette["fusion"]
+	var element_id = element.get("id", 0)
+	var is_ultimate = element_id >= 25  # IDs 25-29 son fusiones definitivas
 	
-	# Estilo del panel
+	var bg_color: Color
+	var border_color: Color
+	if is_base:
+		bg_color = color_palette["base"]
+		border_color = color_palette["border_base"]
+	elif is_ultimate:
+		bg_color = color_palette["ultimate"]
+		border_color = color_palette["border_ultimate"]
+	else:
+		bg_color = color_palette["fusion"]
+		border_color = color_palette["border_fusion"]
+	
+	# Estilo del panel con mejor apariencia
 	var stylebox = StyleBoxFlat.new()
 	stylebox.bg_color = bg_color
-	stylebox.border_color = color_palette["border"]
-	stylebox.set_border_width(SIDE_LEFT, 2)
-	stylebox.set_border_width(SIDE_RIGHT, 2)
-	stylebox.set_border_width(SIDE_TOP, 2)
-	stylebox.set_border_width(SIDE_BOTTOM, 2)
-	stylebox.set_corner_radius(CORNER_TOP_LEFT, 5)
-	stylebox.set_corner_radius(CORNER_TOP_RIGHT, 5)
-	stylebox.set_corner_radius(CORNER_BOTTOM_LEFT, 5)
-	stylebox.set_corner_radius(CORNER_BOTTOM_RIGHT, 5)
+	stylebox.border_color = border_color
+	stylebox.set_border_width(SIDE_LEFT, 3)
+	stylebox.set_border_width(SIDE_RIGHT, 3)
+	stylebox.set_border_width(SIDE_TOP, 3)
+	stylebox.set_border_width(SIDE_BOTTOM, 3)
+	stylebox.set_corner_radius(CORNER_TOP_LEFT, 8)
+	stylebox.set_corner_radius(CORNER_TOP_RIGHT, 8)
+	stylebox.set_corner_radius(CORNER_BOTTOM_LEFT, 8)
+	stylebox.set_corner_radius(CORNER_BOTTOM_RIGHT, 8)
+	stylebox.shadow_color = Color(0, 0, 0, 0.4)
+	stylebox.shadow_size = 4
+	stylebox.shadow_offset = Vector2(2, 2)
 	
 	card.add_theme_stylebox_override("panel", stylebox)
 	
@@ -180,13 +232,14 @@ func create_fusion_card(element: Dictionary, recipes: Dictionary) -> Control:
 	vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	card.add_child(vbox)
 	
-	# Contenedor para la imagen/ícono
+	# Contenedor para la imagen/ícono - más grande
 	var image_container = CenterContainer.new()
-	image_container.custom_minimum_size = Vector2(0, 60)
+	image_container.custom_minimum_size = Vector2(0, 100)
 	
 	var texture_rect = TextureRect.new()
-	texture_rect.custom_minimum_size = Vector2(50, 50)
+	texture_rect.custom_minimum_size = Vector2(80, 80)  # Imágenes más grandes
 	texture_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	
 	# Cargar imagen si existe
 	var element_name = element["nombre"]
@@ -223,12 +276,20 @@ func create_fusion_card(element: Dictionary, recipes: Dictionary) -> Control:
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	vbox.add_child(name_label)
 	
-	# Tipo (Base o Fusión)
+	# Tipo (Base, Fusión o Fusión Definitiva)
 	var type_label = Label.new()
-	type_label.text = "BASE" if is_base else "FUSIÓN"
+	if is_base:
+		type_label.text = "BASE"
+		type_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.2))  # Dorado
+	elif is_ultimate:
+		type_label.text = "FUSIÓN DEFINITIVA"
+		type_label.add_theme_color_override("font_color", Color(0.9, 0.4, 0.9))  # Púrpura brillante
+	else:
+		type_label.text = "FUSIÓN"
+		type_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))  # Verde lima
+	
 	type_label.add_theme_font_override("font", dogica_font)
-	type_label.add_theme_font_size_override("font_size", 10)
-	type_label.add_theme_color_override("font_color", Color.YELLOW if is_base else Color.LIME)
+	type_label.add_theme_font_size_override("font_size", 11)
 	type_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(type_label)
 	

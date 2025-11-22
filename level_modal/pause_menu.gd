@@ -35,15 +35,21 @@ func _ready() -> void:
 	# Ocultar inicialmente
 	visible = false
 	
-	# Estilizar el panel
+	# Estilizar el panel con mejor apariencia
 	if panel:
 		var panel_style = StyleBoxFlat.new()
-		panel_style.bg_color = Color(0.1, 0.1, 0.1, 0.95)
-		panel_style.border_color = Color.WHITE
-		panel_style.set_border_width(SIDE_LEFT, 3)
-		panel_style.set_border_width(SIDE_RIGHT, 3)
-		panel_style.set_border_width(SIDE_TOP, 3)
-		panel_style.set_border_width(SIDE_BOTTOM, 3)
+		panel_style.bg_color = Color(0.08, 0.08, 0.12, 0.97)  # Azul muy oscuro
+		panel_style.border_color = Color(0.9, 0.85, 0.4)  # Borde dorado
+		panel_style.set_border_width(SIDE_LEFT, 4)
+		panel_style.set_border_width(SIDE_RIGHT, 4)
+		panel_style.set_border_width(SIDE_TOP, 4)
+		panel_style.set_border_width(SIDE_BOTTOM, 4)
+		panel_style.set_corner_radius(CORNER_TOP_LEFT, 12)
+		panel_style.set_corner_radius(CORNER_TOP_RIGHT, 12)
+		panel_style.set_corner_radius(CORNER_BOTTOM_LEFT, 12)
+		panel_style.set_corner_radius(CORNER_BOTTOM_RIGHT, 12)
+		panel_style.shadow_color = Color(0, 0, 0, 0.6)
+		panel_style.shadow_size = 10
 		panel.add_theme_stylebox_override("panel", panel_style)
 	
 	# Crear los botones
@@ -75,18 +81,22 @@ func create_buttons() -> void:
 	for child in vbox.get_children():
 		child.queue_free()
 	
-	# Etiqueta de "Pausa"
+	# Etiqueta de "Pausa" mejorada
 	var title = Label.new()
 	title.text = "PAUSA"
-	title.add_theme_font_size_override("font_size", 32)
+	title.add_theme_font_size_override("font_size", 40)
 	title.add_theme_font_override("font", dogica_font)
-	title.add_theme_color_override("font_color", Color.WHITE)
+	title.add_theme_color_override("font_color", Color(1.0, 0.9, 0.2))  # Dorado brillante
+	# Agregar sombra al t\u00edtulo
+	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	title.add_theme_constant_override("shadow_offset_x", 3)
+	title.add_theme_constant_override("shadow_offset_y", 3)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
 	
-	# Espacio
+	# Espacio m\u00e1s grande
 	var spacer = Control.new()
-	spacer.set_custom_minimum_size(Vector2(0, 10))
+	spacer.set_custom_minimum_size(Vector2(0, 20))
 	vbox.add_child(spacer)
 	
 	# Botón Reanudar
@@ -132,56 +142,64 @@ func create_buttons() -> void:
 	print("✅ Botones del menú de pausa creados correctamente")
 
 
-func create_button(text: String, width: int = 200) -> Button:
+func create_button(text: String, width: int = 250) -> Button:
 	var btn = Button.new()
 	btn.text = text
-	btn.custom_minimum_size = Vector2(width, 50)
-	btn.add_theme_font_size_override("font_size", 18)
+	btn.custom_minimum_size = Vector2(width, 60)  # Botones m\u00e1s grandes
+	btn.add_theme_font_size_override("font_size", 20)
 	btn.add_theme_font_override("font", dogica_font)
 	btn.add_theme_color_override("font_color", Color.WHITE)
+	# Sombra al texto del bot\u00f3n
+	btn.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6))
+	btn.add_theme_constant_override("shadow_offset_x", 2)
+	btn.add_theme_constant_override("shadow_offset_y", 2)
 	
-	# Crear un fondo con color
+	# Crear un fondo con gradiente y mejor apariencia
 	var stylebox = StyleBoxFlat.new()
-	stylebox.bg_color = Color(0.2, 0.2, 0.2, 0.9)
-	stylebox.border_color = Color.WHITE
-	stylebox.set_border_width(SIDE_LEFT, 2)
-	stylebox.set_border_width(SIDE_RIGHT, 2)
-	stylebox.set_border_width(SIDE_TOP, 2)
-	stylebox.set_border_width(SIDE_BOTTOM, 2)
-	stylebox.set_corner_radius(CORNER_TOP_LEFT, 5)
-	stylebox.set_corner_radius(CORNER_TOP_RIGHT, 5)
-	stylebox.set_corner_radius(CORNER_BOTTOM_LEFT, 5)
-	stylebox.set_corner_radius(CORNER_BOTTOM_RIGHT, 5)
+	stylebox.bg_color = Color(0.2, 0.25, 0.3, 1.0)  # Azul grisceo
+	stylebox.border_color = Color(0.9, 0.85, 0.4)  # Dorado
+	stylebox.set_border_width(SIDE_LEFT, 3)
+	stylebox.set_border_width(SIDE_RIGHT, 3)
+	stylebox.set_border_width(SIDE_TOP, 3)
+	stylebox.set_border_width(SIDE_BOTTOM, 3)
+	stylebox.set_corner_radius(CORNER_TOP_LEFT, 8)
+	stylebox.set_corner_radius(CORNER_TOP_RIGHT, 8)
+	stylebox.set_corner_radius(CORNER_BOTTOM_LEFT, 8)
+	stylebox.set_corner_radius(CORNER_BOTTOM_RIGHT, 8)
+	stylebox.shadow_color = Color(0, 0, 0, 0.4)
+	stylebox.shadow_size = 3
 	
 	btn.add_theme_stylebox_override("normal", stylebox)
 	
-	# Estilo al pasar el ratón
+	# Estilo al pasar el ratón - más brillante
 	var stylebox_hover = StyleBoxFlat.new()
-	stylebox_hover.bg_color = Color(0.3, 0.3, 0.3, 1.0)
-	stylebox_hover.border_color = Color.YELLOW
-	stylebox_hover.set_border_width(SIDE_LEFT, 2)
-	stylebox_hover.set_border_width(SIDE_RIGHT, 2)
-	stylebox_hover.set_border_width(SIDE_TOP, 2)
-	stylebox_hover.set_border_width(SIDE_BOTTOM, 2)
-	stylebox_hover.set_corner_radius(CORNER_TOP_LEFT, 5)
-	stylebox_hover.set_corner_radius(CORNER_TOP_RIGHT, 5)
-	stylebox_hover.set_corner_radius(CORNER_BOTTOM_LEFT, 5)
-	stylebox_hover.set_corner_radius(CORNER_BOTTOM_RIGHT, 5)
+	stylebox_hover.bg_color = Color(0.3, 0.4, 0.5, 1.0)  # Azul más brillante
+	stylebox_hover.border_color = Color(1.0, 0.95, 0.5)  # Dorado brillante
+	stylebox_hover.set_border_width(SIDE_LEFT, 3)
+	stylebox_hover.set_border_width(SIDE_RIGHT, 3)
+	stylebox_hover.set_border_width(SIDE_TOP, 3)
+	stylebox_hover.set_border_width(SIDE_BOTTOM, 3)
+	stylebox_hover.set_corner_radius(CORNER_TOP_LEFT, 8)
+	stylebox_hover.set_corner_radius(CORNER_TOP_RIGHT, 8)
+	stylebox_hover.set_corner_radius(CORNER_BOTTOM_LEFT, 8)
+	stylebox_hover.set_corner_radius(CORNER_BOTTOM_RIGHT, 8)
+	stylebox_hover.shadow_color = Color(0, 0, 0, 0.5)
+	stylebox_hover.shadow_size = 5
 	
 	btn.add_theme_stylebox_override("hover", stylebox_hover)
 	
-	# Estilo presionado
+	# Estilo presionado - aún más brillante
 	var stylebox_pressed = StyleBoxFlat.new()
-	stylebox_pressed.bg_color = Color(0.4, 0.4, 0.4, 1.0)
-	stylebox_pressed.border_color = Color.GREEN
-	stylebox_pressed.set_border_width(SIDE_LEFT, 2)
-	stylebox_pressed.set_border_width(SIDE_RIGHT, 2)
-	stylebox_pressed.set_border_width(SIDE_TOP, 2)
-	stylebox_pressed.set_border_width(SIDE_BOTTOM, 2)
-	stylebox_pressed.set_corner_radius(CORNER_TOP_LEFT, 5)
-	stylebox_pressed.set_corner_radius(CORNER_TOP_RIGHT, 5)
-	stylebox_pressed.set_corner_radius(CORNER_BOTTOM_LEFT, 5)
-	stylebox_pressed.set_corner_radius(CORNER_BOTTOM_RIGHT, 5)
+	stylebox_pressed.bg_color = Color(0.25, 0.5, 0.3, 1.0)  # Verde azulado
+	stylebox_pressed.border_color = Color(0.4, 1.0, 0.5)  # Verde brillante
+	stylebox_pressed.set_border_width(SIDE_LEFT, 3)
+	stylebox_pressed.set_border_width(SIDE_RIGHT, 3)
+	stylebox_pressed.set_border_width(SIDE_TOP, 3)
+	stylebox_pressed.set_border_width(SIDE_BOTTOM, 3)
+	stylebox_pressed.set_corner_radius(CORNER_TOP_LEFT, 8)
+	stylebox_pressed.set_corner_radius(CORNER_TOP_RIGHT, 8)
+	stylebox_pressed.set_corner_radius(CORNER_BOTTOM_LEFT, 8)
+	stylebox_pressed.set_corner_radius(CORNER_BOTTOM_RIGHT, 8)
 	
 	btn.add_theme_stylebox_override("pressed", stylebox_pressed)
 	
