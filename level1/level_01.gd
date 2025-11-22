@@ -100,7 +100,7 @@ func try_delete_conveyor_at_position(world_pos: Vector2) -> void:
 		# Destruir la entidad
 		entity.queue_free()
 		
-		print("✅ Cinta eliminada exitosamente")
+		print("Cinta eliminada exitosamente")
 	else:
 		if entity:
 			print("⚠️ No se puede borrar: no es una cinta transportadora")
@@ -229,42 +229,19 @@ func setup_objective_hub_ui() -> void:
 
 	print("Hub de objetivos centrado bajo el grid")
 	
-##NUEVO unlock level
-##NUEVO unlock level
+
 func _on_all_done() -> void:
-	print("🏆 ¡Todos los objetivos completados! Mostrando modal...")
-	
-	# Desbloquea el siguiente nivel (esto ya lo tenías)
+	print("¡Todos los objetivos completados!")
 	ProgressManager.unlock(2)
-	
-	# --- CÓDIGO DEL MODAL ---
-	
-	# 1. Crear una instancia (copia) de tu escena modal
 	var modal = modal_scene.instantiate()
-	
-	# 2. Conectar las señales del modal a funciones de ESTE script (Level01)
 	modal.menu_requested.connect(_on_go_to_menu)
 	modal.next_level_requested.connect(_on_go_to_next_level)
-	
-	# 3. Añadir el modal a la escena actual
 	add_child(modal)
-	
-	# 4. Mostrar el modal
-	# (true = mostrar el botón "Siguiente Nivel")
 	modal.show_modal(true)
 	
-	# --- AÑADE ESTAS DOS FUNCIONES AL FINAL ---
 
-## Se llama cuando el jugador presiona "Volver al Menú" en el modal
 func _on_go_to_menu():
-	# (El modal ya quita la pausa, solo cambia de escena)
-	# Asegúrate de que la ruta a tu menú sea correcta
-	print("Cambiando a escena: Menú Principal")
 	get_tree().change_scene_to_file("res://Menu/menu.tscn") 
 
-## Se llama cuando el jugador presiona "Siguiente Nivel" en el modal
 func _on_go_to_next_level():
-	# (El modal ya quita la pausa)
-	# Asegúrate de que la ruta a tu Nivel 2 sea correcta
-	print("Cambiando a escena: Nivel 2")
 	get_tree().change_scene_to_file("res://level2/level_02.tscn")

@@ -57,7 +57,7 @@ func create_price_label() -> void:
 	
 	price_label = Label.new()
 	price_label.name = "PriceLabel"
-	price_label.text = str(cost) + "💰"
+	price_label.text = str(cost) + "🪙"
 	price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	price_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	price_label.add_theme_font_size_override("font_size", 16)
@@ -264,6 +264,8 @@ func end_drag() -> void:
 func get_entity_type_name() -> String:
 	if entity_name.contains("Cinta"):
 		return "conveyor"
+	elif entity_name.contains("Ultimate-Máquina"):
+		return "ultimate_fusion_machine"
 	elif entity_name.contains("Super-Máquina"):
 		return "super_fusion_machine"
 	elif entity_name.contains("Máquina"):
