@@ -103,14 +103,6 @@ func _load_from_json() -> void:
 			
 			if elem.get("es_base", false):
 				base_materials.append(nombre)
-		
-		print("\n📋 Mapa de elementos ID->Nombre cargado:")
-		for id in element_id_to_name.keys():
-			print("   ", id, " → '", element_id_to_name[id], "'")
-		
-		print("\n📋 Mapa de elementos Nombre->ID cargado:")
-		for nombre in element_name_to_id.keys():
-			print("   '", nombre, "' → ", element_name_to_id[nombre])
 	
 	# Cargar combinaciones
 	if data.has("combinaciones"):
@@ -119,9 +111,7 @@ func _load_from_json() -> void:
 		for elem in data["elementos"]:
 			id_to_name[elem["id"]] = elem["nombre"]
 		
-		print("📋 Mapa de elementos ID->Nombre:")
-		for id in id_to_name.keys():
-			print("   ", id, " -> ", id_to_name[id])
+		
 		
 		# Ahora procesar las combinaciones
 		for combo in data["combinaciones"]:
@@ -146,15 +136,8 @@ func _load_from_json() -> void:
 			if key1 != key2:  # Evitar duplicados cuando mat1 == mat2
 				recipes[key2] = resultado_nombre
 			
-			print("✅ Receta: ", mat1_nombre, " + ", mat2_nombre, " = ", resultado_nombre)
+		
 	
-	print("📦 Materiales base: ", base_materials.size())
-	print("🔧 Recetas cargadas: ", recipes.size(), " combinaciones")
-	print("📚 Elementos totales: ", elements.size())
-	print("\n📚 TODAS LAS RECETAS CARGADAS:")
-	for key in recipes.keys():
-		print("   ", key, " -> ", recipes[key])
-
 
 ## FALLBACK: Datos hardcodeados por si falla JSON
 func _load_hardcoded_data() -> void:

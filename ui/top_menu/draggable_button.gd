@@ -105,8 +105,7 @@ func _on_gui_input(event: InputEvent) -> void:
 			is_touch_inside = true
 			start_drag()
 			accept_event()  # Marcar el evento como manejado
-	else:
-		print("❓ Evento desconocido en botón: ", event.get_class())
+	
 
 
 func _process(_delta: float) -> void:
