@@ -1,6 +1,6 @@
 # Factory Flow
 
-Juego móvil 2D de gestión de producción desarrollado en Godot Engine 4.x. Combina materiales usando cintas transportadoras y máquinas de fusión para crear nuevos productos.
+Juego móvil 2D de gestión de producción desarrollado en Godot Engine 4.5.x Combina materiales usando cintas transportadoras y máquinas de fusión para crear nuevos productos.
 
 ## 🎮 Concepto del Juego
 
@@ -10,13 +10,20 @@ Factory Flow es un juego tipo puzzle/automation donde debes:
 3. **Coloca máquinas de fusión** para combinar 2 materiales
 4. **Crea productos nuevos** siguiendo las recetas correctas
 
+## 📱 Descarga APK
+
+Descarga la versión móvil del juego desde Google Drive:
+
+[📥 Descargar APK](https://drive.google.com/file/d/1QJDowwDNnp39xfBweskqGYQwNYcXD6sE/view?usp=sharing)
+
+**Nota:** Asegúrate de permitir la instalación de aplicaciones de fuentes desconocidas en tu dispositivo Android.
+
 ## 📋 Requisitos Previos
 
-Antes de empezar, asegúrate de tener instalado:
+Antes de empezar asegúrate de tener instalado:
 
 - **Godot Engine 4.x** - [Descargar aquí](https://godotengine.org/download)
   - Versión recomendada: 4.2 o superior
-  - Puedes usar la versión estándar o Mono (C#)
 
 ## 🚀 Configuración Inicial
 
@@ -54,7 +61,7 @@ La primera vez que abras el proyecto:
 - Godot importará automáticamente todos los assets
 - Esto puede tomar unos minutos dependiendo del tamaño del proyecto
 - Verás una barra de progreso de importación
-- Los archivos `.import` se generarán automáticamente (estos están en `.gitignore`)
+- Los archivos `.import` se generarán automáticamente
 
 ## ▶️ Ejecutar el Proyecto
 
@@ -63,6 +70,8 @@ Una vez abierto el proyecto en el editor:
 1. **Presiona F5** o haz clic en el botón **"Play"** (▶️) en la esquina superior derecha
 2. Si es la primera vez, Godot te pedirá que selecciones la escena principal
 3. Selecciona la escena de inicio del proyecto
+
+Listo, ya puedes empezar a jugar.
 
 ### Atajos de Teclado Útiles
 
@@ -89,8 +98,3 @@ Una vez abierto el proyecto en el editor:
   git checkout --theirs archivo.import
   ```
 
-## 📝 Notas Adicionales
-
-- **NO** subas archivos `.import` al repositorio (ya están en `.gitignore`)
-- **NO** subas la carpeta `.godot/` (ya está en `.gitignore`)
-- Si agregas assets grandes (>10MB), considera usar Git LFS
