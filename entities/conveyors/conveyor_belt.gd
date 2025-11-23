@@ -41,7 +41,7 @@ func _process(delta: float) -> void:
 ## Callback cuando se coloca en el grid
 func on_placed_in_grid(cell: Vector2i) -> void:
 	current_cell = cell
-	print("Conveyor colocado en: ", cell, " dirección: ", get_direction_name())
+	
 
 
 ## Rota la dirección de la cinta 90 grados (sentido horario)
@@ -58,7 +58,7 @@ func rotate_direction() -> void:
 	
 	update_direction()
 	update_visual()
-	print("🔄 Cinta en [", current_cell, "] rotada a: ", get_direction_name())
+	
 
 
 ## Actualiza el vector de dirección según el enum
@@ -99,7 +99,6 @@ func get_direction_name() -> String:
 ## Acepta un item desde otra entidad
 func accept_item(item: Item) -> bool:
 	if current_item != null:
-		print("   ⏸️ Conveyor [", current_cell, "] ocupada, rechazando item")
 		return false  # Ya hay un item aquí
 	
 	current_item = item
@@ -111,8 +110,6 @@ func accept_item(item: Item) -> bool:
 	# Mover el item a la posición de esta cinta
 	if GameManager.current_grid:
 		item.move_to_position(global_position)
-	
-	print("   ✅ Conveyor [", current_cell, "] dir:", get_direction_name(), " aceptó item:", item.item_type)
 	return true
 
 
@@ -128,11 +125,10 @@ func transfer_item_to_next() -> void:
 	# Calcular la siguiente celda basada en la dirección
 	var next_cell = grid.get_adjacent_cell(current_cell, direction_vector)
 	
-	print("🔄 Conveyor [", current_cell, "] dir:", get_direction_name(), " vector:", direction_vector, " → next:", next_cell)
+	
 	
 	# Verificar si la celda existe
 	if not grid.is_valid_cell(next_cell):
-		print("   ⚠️ Celda fuera de límites - destruyendo item")
 		current_item.destroy()
 		current_item = null
 		return

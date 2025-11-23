@@ -210,33 +210,20 @@ func _load_hardcoded_data() -> void:
 		"Madera+Vidrio": "Ventana con marco de madera",
 		"Vidrio+Madera": "Ventana con marco de madera"
 	}
-	print("📦 Usando datos hardcodeados - TODAS las combinaciones cargadas")
-	print("🔬 Total de recetas:", recipes.size() / 2, "(", recipes.size(), "combinaciones con orden)")
-
+	
 
 ## Verifica si existe una receta válida con dos materiales
 func check_recipe(material_a: String, material_b: String) -> String:
 	var key1 = material_a + "+" + material_b
 	var key2 = material_b + "+" + material_a
 	
-	print("\n🔍 VERIFICANDO RECETA:")
-	print("   Material A: '", material_a, "'")
-	print("   Material B: '", material_b, "'")
-	print("   Clave 1: '", key1, "'")
-	print("   Clave 2: '", key2, "'")
-	print("   Total recetas disponibles: ", recipes.size())
-	
 	if recipes.has(key1):
 		var resultado = recipes[key1]
-		print("   ✅ RECETA ENCONTRADA (key1): ", resultado)
 		return resultado
 	elif recipes.has(key2):
 		var resultado = recipes[key2]
-		print("   ✅ RECETA ENCONTRADA (key2): ", resultado)
 		return resultado
 	else:
-		print("   ❌ RECETA NO ENCONTRADA")
-		print("   Primeras 5 recetas disponibles:")
 		var count = 0
 		for k in recipes.keys():
 			if count < 5:
@@ -271,9 +258,6 @@ func register_fusion() -> void:
 ## Registra una fusión completada en el array de objetivos
 func register_completed_fusion(product: String) -> void:
 	completed_fusions.append(product)
-	print("🎯 Fusión registrada: ", product)
-	print("📊 Fusiones completadas hasta ahora: ", completed_fusions)
-	print("   Total de productos creados: ", completed_fusions.size())
 
 
 ## Muestra el contenido completo del array de fusiones
@@ -293,16 +277,12 @@ func reset_stats() -> void:
 	items_produced = 0
 	successful_fusions = 0
 	completed_fusions.clear()
-	print("📊 Estadísticas reiniciadas")
-	print("   Array de fusiones limpiado")
 
 
 ## Obtiene el ID de un elemento por su nombre
 func get_element_id_by_name(element_name: String) -> int:
 	var result = element_name_to_id.get(element_name, -1)
 	if result == -1:
-		print("⚠️ get_element_id_by_name: No se encontró ID para '", element_name, "'")
-		print("   Elementos disponibles en mapa:")
 		for name in element_name_to_id.keys():
 			if name.contains("bebidas") or name.contains("Biblioteca"):
 				print("      '", name, "' → ", element_name_to_id[name])
@@ -313,8 +293,4 @@ func get_element_id_by_name(element_name: String) -> int:
 func get_element_name_by_id(element_id: int) -> String:
 	if element_id_to_name.has(element_id):
 		return element_id_to_name[element_id]
-	
-	print("⚠️ get_element_name_by_id: No se encontró nombre para ID ", element_id)
-	print("   Tamaño del mapa element_id_to_name: ", element_id_to_name.size())
-	print("   IDs disponibles: ", element_id_to_name.keys())
 	return ""

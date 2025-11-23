@@ -307,7 +307,7 @@
 		{
 			"numero": 2,
 			"nombre": "Nivel 2 - Super Fusiones",
-			"monedas_iniciales": 1500,
+			"monedas_iniciales": 2000,
 			"economia": {
 				"cinta": 10,
 				"maquina": 50,
@@ -315,14 +315,18 @@
 				"reembolso_porcentaje": 60
 			},
 			"objetivos": [
-				16
+				16,
+				17,
+				19,
+				20,
+				21
 			]
 		},
 		{
 			"numero": 3,
 			"nombre": "Nivel 3 - Fusiones Definitivas",
 			"monedas_iniciales": 2000,
-			"tiempo_limite_segundos": 900,
+			"tiempo_limite_segundos": 1080,
 			"economia": {
 				"cinta": 10,
 				"maquina": 50,
