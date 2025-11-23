@@ -1,0 +1,218 @@
+[gd_scene load_steps=12 format=3 uid="uid://cl4ypxvb3bddi"]
+
+[ext_resource type="Script" uid="uid://3pw82fsnpjux" path="res://ui/top_menu/top_menu.gd" id="1_topmenu"]
+[ext_resource type="Script" uid="uid://d2qvy781cecv3" path="res://ui/top_menu/draggable_button.gd" id="2_draggable"]
+[ext_resource type="PackedScene" uid="uid://c4mnvf0p7jtgk" path="res://entities/conveyors/conveyor_belt.tscn" id="3_conveyor"]
+[ext_resource type="PackedScene" uid="uid://bhptg6oky5hma" path="res://entities/machines/fusion_machine.tscn" id="4_machine"]
+[ext_resource type="Texture2D" uid="uid://b218gcsh47q7d" path="res://assets/images/conveyor_belt_up.png" id="5_conv_up"]
+[ext_resource type="Texture2D" uid="uid://x7fx1ekd1hvy" path="res://assets/images/conveyor_belt_down.png" id="6_conv_down"]
+[ext_resource type="Texture2D" uid="uid://b8m2mkkp4b1nj" path="res://assets/images/conveyor_belt_left.png" id="7_conv_left"]
+[ext_resource type="Texture2D" uid="uid://c30psxtpjyfo" path="res://assets/images/conveyor_belt_right.png" id="8_conv_right"]
+[ext_resource type="Texture2D" uid="uid://u855jaktkmnw" path="res://assets/images/fusion_machine_level_one.png" id="9_machine"]
+[ext_resource type="Texture2D" uid="uid://b38r7ktxlneqs" path="res://assets/images/boton_pause.png" id="10_pause_btn"]
+[ext_resource type="Texture2D" uid="uid://dg7u6hy9a3p4o" path="res://assets/images/almanaque.png" id="11_almanac_btn"]
+
+[node name="TopMenu" type="CanvasLayer"]
+script = ExtResource("1_topmenu")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 10.0
+offset_bottom = 80.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 0
+
+[node name="ConveyorUpContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ConveyorUpBtn" type="TextureButton" parent="Panel/HBoxContainer/ConveyorUpContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("5_conv_up")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("3_conveyor")
+entity_name = "Cinta Arriba"
+conveyor_direction = 0
+
+[node name="Label" type="Label" parent="Panel/HBoxContainer/ConveyorUpContainer/ConveyorUpBtn"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "↑"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConveyorDownContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ConveyorDownBtn" type="TextureButton" parent="Panel/HBoxContainer/ConveyorDownContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("6_conv_down")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("3_conveyor")
+entity_name = "Cinta Abajo"
+conveyor_direction = 1
+
+[node name="Label" type="Label" parent="Panel/HBoxContainer/ConveyorDownContainer/ConveyorDownBtn"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "↓"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConveyorLeftContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ConveyorLeftBtn" type="TextureButton" parent="Panel/HBoxContainer/ConveyorLeftContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("7_conv_left")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("3_conveyor")
+entity_name = "Cinta Izquierda"
+conveyor_direction = 2
+
+[node name="Label" type="Label" parent="Panel/HBoxContainer/ConveyorLeftContainer/ConveyorLeftBtn"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "←"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConveyorRightContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ConveyorRightBtn" type="TextureButton" parent="Panel/HBoxContainer/ConveyorRightContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("8_conv_right")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("3_conveyor")
+entity_name = "Cinta Derecha"
+
+[node name="Label" type="Label" parent="Panel/HBoxContainer/ConveyorRightContainer/ConveyorRightBtn"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "→"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MachineContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="MachineBtn" type="TextureButton" parent="Panel/HBoxContainer/MachineContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("9_machine")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("2_draggable")
+entity_scene = ExtResource("4_machine")
+entity_name = "Máquina de Fusión"
+
+[node name="Spacer" type="Control" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeleteButtonContainer" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="AlmanacButtonContainer" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="AlmanacBtn" type="TextureButton" parent="Panel/HBoxContainer/AlmanacButtonContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("11_almanac_btn")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="PauseButtonContainer" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="PauseBtn" type="TextureButton" parent="Panel/HBoxContainer/PauseButtonContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture_normal = ExtResource("10_pause_btn")
+ignore_texture_size = true
+stretch_mode = 5

@@ -1,0 +1,116 @@
+[gd_scene load_steps=3 format=3 uid="uid://d1wugicvltxee"]
+
+[ext_resource type="Script" uid="uid://ckfqh0osx7nqr" path="res://Scripts/username_modal.gd" id="1_4jbm6"]
+[ext_resource type="FontFile" uid="uid://by8s55j3r8lk" path="res://assets/scenes/dogica.ttf" id="2_4sxs6"]
+
+[node name="UsernameModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4jbm6")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -393.0
+offset_top = -307.0
+offset_right = 385.0
+offset_bottom = 293.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -136.5
+offset_top = -60.0
+offset_right = 136.5
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_4sxs6")
+text = "BIENVENIDO/A!"
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AvatarRect" type="TextureRect" parent="Panel/VBoxContainer/CenterContainer"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SelectAvatarButton" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Subir foto"
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_4sxs6")
+text = "Escribe tu nombre de jugador..."
+
+[node name="UsernameEdit" type="LineEdit" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_4sxs6")
+
+[node name="CharCounterLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_4sxs6")
+theme_override_font_sizes/font_size = 14
+text = "0/10 caracteres"
+horizontal_alignment = 1
+
+[node name="ErrorLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.04000002, 0.04000002, 1)
+theme_override_fonts/font = ExtResource("2_4sxs6")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="OkButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_4sxs6")
+text = "Continuar"
+
+[node name="RandomButton" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_4sxs6")
+text = "Nombre aleatorio"
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.png", "*.jpg", "**.jpeg")
+
+[connection signal="pressed" from="Panel/VBoxContainer/SelectAvatarButton" to="." method="_on_SelectAvatarButton_pressed"]
+[connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/OkButton" to="." method="_on_OkButton_pressed"]
+[connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/RandomButton" to="." method="_on_RandomButton_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]

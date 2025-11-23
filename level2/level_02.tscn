@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3 uid="uid://c7xnavb8qrjmn"]
+
+[ext_resource type="Script" uid="uid://ccp4n1el75piy" path="res://level2/level_02.gd" id="1_level"]
+[ext_resource type="Texture2D" uid="uid://blpam2wh31oww" path="res://assets/images/fondo2.png" id="2_5gtkc"]
+[ext_resource type="PackedScene" uid="uid://c8y0xm7g5xn1s" path="res://entities/grid/grid.tscn" id="2_grid"]
+[ext_resource type="PackedScene" uid="uid://cl4ypxvb3bddi" path="res://ui/top_menu/top_menu.tscn" id="3_topmenu"]
+[ext_resource type="PackedScene" uid="uid://b64mfv6yhiwm" path="res://level_modal/pause_menu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" uid="uid://fjbmcj6nn7ig" path="res://ui/top_menu/fusion_almanac.tscn" id="5_almanac"]
+
+[node name="Level02" type="Node2D"]
+script = ExtResource("1_level")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 4.0
+offset_right = 2.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_5gtkc")
+expand_mode = 1
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(571, 324)
+
+[node name="Grid" parent="." instance=ExtResource("2_grid")]
+position = Vector2(51, 110)
+cell_size = 50
+grid_width = 20
+grid_height = 10
+
+[node name="TopMenu" parent="." instance=ExtResource("3_topmenu")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("4_pause")]
+
+[node name="FusionAlmanac" parent="." instance=ExtResource("5_almanac")]

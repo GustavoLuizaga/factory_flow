@@ -1,0 +1,344 @@
+{
+	"elementos": [
+		{
+			"id": 1,
+			"nombre": "Papel",
+			"es_base": true
+		},
+		{
+			"id": 2,
+			"nombre": "Metal",
+			"es_base": true
+		},
+		{
+			"id": 3,
+			"nombre": "Plastico",
+			"es_base": true
+		},
+		{
+			"id": 4,
+			"nombre": "Madera",
+			"es_base": true
+		},
+		{
+			"id": 5,
+			"nombre": "Vidrio",
+			"es_base": true
+		},
+		{
+			"id": 6,
+			"nombre": "Lata con etiqueta",
+			"es_base": false
+		},
+		{
+			"id": 7,
+			"nombre": "Botella con etiqueta",
+			"es_base": false
+		},
+		{
+			"id": 8,
+			"nombre": "Libro",
+			"es_base": false
+		},
+		{
+			"id": 9,
+			"nombre": "Caja de carton prensado",
+			"es_base": false
+		},
+		{
+			"id": 10,
+			"nombre": "Botella con tapa metalica",
+			"es_base": false
+		},
+		{
+			"id": 11,
+			"nombre": "Cable recubierto",
+			"es_base": false
+		},
+		{
+			"id": 12,
+			"nombre": "Herramienta con mango de madera",
+			"es_base": false
+		},
+		{
+			"id": 13,
+			"nombre": "Botella con tapa plastica",
+			"es_base": false
+		},
+		{
+			"id": 14,
+			"nombre": "Juguete",
+			"es_base": false
+		},
+		{
+			"id": 15,
+			"nombre": "Ventana con marco de madera",
+			"es_base": false
+		},
+		{
+			"id": 16,
+			"nombre": "Pack de bebidas reciclado",
+			"es_base": false
+		},
+		{
+			"id": 17,
+			"nombre": "Biblioteca reciclada",
+			"es_base": false
+		},
+		{
+			"id": 18,
+			"nombre": "Coleccion de envases",
+			"es_base": false
+		},
+		{
+			"id": 19,
+			"nombre": "Kit electrico reciclado",
+			"es_base": false
+		},
+		{
+			"id": 20,
+			"nombre": "Botella de coleccion",
+			"es_base": false
+		},
+		{
+			"id": 21,
+			"nombre": "Invernadero basico",
+			"es_base": false
+		},
+		{
+			"id": 22,
+			"nombre": "E-book",
+			"es_base": false
+		},
+		{
+			"id": 23,
+			"nombre": "Botella con sorpresa",
+			"es_base": false
+		},
+		{
+			"id": 24,
+			"nombre": "Casa infantil de juguetes",
+			"es_base": false
+		},
+		{
+			"id": 25,
+			"nombre": "Centro educativo de reciclaje",
+			"es_base": false
+		},
+		{
+			"id": 26,
+			"nombre": "Taller de proyectos domésticos reciclados",
+			"es_base": false
+		},
+		{
+			"id": 27,
+			"nombre": "Invernadero experimental",
+			"es_base": false
+		},
+		{
+			"id": 28,
+			"nombre": "Estación educativa interactiva",
+			"es_base": false
+		},
+		{
+			"id": 29,
+			"nombre": "Taller de manualidades",
+			"es_base": false
+		}
+	],
+	"combinaciones": [
+		{
+			"elemento1": 1,
+			"elemento2": 2,
+			"resultado": 6,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 1,
+			"elemento2": 5,
+			"resultado": 7,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 1,
+			"elemento2": 3,
+			"resultado": 8,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 1,
+			"elemento2": 4,
+			"resultado": 9,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 2,
+			"elemento2": 5,
+			"resultado": 10,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 2,
+			"elemento2": 3,
+			"resultado": 11,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 2,
+			"elemento2": 4,
+			"resultado": 12,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 3,
+			"elemento2": 5,
+			"resultado": 13,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 3,
+			"elemento2": 4,
+			"resultado": 14,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 4,
+			"elemento2": 5,
+			"resultado": 15,
+			"maquina": "Fusion Basica"
+		},
+		{
+			"elemento1": 6,
+			"elemento2": 7,
+			"resultado": 16,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 8,
+			"elemento2": 9,
+			"resultado": 17,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 6,
+			"elemento2": 10,
+			"resultado": 18,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 11,
+			"elemento2": 12,
+			"resultado": 19,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 7,
+			"elemento2": 10,
+			"resultado": 20,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 13,
+			"elemento2": 15,
+			"resultado": 21,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 8,
+			"elemento2": 11,
+			"resultado": 22,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 13,
+			"elemento2": 14,
+			"resultado": 23,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 15,
+			"elemento2": 14,
+			"resultado": 24,
+			"maquina": "Super Fusion"
+		},
+		{
+			"elemento1": 17,
+			"elemento2": 18,
+			"resultado": 26,
+			"maquina": "Fusion definitiva"
+		},
+		{
+			"elemento1": 16,
+			"elemento2": 19,
+			"resultado": 25,
+			"maquina": "Fusion definitiva"
+		},
+		{
+			"elemento1": 21,
+			"elemento2": 24,
+			"resultado": 27,
+			"maquina": "Fusion definitiva"
+		},
+		{
+			"elemento1": 22,
+			"elemento2": 20,
+			"resultado": 28,
+			"maquina": "Fusion definitiva"
+		},
+		{
+			"elemento1": 23,
+			"elemento2": 24,
+			"resultado": 29,
+			"maquina": "Fusion definitiva"
+		}
+	],
+	"niveles": [
+		{
+			"numero": 1,
+			"nombre": "Nivel 1 - Introducción",
+			"objetivos": [
+				6,
+				7,
+				8,
+				9,
+				10
+			]
+		},
+		{
+			"numero": 2,
+			"nombre": "Nivel 2 - Super Fusiones",
+			"monedas_iniciales": 2000,
+			"economia": {
+				"cinta": 10,
+				"maquina": 50,
+				"super_maquina": 100,
+				"reembolso_porcentaje": 60
+			},
+			"objetivos": [
+				16,
+				17,
+				19,
+				20,
+				21
+			]
+		},
+		{
+			"numero": 3,
+			"nombre": "Nivel 3 - Fusiones Definitivas",
+			"monedas_iniciales": 2000,
+			"tiempo_limite_segundos": 1080,
+			"economia": {
+				"cinta": 10,
+				"maquina": 50,
+				"super_maquina": 100,
+				"ultimate_maquina": 150,
+				"reembolso_porcentaje": 60
+			},
+			"objetivos": [
+				26,
+				25,
+				29
+			]
+		}
+	]
+}

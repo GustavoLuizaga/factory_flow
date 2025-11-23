@@ -1,0 +1,53 @@
+[gd_scene load_steps=3 format=3 uid="uid://82jqlksfujti"]
+
+[ext_resource type="Script" uid="uid://cuqihbixjfedm" path="res://level_modal/reinicio_nivel.gd" id="1_hf1ce"]
+[ext_resource type="Texture2D" path="res://assets/images/Sin_monedas.png" id="1_opeoy"]
+
+[node name="ReinicioNivel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hf1ce")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1142.0
+offset_bottom = -648.0
+color = Color(1, 1, 1, 0)
+
+[node name="TextureRect" type="TextureRect" parent="ColorRect"]
+layout_mode = 1
+offset_left = 402.0
+offset_top = 185.0
+offset_right = 771.0
+offset_bottom = 408.0
+texture = ExtResource("1_opeoy")
+expand_mode = 1
+
+[node name="MenuButton" type="TextureButton" parent="ColorRect/TextureRect"]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 113.0
+offset_right = 172.0
+offset_bottom = 162.0
+
+[node name="Reintentar" type="TextureButton" parent="ColorRect/TextureRect"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.64100003
+anchor_top = -0.535
+anchor_right = -0.64100003
+anchor_bottom = -0.535
+offset_left = 428.529
+offset_top = 234.305
+offset_right = 573.529
+offset_bottom = 281.305
+
+[connection signal="pressed" from="ColorRect/TextureRect/MenuButton" to="." method="_on_menu_button_pressed"]
+[connection signal="pressed" from="ColorRect/TextureRect/Reintentar" to="." method="_on_reintentar_pressed"]

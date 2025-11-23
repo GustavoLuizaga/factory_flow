@@ -1,0 +1,176 @@
+extends Node2D
+class_name Grid
+
+## Sistema de grilla/tablero donde se colocan entidades
+## Gestiona el snap, colisiones y posicionamiento
+
+@export var cell_size: int = 64
+@export var grid_width: int = 10
+@export var grid_height: int = 12
+
+var occupied_cells: Dictionary = {}  # Vector2i -> Entity
+var entities: Array = []
+
+@onready var background: TextureRect = $Background
+
+
+func _ready() -> void:
+	GameManager.current_grid = self
+	setup_background()
+	draw_grid_lines()
+
+
+## Configura el fondo del grid
+func setup_background() -> void:
+	if background:
+		var horizontal_margin := 50  # Mantener el margen horizontal
+		var top_margin := 40  # Margen superior
+		var bottom_margin := 15  # Margen inferior reducido
+		var vertical_offset := 16  # Desplazamiento hacia abajo
+		
+		background.position = Vector2(-horizontal_margin, -top_margin + vertical_offset)
+		background.size = Vector2(
+			grid_width * cell_size + horizontal_margin * 2,
+			grid_height * cell_size + top_margin + bottom_margin
+		)
+		background.custom_minimum_size = background.size
+
+
+## Dibuja las líneas del grid para visualización
+func draw_grid_lines() -> void:
+	queue_redraw()
+
+
+func _draw() -> void:
+	# Dibujar líneas horizontales y verticales
+	for x in range(grid_width + 1):
+		draw_line(
+			Vector2(x * cell_size, 0),
+			Vector2(x * cell_size, grid_height * cell_size),
+			Color(0.3, 0.3, 0.35, 0.5),
+			1.0
+		)
+	
+	for y in range(grid_height + 1):
+		draw_line(
+			Vector2(0, y * cell_size),
+			Vector2(grid_width * cell_size, y * cell_size),
+			Color(0.3, 0.3, 0.35, 0.5),
+			1.0
+		)
+
+
+## Convierte una posición del mundo a coordenadas de celda
+func world_to_grid(world_pos: Vector2) -> Vector2i:
+	# Convertir la posición global del mundo a posición local del grid
+	var local_pos = to_local(world_pos)
+	
+	# Calcular la celda
+	var cell = Vector2i(
+		int(floor(local_pos.x / cell_size)),
+		int(floor(local_pos.y / cell_size))
+	)
+	
+	return cell
+
+
+## Convierte coordenadas de celda a posición del mundo (centro de la celda)
+func grid_to_world(grid_pos: Vector2i) -> Vector2:
+	return global_position + Vector2(
+		grid_pos.x * cell_size + cell_size / 2,
+		grid_pos.y * cell_size + cell_size / 2
+	)
+
+
+## Verifica si una celda está dentro de los límites del grid
+func is_valid_cell(cell: Vector2i) -> bool:
+	return cell.x >= 0 and cell.x < grid_width and cell.y >= 0 and cell.y < grid_height
+
+
+## Verifica si una celda está ocupada
+func is_cell_occupied(cell: Vector2i) -> bool:
+	return occupied_cells.has(cell)
+
+
+## Verifica si hay un item (producto o material) en una celda específica
+func has_item_at_cell(cell: Vector2i) -> bool:
+	# Buscar entre todos los hijos del grid si hay un item en esa celda
+	for child in get_children():
+		if child is Item:
+			if child.current_cell == cell:
+				return true
+	return false
+
+
+## Obtiene la entidad en una celda específica
+func get_entity_at(cell: Vector2i) -> Node:
+	return occupied_cells.get(cell, null)
+
+
+## DEBUG: Imprime todas las entidades en el grid
+func debug_print_all_entities() -> void:
+	print("\n=== MAPA DEL GRID ===")
+	for cell in occupied_cells.keys():
+		var entity = occupied_cells[cell]
+		var entity_info = ""
+		
+		if entity is ConveyorBelt:
+			entity_info = "Conveyor(" + entity.get_direction_name() + ")"
+		elif entity is MaterialSpawner:
+			entity_info = "Spawner(" + entity.material_type + ")"
+		else:
+			entity_info = entity.get_class()
+		
+		print("  [", cell, "] = ", entity_info)
+	print("===================\n")
+
+
+## Coloca una entidad en el grid
+func place_entity(entity: Node2D, cell: Vector2i) -> bool:
+	if not is_valid_cell(cell):
+		print("❌ Celda fuera de límites: ", cell)
+		return false
+	
+	if is_cell_occupied(cell):
+		print("❌ Celda ocupada: ", cell, " por: ", occupied_cells[cell].name)
+		return false
+	
+	# NUEVO: Verificar si hay un item en la celda
+	if has_item_at_cell(cell):
+		print("❌ No se puede colocar: hay un item en la celda ", cell)
+		return false
+	
+	# Colocar entidad
+	occupied_cells[cell] = entity
+	entities.append(entity)
+	
+	# Posicionar en el mundo
+	entity.global_position = grid_to_world(cell)
+	
+	# Notificar a la entidad
+	if entity.has_method("on_placed_in_grid"):
+		entity.on_placed_in_grid(cell)
+	
+	var entity_type = "?"
+	if entity is ConveyorBelt:
+		entity_type = "Conveyor(" + entity.get_direction_name() + ")"
+	elif entity is MaterialSpawner:
+		entity_type = "Spawner(" + entity.material_type + ")"
+	else:
+		entity_type = entity.get_class()
+	
+	print("✅ Entidad colocada: ", entity_type, " en celda [", cell, "]")
+	return true
+
+
+## Remueve una entidad del grid
+func remove_entity(cell: Vector2i) -> void:
+	if occupied_cells.has(cell):
+		var entity = occupied_cells[cell]
+		occupied_cells.erase(cell)
+		entities.erase(entity)
+
+
+## Obtiene la celda adyacente en una dirección
+func get_adjacent_cell(cell: Vector2i, direction: Vector2) -> Vector2i:
+	return cell + Vector2i(int(direction.x), int(direction.y))

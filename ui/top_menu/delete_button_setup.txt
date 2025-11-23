@@ -1,0 +1,80 @@
+# Instrucciones para configurar el botón de borrar en Godot
+
+Para agregar el botón de borrar al top_menu, sigue estos pasos en el editor de Godot:
+
+1. **Abrir la escena top_menu.tscn**
+
+2. **Crear el contenedor del botón:**
+   - Selecciona el nodo `Panel/HBoxContainer`
+   - Clic derecho → Add Child Node
+   - Busca y crea un `MarginContainer`
+   - Renómbralo a "DeleteContainer"
+
+3. **Configurar el MarginContainer:**
+   - En el Inspector, sección Theme Overrides → Constants:
+	 - margin_left: 10
+	 - margin_right: 10
+	 - margin_top: 10
+	 - margin_bottom: 10
+
+4. **Crear el botón:**
+   - Selecciona `DeleteContainer`
+   - Clic derecho → Add Child Node
+   - Busca y crea un `TextureButton`
+   - Renómbralo a "DeleteBtn"
+
+5. **Configurar el botón (si no tienes textura):**
+   - En el Inspector, sección `Rect`:
+	 - Custom Minimum Size: (64, 64)
+   - Agregar un ColorRect como hijo:
+	 - Color: rojo (1, 0, 0, 1)
+	 - Size: (64, 64)
+   - Agregar un Label como hijo del ColorRect:
+	 - Text: "🗑️" o "X"
+	 - Horizontal Alignment: Center
+	 - Vertical Alignment: Center
+	 - Font Size: 32
+	 - Outline Size: 2
+
+6. **Si tienes una textura de icono de borrar:**
+   - Arrastra la imagen al proyecto
+   - En el Inspector del DeleteBtn:
+	 - Texture Normal: [tu textura]
+	 - Ignore Texture Size: ✓ (activado)
+	 - Stretch Mode: Keep Aspect Centered
+
+7. **Guardar la escena (Ctrl+S)**
+
+El código ya está listo para usar el botón. Solo necesitas crear la estructura visual en el editor.
+
+ALTERNATIVA RÁPIDA:
+Si prefieres, puedes crear el botón programáticamente agregando esto al final de _ready() en top_menu.gd:
+
+```gdscript
+# Crear botón de borrar si no existe
+if not delete_btn:
+	var delete_container = MarginContainer.new()
+	delete_container.name = "DeleteContainer"
+	$Panel/HBoxContainer.add_child(delete_container)
+	
+	delete_btn = TextureButton.new()
+	delete_btn.name = "DeleteBtn"
+	delete_btn.custom_minimum_size = Vector2(64, 64)
+	delete_container.add_child(delete_btn)
+	
+	# Crear visual simple
+	var color_rect = ColorRect.new()
+	color_rect.color = Color(0.8, 0.2, 0.2, 1)
+	color_rect.size = Vector2(64, 64)
+	delete_btn.add_child(color_rect)
+	
+	var label = Label.new()
+	label.text = "🗑️"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	label.add_theme_font_size_override("font_size", 32)
+	color_rect.add_child(label)
+	
+	delete_btn.pressed.connect(_on_delete_btn_pressed)
+```

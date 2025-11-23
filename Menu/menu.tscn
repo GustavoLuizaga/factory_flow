@@ -1,0 +1,135 @@
+[gd_scene load_steps=10 format=3 uid="uid://7lylhtm1rwho"]
+
+[ext_resource type="Script" uid="uid://c6vwlw74xnpjb" path="res://Scripts/menu.gd" id="1_ihied"]
+[ext_resource type="Texture2D" uid="uid://beo1rtu3t4qxj" path="res://assets/images/Fondo_Menu.png" id="1_rwxi6"]
+[ext_resource type="FontFile" uid="uid://by8s55j3r8lk" path="res://assets/scenes/dogica.ttf" id="3_8w4re"]
+[ext_resource type="Texture2D" uid="uid://gsn5c8h5a504" path="res://assets/images/TituloJuego.png" id="3_raj00"]
+[ext_resource type="PackedScene" uid="uid://d1wugicvltxee" path="res://Menu/username_modal.tscn" id="5_ofseh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_raj00"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8w4re"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ofseh"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w6voe"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ihied")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.58506185, 0.5850621, 0.5850621, 1)
+
+[node name="TextureRect" type="TextureRect" parent="ColorRect"]
+modulate = Color(0.89492244, 0.89492244, 0.8949224, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_rwxi6")
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -521.0
+offset_top = -23.0
+offset_right = 524.0
+offset_bottom = 244.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 60
+
+[node name="SeleccionNivel" type="Button" parent="ColorRect/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_8w4re")
+theme_override_font_sizes/font_size = 55
+theme_override_styles/normal = SubResource("StyleBoxFlat_raj00")
+text = " Iniciar Juego "
+
+[node name="Opciones" type="Button" parent="ColorRect/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_8w4re")
+theme_override_font_sizes/font_size = 55
+theme_override_styles/normal = SubResource("StyleBoxFlat_8w4re")
+text = " Opciones "
+
+[node name="Salir" type="Button" parent="ColorRect/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_8w4re")
+theme_override_font_sizes/font_size = 55
+theme_override_styles/normal = SubResource("StyleBoxFlat_ofseh")
+text = " Salir "
+
+[node name="TextureRect2" type="TextureRect" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -326.0
+offset_top = -45.0
+offset_right = 325.0
+offset_bottom = 327.0
+grow_horizontal = 2
+texture = ExtResource("3_raj00")
+
+[node name="UsernameModal" parent="." instance=ExtResource("5_ofseh")]
+layout_mode = 1
+
+[node name="UserMenu" type="MenuButton" parent="."]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = 75.0
+grow_horizontal = 0
+text = "Usuario"
+flat = false
+icon_alignment = 0
+
+[connection signal="pressed" from="ColorRect/VBoxContainer/SeleccionNivel" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="ColorRect/VBoxContainer/Opciones" to="." method="_on_button_2_pressed"]
+[connection signal="pressed" from="ColorRect/VBoxContainer/Salir" to="." method="_on_button_3_pressed"]
