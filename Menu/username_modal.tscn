@@ -78,6 +78,13 @@ text = "Escribe tu nombre de jugador..."
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_4sxs6")
 
+[node name="CharCounterLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_4sxs6")
+theme_override_font_sizes/font_size = 14
+text = "0/10 caracteres"
+horizontal_alignment = 1
+
 [node name="ErrorLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.04000002, 0.04000002, 1)

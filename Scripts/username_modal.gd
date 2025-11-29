@@ -7,6 +7,7 @@ signal username_confirmed(username: String)
 @onready var username_edit: LineEdit = $Panel/VBoxContainer/UsernameEdit
 @onready var error_label: Label      = $Panel/VBoxContainer/ErrorLabel
 @onready var title_label: Label      = $Panel/VBoxContainer/TitleLabel
+@onready var char_counter_label: Label = $Panel/VBoxContainer/CharCounterLabel
 #@onready var trophy_icon: TextureRect = $Panel/VBoxContainer/TrophyIcon
 @onready var ok_button: Button       = $Panel/VBoxContainer/HBoxContainer/OkButton
 @onready var random_button: Button   = $Panel/VBoxContainer/HBoxContainer/RandomButton
@@ -18,6 +19,9 @@ const DEFAULT_AVATAR: Texture2D = preload("res://assets/images/avatar_default.pn
 
 # Ruta del avatar elegido para este modal (user://...)
 var _selected_avatar_path: String = ""
+
+# Modo de edición: si es true, estamos editando un perfil existente
+var is_edit_mode: bool = false
 
 func _ready() -> void:
 	# Empieza oculto; lo abrirá el menú si hace falta
@@ -35,17 +39,85 @@ func _ready() -> void:
 	_setup_panel_style()
 	_setup_text_style()
 	_setup_buttons_style()
+	
+	# Conectar señal para actualizar contador de caracteres
+	if username_edit:
+		username_edit.text_changed.connect(_on_username_text_changed)
 
 # Llamar a esto para mostrar el modal
-func open() -> void:
+# edit_mode: si es true, carga los datos del perfil actual para editarlos
+func open(edit_mode: bool = false) -> void:
+	is_edit_mode = edit_mode
 	visible = true
+	
 	if error_label:
 		error_label.text = ""
-	if username_edit:
-		username_edit.text = ""
-		username_edit.grab_focus()
-	# Si quieres pausar el resto del juego (en menú no es tan grave, pero sirve):
-	#get_tree().paused = true
+	
+	if is_edit_mode:
+		# Modo edición: cargar datos del perfil actual
+		var profile := ProgressManager.get_current_profile()
+		
+		# Cargar nombre actual
+		if username_edit:
+			username_edit.text = profile.get("username", "")
+			username_edit.grab_focus()
+		
+		# Cargar avatar actual
+		if avatar_rect:
+			avatar_rect.texture = ProgressManager.get_avatar_texture()
+		
+		# Guardar la ruta del avatar actual
+		_selected_avatar_path = profile.get("avatar_path", "")
+		
+		# Cambiar título
+		if title_label:
+			title_label.text = "EDITAR PERFIL"
+		
+		# Cambiar texto del botón OK
+		if ok_button:
+			ok_button.text = "Guardar Cambios"
+		
+		# Ocultar botón de nombre aleatorio en modo edición
+		if random_button:
+			random_button.visible = false
+		
+		# Mostrar cuántos cambios quedan
+		var remaining := ProgressManager.get_remaining_name_changes()
+		if char_counter_label:
+			if remaining > 0:
+				char_counter_label.text = "Cambios restantes: %d/5" % remaining
+				char_counter_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
+			else:
+				char_counter_label.text = "Sin cambios disponibles (0/5)"
+				char_counter_label.add_theme_color_override("font_color", Color(1, 0.35, 0.35))
+				# Deshabilitar edición si no quedan cambios
+				if username_edit:
+					username_edit.editable = false
+				if ok_button:
+					ok_button.disabled = true
+	else:
+		# Modo creación: limpiar campos
+		if username_edit:
+			username_edit.text = ""
+			username_edit.grab_focus()
+		
+		if avatar_rect:
+			avatar_rect.texture = DEFAULT_AVATAR
+		
+		_selected_avatar_path = ""
+		
+		if title_label:
+			title_label.text = "BIENVENIDO/A!"
+		
+		if ok_button:
+			ok_button.text = "Continuar"
+		
+		if random_button:
+			random_button.visible = true
+		
+		# Ocultar contador en modo creación
+		if char_counter_label:
+			char_counter_label.visible = false
 
 
 func _close() -> void:
@@ -66,21 +138,56 @@ func _on_RandomButton_pressed() -> void:
 
 # Lógica común para ambos botones que llama al backend
 func _confirm_username(raw_name: String) -> void:
-	# 1) El backend asegura que haya usuario (crea o selecciona)
-	var final_name := ProgressManager.ensure_simple_user(raw_name)
-
-	if final_name == "":
-		# Caso muy raro: algo falló guardando
-		error_label.text = "No se pudo crear el perfil."
-		return
-
-	# 2) Si se eligió un avatar, lo guardamos en el perfil
-	if _selected_avatar_path != "":
-		ProgressManager.set_avatar(_selected_avatar_path)
+	if is_edit_mode:
+		# Modo edición: actualizar perfil existente
+		raw_name = raw_name.strip_edges()
 		
-	# 3) Avisamos al menu que el usuario ya esta listo
-	username_confirmed.emit(final_name)
-	_close()
+		# Validar que no esté vacío
+		if raw_name == "":
+			error_label.text = "El nombre no puede estar vacío."
+			return
+		
+		# Validar longitud máxima
+		if raw_name.length() > 6:
+			error_label.text = "Máximo 6 caracteres."
+			return
+		
+		# Intentar actualizar el nombre
+		var success := ProgressManager.update_username(raw_name)
+		
+		if not success:
+			# Verificar si fue por límite de cambios o nombre duplicado
+			if ProgressManager.get_remaining_name_changes() == 0:
+				error_label.text = "Límite de cambios alcanzado."
+			else:
+				# El nombre ya está en uso
+				error_label.text = "Ese nombre ya está en uso."
+			return
+		
+		# Si se eligió un nuevo avatar, actualizarlo
+		if _selected_avatar_path != "":
+			ProgressManager.set_avatar(_selected_avatar_path)
+		
+		# Emitir señal con el nombre actualizado
+		username_confirmed.emit(raw_name)
+		_close()
+	else:
+		# Modo creación: crear nuevo perfil
+		# 1) El backend asegura que haya usuario (crea o selecciona)
+		var final_name := ProgressManager.ensure_simple_user(raw_name)
+
+		if final_name == "":
+			# Caso muy raro: algo falló guardando
+			error_label.text = "No se pudo crear el perfil."
+			return
+
+		# 2) Si se eligió un avatar, lo guardamos en el perfil
+		if _selected_avatar_path != "":
+			ProgressManager.set_avatar(_selected_avatar_path)
+			
+		# 3) Avisamos al menu que el usuario ya esta listo
+		username_confirmed.emit(final_name)
+		_close()
 
 #=ESTILOS VISUALES
 # Panel tipo “cartel de nivel superado”
@@ -144,6 +251,7 @@ func _setup_text_style() -> void:
 		username_edit.add_theme_color_override("font_outline_color", Color(0, 0, 0))
 		username_edit.add_theme_constant_override("outline_size", 2)
 		username_edit.placeholder_text = "Escribe tu nombre de jugador..."
+		username_edit.max_length = 10  # <- Límite de 10 caracteres
 
 			# --- Hacer el campo más grueso ---
 		username_edit.custom_minimum_size = Vector2(0, 48)   # ← altura del campo
@@ -266,3 +374,26 @@ func _on_FileDialog_file_selected(path: String) -> void:
 
 	# Recordar la ruta para guardarla cuando se confirme el usuario
 	_selected_avatar_path = save_path
+
+
+# Actualiza el contador de caracteres mientras el usuario escribe
+func _on_username_text_changed(new_text: String) -> void:
+	if not char_counter_label:
+		return
+	
+	if is_edit_mode:
+		# En modo edición, mostrar caracteres usados
+		var remaining := ProgressManager.get_remaining_name_changes()
+		if remaining > 0:
+			char_counter_label.text = "Cambios restantes: %d/5 | %d/10 caracteres" % [remaining, new_text.length()]
+		else:
+			char_counter_label.text = "Sin cambios disponibles (0/5)"
+	else:
+		# En modo creación, solo mostrar caracteres
+		char_counter_label.text = "%d/10 caracteres" % new_text.length()
+		char_counter_label.visible = true
+		
+		if new_text.length() >= 10:
+			char_counter_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.2))
+		else:
+			char_counter_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))

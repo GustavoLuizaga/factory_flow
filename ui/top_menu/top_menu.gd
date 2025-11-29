@@ -17,11 +17,20 @@ signal delete_mode_changed(is_active: bool)
 @onready var label_left: Label = $Panel/HBoxContainer/ConveyorLeftContainer/ConveyorLeftBtn/Label
 @onready var label_right: Label = $Panel/HBoxContainer/ConveyorRightContainer/ConveyorRightBtn/Label
 
+var pause_btn: TextureButton = null
+var almanac_btn: TextureButton = null
 var delete_mode: bool = false
 var delete_btn: TextureButton = null  # Se crea dinámicamente
+var fusion_almanac: Node = null
 
 
 func _ready() -> void:
+	# Obtener el botón de pausa
+	pause_btn = $Panel/HBoxContainer/PauseButtonContainer/PauseBtn
+	
+	# Obtener el botón del almanaque
+	almanac_btn = $Panel/HBoxContainer/AlmanacButtonContainer/AlmanacBtn
+	
 	# Estilizar solo las etiquetas de las cintas
 	style_label(label_up)
 	style_label(label_down)
@@ -35,6 +44,20 @@ func _ready() -> void:
 	# Conectar el botón de borrar
 	if delete_btn:
 		delete_btn.pressed.connect(_on_delete_btn_pressed)
+	
+	# Conectar el botón de pausa
+	if pause_btn:
+		pause_btn.pressed.connect(_on_pause_btn_pressed)
+		print("✅ Botón de pausa conectado correctamente")
+	else:
+		print("❌ No se encontró el botón de pausa")
+	
+	# Conectar el botón del almanaque
+	if almanac_btn:
+		almanac_btn.pressed.connect(_on_almanac_btn_pressed)
+		print("✅ Botón del almanaque conectado correctamente")
+	else:
+		print("❌ No se encontró el botón del almanaque")
 	
 	# Conectar señales de los botones draggable para desactivar modo borrar
 	conveyor_up_btn.drag_started.connect(_on_any_drag_started)
@@ -109,36 +132,71 @@ func create_delete_button() -> void:
 
 	var delete_container = MarginContainer.new()
 	delete_container.name = "DeleteContainer"
-	delete_container.add_theme_constant_override("margin_left", 10)
-	delete_container.add_theme_constant_override("margin_right", 10)
-	delete_container.add_theme_constant_override("margin_top", 10)
-	delete_container.add_theme_constant_override("margin_bottom", 10)
-	hbox.add_child(delete_container)
+	delete_container.add_theme_constant_override("margin_left", 5)
+	delete_container.add_theme_constant_override("margin_right", 5)
+	delete_container.add_theme_constant_override("margin_top", 5)
+	delete_container.add_theme_constant_override("margin_bottom", 5)
 	
 	delete_btn = TextureButton.new()
 	delete_btn.name = "DeleteBtn"
 	
 	delete_btn.texture_normal = delete_icon_normal
 	delete_btn.ignore_texture_size = true 
-	delete_btn.custom_minimum_size = Vector2(50, 50)
+	delete_btn.custom_minimum_size = Vector2(60, 60)
 	
 	delete_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 
 	delete_container.add_child(delete_btn)
 	
+	# Insertar el botón delete antes del almanaque
+	# Encontrar índice del AlmanacButtonContainer
+	var almanac_container_index = -1
+	for i in range(hbox.get_child_count()):
+		if hbox.get_child(i).name == "AlmanacButtonContainer":
+			almanac_container_index = i
+			break
 	
-	# Crear fondo rojo (BORRADO)
-	#var color_rect = ColorRect.new()
-	#color_rect.color = Color(0.8, 0.2, 0.2, 1)
-	#color_rect.custom_minimum_size = Vector2(64, 64)
-	#color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	#delete_btn.add_child(color_rect)
-	
-	# Crear etiqueta con emoji (BORRADO)
-	#var label = Label.new()
-	#label.text = "🗑️"
-	#label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	# ... (más propiedades del label) ...
-	#color_rect.add_child(label)
+	if almanac_container_index >= 0:
+		hbox.add_child(delete_container)
+		hbox.move_child(delete_container, almanac_container_index)
+	else:
+		# Si no está, agregar antes del PauseButtonContainer
+		var pause_container_index = -1
+		for i in range(hbox.get_child_count()):
+			if hbox.get_child(i).name == "PauseButtonContainer":
+				pause_container_index = i
+				break
+		
+		if pause_container_index >= 0:
+			hbox.add_child(delete_container)
+			hbox.move_child(delete_container, pause_container_index)
+		else:
+			hbox.add_child(delete_container)
 	
 	print("✅ Botón de borrar con imagen PNG creado exitosamente")
+
+
+## Callback cuando se presiona el botón del almanaque
+func _on_almanac_btn_pressed() -> void:
+	# Buscar el almanaque de fusiones en el nivel actual
+	var current_scene = get_tree().current_scene
+	var fusion_almanac = current_scene.find_child("FusionAlmanac", true, false)
+	
+	if fusion_almanac:
+		fusion_almanac.toggle_almanac()
+		print("📖 Botón del almanaque presionado")
+	else:
+		print("❌ No se encontró FusionAlmanac en la escena actual")
+
+
+## Callback cuando se presiona el botón de pausa
+func _on_pause_btn_pressed() -> void:
+	# Buscar el menú de pausa en el nivel actual
+	var current_scene = get_tree().current_scene
+	var pause_menu = current_scene.find_child("PauseMenu", true, false)
+	
+	if pause_menu:
+		pause_menu.toggle_pause()
+		print("⏸️ Botón de pausa presionado")
+	else:
+		print("❌ No se encontró PauseMenu en la escena actual")

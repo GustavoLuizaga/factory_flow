@@ -34,6 +34,9 @@ var element_name_to_id: Dictionary = {}
 # Tipos de materiales base disponibles
 var base_materials: Array[String] = []
 
+# Array con todos los elementos (para almanaque)
+var elements: Array[Dictionary] = []
+
 # Referencia al grid actual
 var current_grid: Node = null
 
@@ -86,11 +89,13 @@ func _load_from_json() -> void:
 	# Limpiar diccionarios
 	recipes.clear()
 	base_materials.clear()
+	elements.clear()
 	
-	# Cargar elementos base
+	# Cargar elementos
 	if data.has("elementos"):
 		# Primero cargar el mapa de IDs
 		for elem in data["elementos"]:
+			elements.append(elem)
 			var id = elem["id"]
 			var nombre = elem["nombre"]
 			element_id_to_name[id] = nombre
@@ -145,6 +150,7 @@ func _load_from_json() -> void:
 	
 	print("📦 Materiales base: ", base_materials.size())
 	print("🔧 Recetas cargadas: ", recipes.size(), " combinaciones")
+	print("📚 Elementos totales: ", elements.size())
 	print("\n📚 TODAS LAS RECETAS CARGADAS:")
 	for key in recipes.keys():
 		print("   ", key, " -> ", recipes[key])
@@ -153,7 +159,33 @@ func _load_from_json() -> void:
 ## FALLBACK: Datos hardcodeados por si falla JSON
 func _load_hardcoded_data() -> void:
 	print("⚠️ Usando datos hardcodeados de respaldo")
+	
+	# Limpiar y llenar elementos
+	elements.clear()
+	base_materials.clear()
+	
+	# Elementos base
+	elements.append({"id": 1, "nombre": "Papel", "es_base": true})
+	elements.append({"id": 2, "nombre": "Metal", "es_base": true})
+	elements.append({"id": 3, "nombre": "Plastico", "es_base": true})
+	elements.append({"id": 4, "nombre": "Madera", "es_base": true})
+	elements.append({"id": 5, "nombre": "Vidrio", "es_base": true})
+	
+	# Elementos de fusión
+	elements.append({"id": 6, "nombre": "Lata con etiqueta", "es_base": false})
+	elements.append({"id": 7, "nombre": "Botella con etiqueta", "es_base": false})
+	elements.append({"id": 8, "nombre": "Libro", "es_base": false})
+	elements.append({"id": 9, "nombre": "Caja de carton prensado", "es_base": false})
+	elements.append({"id": 10, "nombre": "Botella con tapa metalica", "es_base": false})
+	elements.append({"id": 11, "nombre": "Cable recubierto", "es_base": false})
+	elements.append({"id": 12, "nombre": "Herramienta con mango de madera", "es_base": false})
+	elements.append({"id": 13, "nombre": "Botella con tapa plastica", "es_base": false})
+	elements.append({"id": 14, "nombre": "Juguete", "es_base": false})
+	elements.append({"id": 15, "nombre": "Ventana con marco de madera", "es_base": false})
+	
+	# Llenar base_materials
 	base_materials = ["Papel", "Metal", "Plastico", "Madera", "Vidrio"]
+	
 	recipes = {
 		# Lata con etiqueta (Papel + Metal)
 		"Papel+Metal": "Lata con etiqueta",
