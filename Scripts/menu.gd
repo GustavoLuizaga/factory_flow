@@ -44,9 +44,7 @@ func _on_button_pressed() -> void:
 
 
 func _on_button_2_pressed() -> void:
-	#pass # Replace with function body.
-	# Abrir pantalla de perfil/opciones
-	get_tree().change_scene_to_file("res://Menu/profile_screen.tscn")
+	pass # Replace with function body.
 
 
 func _on_button_3_pressed() -> void:
